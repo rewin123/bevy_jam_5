@@ -1,5 +1,6 @@
 Design doc - https://docs.google.com/document/d/1Fmn5A9aLNOFJ0A6bqsuo7XWaz2jTZ0GFZmN9Elpx3E4/edit?usp=sharing
 Miro design board - https://miro.com/welcomeonboard/aE5wcUFEUGJybGdJT1NHcXBybzBKanpWMDhXaEtNUWJlSWNDcmhvSVEzeFFEam5la3ZmZFlPWGc4OVFSS1k2UHwzNDU4NzY0NTk0ODE4NTA1NTkxfDI=?share_link_id=472846460666
+Task planning - https://github.com/users/rewin123/projects/6/views/1
 Global team info (time zones etc) - https://docs.google.com/spreadsheets/d/1XoyHA536f8EukFLZK38vWAHRh7u84ypvU8089tvwB3E/edit?usp=sharing
 
 
