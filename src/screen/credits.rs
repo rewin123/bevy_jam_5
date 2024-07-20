@@ -31,6 +31,14 @@ fn enter_credits(mut commands: Commands) {
         .insert(StateScoped(Screen::Credits))
         .with_children(|children| {
             children.header("Made by");
+
+            children.label("Gobbe");
+            children.label("ThierryBeaulieu");
+            children.label("Nickynah");
+            children.label("Rewin");
+            children.label("Naomi");
+
+            children.header("Template made by by");
             children.label("Alice - Foo");
             children.label("Bob - Bar");
 
