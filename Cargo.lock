@@ -829,6 +829,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "log",
+ "node_tree",
  "rand",
 ]
 
@@ -2607,6 +2608,13 @@ dependencies = [
  "cfg-if",
  "cfg_aliases 0.2.1",
  "libc",
+]
+
+[[package]]
+name = "node_tree"
+version = "0.1.0"
+dependencies = [
+ "bevy",
 ]
 
 [[package]]

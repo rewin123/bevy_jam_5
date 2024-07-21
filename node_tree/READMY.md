@@ -1,0 +1,1 @@
+Entities and compoents can be despawned with ReactCommands struct;
