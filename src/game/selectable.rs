@@ -3,11 +3,8 @@ use bevy_mod_outline::*;
 use bevy_mod_picking::prelude::*;
 
 pub(crate) fn plugin(app: &mut App) {
-    app.add_plugins(DefaultPickingPlugins);
-
     app.add_systems(Update, selectable_add);
 }
-
 
 #[derive(Component)]
 pub struct Selectable;
@@ -27,27 +24,22 @@ pub struct OnMouseOver;
 #[derive(Event)]
 pub struct OnMouseOut;
 
-fn selectable_add(
-    mut commands: Commands,
-    mut q_selectable: Query<Entity, Added<Selectable>>
-) {
-
+fn selectable_add(mut commands: Commands, mut q_selectable: Query<Entity, Added<Selectable>>) {
     for entity in q_selectable.iter() {
-        commands.entity(entity)
+        commands
+            .entity(entity)
             .insert(PickableBundle {
                 pickable: Pickable {
                     should_block_lower: true,
-                    is_hoverable: true
+                    is_hoverable: true,
                 },
                 ..default()
             })
-            .insert(
-            On::<Pointer<Click>>::run(
-                |mut event : ListenerMut<Pointer<Click>>, 
-                mut commands: Commands, 
-                mut q_selected: Query<Entity, With<Selected>>, 
-                mut q_selectable: Query<Entity, With<Selectable>>| 
-                {
+            .insert(On::<Pointer<Click>>::run(
+                |mut event: ListenerMut<Pointer<Click>>,
+                 mut commands: Commands,
+                 mut q_selected: Query<Entity, With<Selected>>,
+                 mut q_selectable: Query<Entity, With<Selectable>>| {
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }
@@ -68,11 +60,12 @@ fn selectable_add(
                     }
 
                     event.stop_propagation();
-                }
-            )).insert(On::<Pointer<Out>>::run(
-                |mut event : ListenerMut<Pointer<Out>>,
-                mut commands: Commands,
-                mut q_selectable: Query<Entity, With<Selectable>>| {
+                },
+            ))
+            .insert(On::<Pointer<Out>>::run(
+                |mut event: ListenerMut<Pointer<Out>>,
+                 mut commands: Commands,
+                 mut q_selectable: Query<Entity, With<Selectable>>| {
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }
@@ -80,12 +73,12 @@ fn selectable_add(
                     commands.trigger_targets(OnMouseOut, event.listener());
                     info!("OnMouseOut {}", event.listener());
                     event.stop_propagation();
-                }
+                },
             ))
             .insert(On::<Pointer<Over>>::run(
-                |mut event : ListenerMut<Pointer<Over>>,
-                mut commands: Commands,
-                q_selectable: Query<Entity, With<Selectable>>| {
+                |mut event: ListenerMut<Pointer<Over>>,
+                 mut commands: Commands,
+                 q_selectable: Query<Entity, With<Selectable>>| {
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }
@@ -93,8 +86,7 @@ fn selectable_add(
                     commands.trigger_targets(OnMouseOver, event.listener());
                     info!("OnMouseOver {}", event.listener());
                     event.stop_propagation();
-                }
+                },
             ));
-
     }
 }

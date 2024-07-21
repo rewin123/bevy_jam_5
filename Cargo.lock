@@ -614,30 +614,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_eventlistener"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "63aff74ac1477b88b57ff2f82fc711a7931414be7ee7d0e96aeea45b6d4a7cb6"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_eventlistener_derive",
- "bevy_hierarchy",
- "bevy_utils",
-]
-
-[[package]]
-name = "bevy_eventlistener_derive"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fc779559aa23b81da2b14fba90586755d225983c5b6d3154658e42fc088de7f"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.71",
-]
-
-[[package]]
 name = "bevy_gilrs"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -836,6 +812,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b7ce4266293629a2d10459cc112dffe3b3e9229a4f2b8a4d20061b8dd53316d0"
 dependencies = [
  "glam",
+]
+
+[[package]]
+name = "bevy_mod_outline"
+version = "0.8.0"
+dependencies = [
+ "bevy",
+ "bitfield",
+ "interpolation",
+ "nonmax",
+ "thiserror",
+ "wgpu-types",
 ]
 
 [[package]]
@@ -1059,6 +1047,7 @@ name = "bevy_quickstart"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_mod_outline",
  "bevy_mod_picking",
  "bevy_mod_stylebuilder",
  "bevy_quill",
