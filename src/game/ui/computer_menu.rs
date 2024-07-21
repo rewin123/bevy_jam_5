@@ -1,9 +1,7 @@
 use bevy::{prelude::*, ui};
 use bevy_mod_stylebuilder::*;
 use bevy_quill::prelude::*;
-use bevy_quill_obsidian::{colors, controls::Button};
-
-use super::SelectedItem;
+use bevy_quill_obsidian::controls::Button;
 
 #[derive(Clone, PartialEq)]
 pub(super) struct ComputerMenu;
