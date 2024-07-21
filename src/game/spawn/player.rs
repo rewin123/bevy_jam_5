@@ -28,21 +28,22 @@ fn spawn_player(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    asset_server: Res<AssetServer>,
 ) {
+    
 
-    let capsule = meshes.add(Capsule3d::new(0.3, 1.0));
-    let material = StandardMaterial {
-        base_color: Color::linear_rgb(1.0, 0.0, 0.0),
-        ..default()
-    };
+    // let capsule = asset_server.load("models/guy.glb#Scene0");
+    // let material = StandardMaterial {
+    //     base_color: Color::linear_rgb(1.0, 0.0, 0.0),
+    //     ..default()
+    // };
 
     commands.spawn((
         Name::new("Player"),
         Player,
-        PbrBundle {
-            mesh: capsule.clone(),
-            material: materials.add(material),
-            transform: Transform::from_translation(Vec3::new(5.0, 1.0, 5.0)),
+        SceneBundle {
+            scene: asset_server.load("models/guy.glb#Scene0"),
+            transform: Transform::from_translation(Vec3::new(5.0, 0.7, 5.0)).with_scale(Vec3::splat(0.25)),
             ..default()
         },
         MovementController::default(),

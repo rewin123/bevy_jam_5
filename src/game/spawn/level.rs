@@ -1,6 +1,6 @@
 //! Spawn the main level by triggering other observers.
 
-use bevy::prelude::*;
+use bevy::{pbr::ExtendedMaterial, prelude::*};
 use rand::Rng;
 
 use crate::game::{
@@ -115,6 +115,8 @@ fn spawn_level(
     });
 
     commands.add(SpawnEarth);
+
+    
 }
 
 fn setup_camera(_: Trigger<SpawnLevel>, mut q_cameras: Query<&mut Transform, With<Camera>>) {
