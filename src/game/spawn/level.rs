@@ -15,7 +15,7 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(Event, Debug)]
 pub struct SpawnLevel;
 
-fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands) {
+fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_server: Res<AssetServer>) {
     // The only thing we have in our level is a player,
     // but add things like walls etc. here.
     commands.trigger(SpawnPlayer);
@@ -30,6 +30,12 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands) {
     });
 
     commands.insert_resource(TimeSpeed::Normal);
+
+    commands.spawn(SceneBundle {
+        scene: asset_server.load("models/pc.glb#Scene0"),
+        transform: Transform::from_translation(Vec3::new(4.0, 0.9, 5.0)).with_scale(Vec3::splat(0.5)),
+        ..default()
+    });
 }
 
 
