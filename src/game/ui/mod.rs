@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_quill::View;
 
+use super::resources::Water;
 use super::selectable::Computer;
 use super::selectable::OnDeselect;
 use super::selectable::OnSelect;
@@ -40,11 +41,13 @@ impl Default for SelectedItem {
 fn spawn_root_ui(
     _trigger: Trigger<SpawnLevel>,
     camera_q: Query<Entity, With<IsDefaultUiCamera>>,
+    mut water: ResMut<Water>,
     mut commands: Commands,
 ) {
     let Ok(entity) = camera_q.get_single() else {
         return ();
     };
+    water.amount = water.amount + 1.0;
 
     commands.spawn(root::RootUi { camera: entity }.to_root());
 }
