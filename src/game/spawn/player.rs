@@ -26,33 +26,26 @@ pub struct Player;
 fn spawn_player(
     _trigger: Trigger<SpawnPlayer>,
     mut commands: Commands,
-    image_handles: Res<HandleMap<ImageKey>>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    // A texture atlas is a way to split one image with a grid into multiple sprites.
-    // By attaching it to a [`SpriteBundle`] and providing an index, we can specify which section of the image we want to see.
-    // We will use this to animate our player character. You can learn more about texture atlases in this example:
-    // https://github.com/bevyengine/bevy/blob/latest/examples/2d/texture_atlas.rs
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 2, Some(UVec2::splat(1)), None);
-    let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let player_animation = PlayerAnimation::new();
+
+    let capsule = meshes.add(Capsule3d::new(0.3, 1.0));
+    let material = StandardMaterial {
+        base_color: Color::linear_rgb(1.0, 0.0, 0.0),
+        ..default()
+    };
 
     commands.spawn((
         Name::new("Player"),
         Player,
-        SpriteBundle {
-            texture: image_handles[&ImageKey::Ducky].clone_weak(),
-            transform: Transform::from_scale(Vec2::splat(8.0).extend(1.0)),
-            ..Default::default()
-        },
-        TextureAtlas {
-            layout: texture_atlas_layout.clone(),
-            index: player_animation.get_atlas_index(),
+        PbrBundle {
+            mesh: capsule.clone(),
+            material: materials.add(material),
+            transform: Transform::from_translation(Vec3::new(5.0, 1.0, 5.0)),
+            ..default()
         },
         MovementController::default(),
-        Movement { speed: 420.0 },
-        WrapWithinWindow,
-        player_animation,
-        StateScoped(Screen::Playing),
+        Movement { speed: 5.0 },
     ));
 }

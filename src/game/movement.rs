@@ -7,6 +7,8 @@ use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::AppSet;
 
+use super::daycycle::GameTime;
+
 pub(super) fn plugin(app: &mut App) {
     // Record directional input as movement controls.
     app.register_type::<MovementController>();
@@ -61,20 +63,28 @@ fn record_movement_controller(
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 pub struct Movement {
-    /// Since Bevy's default 2D camera setup is scaled such that
-    /// one unit is one pixel, you can think of this as
-    /// "How many pixels per second should the player move?"
-    /// Note that physics engines may use different unit/pixel ratios.
     pub speed: f32,
 }
 
 fn apply_movement(
-    time: Res<Time>,
+    time: Res<GameTime>,
     mut movement_query: Query<(&MovementController, &Movement, &mut Transform)>,
+    mut q_camera: Query<&Transform, (With<Camera>, Without<Movement>)>
 ) {
+    let Ok(cam_transform) = q_camera.get_single() else {return;};
+
     for (controller, movement, mut transform) in &mut movement_query {
         let velocity = movement.speed * controller.0;
-        transform.translation += velocity.extend(0.0) * time.delta_seconds();
+
+        let cam_frw = cam_transform.forward();
+        let up = Vec3::new(cam_frw.x, 0.0, cam_frw.z).normalize_or_zero();
+
+        let cam_right = cam_transform.right();
+        let right = Vec3::new(cam_right.x, 0.0, cam_right.z).normalize_or_zero();
+
+        let velocity = right * velocity.x + up * velocity.y;
+
+        transform.translation += velocity * time.delta_seconds();
     }
 }
 
