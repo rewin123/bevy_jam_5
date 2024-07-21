@@ -28,62 +28,79 @@ pub struct MetalTrash {
     pub amount: f32,
 }
 
-#[derive(Resource, Default)]
+#[derive(Resource)]
 pub struct Water {
     pub amount: f32,
-    pub limit: f32
+    pub limit: f32,
+}
+
+impl Default for Water {
+    fn default() -> Self {
+        Self {
+            amount: 50.0,
+            limit: 100.0,
+        }
+    }
 }
 
 #[derive(Resource, Default)]
 pub struct BadWater {
     pub amount: f32,
-    pub limit: f32
+    pub limit: f32,
 }
 
 /// Oxygen in ship
-#[derive(Resource, Default)]
+#[derive(Resource)]
 pub struct Oxygen {
     pub amount: f32,
-    pub limit: f32
+    pub limit: f32,
 }
 
+impl Default for Oxygen {
+    fn default() -> Self {
+        Self {
+            amount: 50.0,
+            limit: 100.0,
+        }
+    }
+}
 
 /// Oxygen in ship air
 #[derive(Resource, Default)]
 pub struct OxygenInAir {
     pub amount: f32,
-    pub limit: f32
+    pub limit: f32,
 }
 
 /// How many carbon is in the air. If its too many, then you will die
 #[derive(Resource, Default)]
 pub struct CarbonInAir {
     pub amount: f32,
-    pub limit: f32
+    pub limit: f32,
 }
 
 #[derive(Resource, Default)]
 pub struct Pee {
     pub amount: f32,
-    pub limit: f32
+    pub limit: f32,
 }
 
 #[derive(Resource, Default)]
 pub struct Food {
     pub amount: f32,
-    pub limit: f32
+    pub limit: f32,
 }
 
 #[derive(Resource, Default)]
 pub struct Hydrogen {
     pub amount: f32,
-    pub limit: f32
+    pub limit: f32,
 }
 
 #[derive(Resource, Default)]
 pub struct Electricity {
     pub total: f32, //how many electricity can be used. If used > total, then all electricity generators will be shut off
-    pub used : f32 //how many electricity was used in last tick
+    pub used: f32,  //how many electricity was used in last tick
 }
 
 #[derive(Resource, Default)]
@@ -93,8 +110,8 @@ pub struct Temperature {
 
 #[cfg(feature = "dev")]
 mod dev {
-    use bevy::prelude::*;
     use crate::dev_tools::DebugPanel;
+    use bevy::prelude::*;
 
     use super::*;
 
@@ -117,18 +134,47 @@ mod dev {
         carbon_in_air: Res<CarbonInAir>,
         temperature: Res<Temperature>,
     ) {
-
         debug_panel.add("Metal", format!("Metal: {}", metal.amount));
-        debug_panel.add("Metal trash", format!("Metal trash: {}", metal_trash.amount));
+        debug_panel.add(
+            "Metal trash",
+            format!("Metal trash: {}", metal_trash.amount),
+        );
         debug_panel.add("Water", format!("Water: {}/{}", water.amount, water.limit));
-        debug_panel.add("Bad water", format!("Bad water: {}/{}", bad_water.amount, bad_water.limit));
-        debug_panel.add("Oxygen", format!("Oxygen: {}/{}", oxygen.amount, oxygen.limit));
-        debug_panel.add("Oxygen in air", format!("Oxygen in air: {}/{}", oxygen_in_air.amount, oxygen_in_air.limit));
+        debug_panel.add(
+            "Bad water",
+            format!("Bad water: {}/{}", bad_water.amount, bad_water.limit),
+        );
+        debug_panel.add(
+            "Oxygen",
+            format!("Oxygen: {}/{}", oxygen.amount, oxygen.limit),
+        );
+        debug_panel.add(
+            "Oxygen in air",
+            format!(
+                "Oxygen in air: {}/{}",
+                oxygen_in_air.amount, oxygen_in_air.limit
+            ),
+        );
         debug_panel.add("Pee", format!("Pee: {}/{}", pee.amount, pee.limit));
         debug_panel.add("Food", format!("Food: {}/{}", food.amount, food.limit));
-        debug_panel.add("Hydrogen", format!("Hydrogen: {}/{}", hydrogen.amount, hydrogen.limit));
-        debug_panel.add("Electricity", format!("Electricity: {}/{}", electricity.total, electricity.used));
-        debug_panel.add("Carbon in air", format!("Carbon in air: {}/{}", carbon_in_air.amount, carbon_in_air.limit));
-        debug_panel.add("Temperature", format!("Temperature: {} ℃", temperature.amount));
+        debug_panel.add(
+            "Hydrogen",
+            format!("Hydrogen: {}/{}", hydrogen.amount, hydrogen.limit),
+        );
+        debug_panel.add(
+            "Electricity",
+            format!("Electricity: {}/{}", electricity.total, electricity.used),
+        );
+        debug_panel.add(
+            "Carbon in air",
+            format!(
+                "Carbon in air: {}/{}",
+                carbon_in_air.amount, carbon_in_air.limit
+            ),
+        );
+        debug_panel.add(
+            "Temperature",
+            format!("Temperature: {} ℃", temperature.amount),
+        );
     }
 }
