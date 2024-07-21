@@ -47,16 +47,15 @@ fn selectable_add(mut commands: Commands, mut q_selectable: Query<Entity, Added<
                     let is_selected = q_selected.contains(event.listener());
                     if is_selected {
                         // Deselect will be in for loop
+                        for entity in q_selected.iter() {
+                            commands.entity(entity).remove::<Selected>();
+                            commands.trigger_targets(OnDeselect, entity);
+                            println!("OnDeselect {}", entity);
+                        }
                     } else {
                         commands.entity(event.listener()).insert(Selected);
                         commands.trigger_targets(OnSelect, event.listener());
                         println!("OnSelect {}", event.listener());
-                    }
-
-                    for entity in q_selected.iter() {
-                        commands.entity(entity).remove::<Selected>();
-                        commands.trigger_targets(OnDeselect, entity);
-                        println!("OnDeselect {}", entity);
                     }
 
                     event.stop_propagation();
