@@ -13,7 +13,7 @@ impl Command for SpawnOxygenGenerator {
 
         let bundle = SceneBundle {
             scene,
-            transform: Transform::from_translation(self.pos),
+            transform: Transform::from_translation(self.pos).with_scale(Vec3::splat(0.5)),
             ..default()
         };
 
@@ -23,6 +23,23 @@ impl Command for SpawnOxygenGenerator {
 }
 
 
-pub struct SpawnScene {
-    pub pos: Vec3,
+
+pub struct SpawnHydroponic {
+    pub pos: Vec3
+}
+
+
+impl Command for SpawnHydroponic {
+    fn apply(self, world: &mut World) {
+        let scene = world.resource::<AssetServer>().load("models/hydroponic.glb#Scene0");
+
+        let bundle = SceneBundle {
+            scene,
+            transform: Transform::from_translation(self.pos).with_scale(Vec3::splat(0.5)),
+            ..default()
+        };
+
+        world.spawn(bundle)
+            .insert(Selectable);
+    }
 }

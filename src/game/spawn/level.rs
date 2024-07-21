@@ -5,7 +5,7 @@ use rand::Rng;
 
 use crate::game::{daycycle::TimeSpeed, map::{ShipMap, Tile}, selectable::Selectable};
 
-use super::{player::SpawnPlayer, spawn_commands::SpawnOxygenGenerator};
+use super::{player::SpawnPlayer, spawn_commands::{SpawnHydroponic, SpawnOxygenGenerator}};
 
 pub(super) fn plugin(app: &mut App) {
     app.observe(spawn_level);
@@ -77,6 +77,10 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_serv
 
     commands.add(SpawnOxygenGenerator {
         pos: Vec3::new(3.0, 0.1, 7.0),
+    });
+
+    commands.add(SpawnHydroponic {
+        pos: Vec3::new(1.0, 0.1, 7.0),
     });
 }
 
