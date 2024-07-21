@@ -1,19 +1,13 @@
 use bevy::{prelude::*, ui};
 use bevy_mod_stylebuilder::*;
 use bevy_quill::{prelude::*, Dynamic, IntoViewChild};
-use bevy_quill_obsidian::{colors, controls::Button};
+use bevy_quill_obsidian::colors;
 
 use super::{computer_menu, SelectedItem};
 
 #[derive(Clone, PartialEq)]
 pub(super) struct ContextMenu;
 
-fn style_row(ss: &mut StyleBuilder) {
-    ss.display(Display::Flex)
-        .flex_direction(FlexDirection::Row)
-        .align_items(ui::AlignItems::Center)
-        .column_gap(4);
-}
 impl ViewTemplate for ContextMenu {
     type View = impl View;
 

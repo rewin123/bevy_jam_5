@@ -1,12 +1,5 @@
 use bevy::prelude::*;
-use bevy::ui;
-use bevy_mod_stylebuilder::*;
-use bevy_quill::prelude::*;
-use bevy_quill::{View, ViewTemplate};
-use bevy_quill_obsidian::colors;
-use bevy_quill_obsidian::controls::{Button, ButtonVariant, IconButton};
-use bevy_quill_obsidian::size::Size;
-use bevy_quill_obsidian::RoundedCorners;
+use bevy_quill::View;
 
 use super::selectable::Computer;
 use super::selectable::OnDeselect;
@@ -15,6 +8,7 @@ use super::spawn::level::SpawnLevel;
 
 mod computer_menu;
 mod context_menu;
+mod root;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<SelectedItem>();
@@ -52,7 +46,7 @@ fn spawn_root_ui(
         return ();
     };
 
-    commands.spawn((ConfigMenu { camera: entity }.to_root(), ConfigUiComponent));
+    commands.spawn(root::RootUi { camera: entity }.to_root());
 }
 
 fn clear_context_menu_position(
@@ -97,33 +91,4 @@ fn set_context_menu_position(
         return ();
     };
     context_menu.item = Some((entity, position, _trigger.event().0));
-}
-
-#[derive(Component, Clone)]
-pub struct ConfigUiComponent;
-
-#[derive(Clone, PartialEq)]
-struct ConfigMenu {
-    camera: Entity,
-}
-
-fn style_row(ss: &mut StyleBuilder) {
-    ss.display(Display::Flex)
-        .flex_direction(FlexDirection::Row)
-        .align_items(ui::AlignItems::Center)
-        .column_gap(4);
-}
-
-impl ViewTemplate for ConfigMenu {
-    type View = impl View;
-    fn create(&self, cx: &mut Cx) -> Self::View {
-        let context = cx.use_resource::<SelectedItem>();
-        let position = context.item;
-
-        Element::<NodeBundle>::new().children(
-            // If the position of the menu is `Some` we show the Context Menu
-            // Other wise we show nothing
-            Cond::new(position.is_some(), context_menu::ContextMenu, ()),
-        )
-    }
 }
