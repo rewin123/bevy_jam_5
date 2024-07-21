@@ -3,6 +3,8 @@ use bevy_mod_stylebuilder::*;
 use bevy_quill::prelude::*;
 use bevy_quill_obsidian::controls::Button;
 
+use super::StartWorking;
+
 #[derive(Clone, PartialEq)]
 pub(super) struct ComputerMenu;
 
@@ -12,6 +14,7 @@ fn style_row(ss: &mut StyleBuilder) {
         .align_items(ui::AlignItems::Center)
         .column_gap(4);
 }
+
 impl ViewTemplate for ComputerMenu {
     type View = impl View;
 
@@ -21,8 +24,11 @@ impl ViewTemplate for ComputerMenu {
             Element::<NodeBundle>::new()
                 .style(style_row)
                 .children((Button::new()
-                    .on_click(cx.create_callback(|| info!("clicked Recycle")))
-                    .children("Recycle"),)),
+                    .on_click(cx.create_callback(|mut events: EventWriter<StartWorking>| {
+                        events.send(StartWorking);
+                        info!("Clicked Work")
+                    }))
+                    .children("Work"),)),
         )
     }
 }

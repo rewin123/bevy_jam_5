@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use bevy_quill::View;
 
-use super::resources::Water;
 use super::selectable::Computer;
 use super::selectable::OnDeselect;
 use super::selectable::OnSelect;
@@ -13,12 +12,15 @@ mod root;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<SelectedItem>();
+    app.add_event::<StartWorking>();
     app.observe(spawn_root_ui);
     app.observe(open_context);
     app.observe(set_context_menu_position);
     app.observe(clear_context_menu_position);
-    // app.observe(spawn_ui);
 }
+
+#[derive(Event, Debug)]
+pub(super) struct StartWorking;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum ResourceType {
