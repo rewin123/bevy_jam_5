@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use bevy::{prelude::*, ui::update};
+use bevy::{input::{keyboard::{Key, KeyboardInput}, ButtonState}, prelude::*, ui::update};
 
 pub type GameTime = Time<GameTimeContext>;
 
@@ -8,7 +8,7 @@ pub struct GameTimePlugin;
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(DayDuration(30.0));
-    app.insert_resource(GameTimeOfDay(0));
+    app.insert_resource(DayPassed(0));
     app.insert_resource(TimeSpeed::Pause);
     app.insert_resource(DayState::Day);
     app.insert_resource(GameTime::default());
@@ -20,10 +20,15 @@ pub(crate) fn plugin(app: &mut App) {
 
     app.add_systems(PreUpdate, (time_speed, update_time).chain());
     app.add_systems(PreUpdate, day_events);
+    app.add_systems(Update, change_time_speed);
+
+    
+    #[cfg(feature = "dev")]
+    app.add_plugins(dev::plugin);
 }
 
 
-#[derive(Resource)]
+#[derive(Resource, Debug)]
 pub enum TimeSpeed {
     Pause,
     Normal,
@@ -38,7 +43,7 @@ pub enum TimeSpeed {
 pub struct DayDuration(f32);
 
 #[derive(Resource)]
-pub struct GameTimeOfDay(u32);
+pub struct DayPassed(u32);
 
 #[derive(Resource, Reflect, PartialEq)]
 pub enum DayState {
@@ -55,7 +60,7 @@ pub struct DayStart;
 fn day_events(
     mut commands: Commands, 
     day_duration: Res<DayDuration>,
-    mut day_pased: ResMut<GameTimeOfDay>, 
+    mut day_pased: ResMut<DayPassed>, 
     gametime: Res<GameTime>,
     mut day_state: ResMut<DayState>,
 //events
@@ -101,6 +106,32 @@ fn update_time(mut gametime: ResMut<GameTime>, real_time: Res<Time>) {
     gametime.advance_by(Duration::from_secs_f32(delta));
 }
 
+fn change_time_speed(mut keyboard_input: EventReader<KeyboardInput>, mut time_speed: ResMut<TimeSpeed>) {
+    for key in keyboard_input.read() {
+        if key.state != ButtonState::Pressed {
+            continue;
+        }
+        if key.key_code == KeyCode::BracketRight {
+            *time_speed = match *time_speed {
+                TimeSpeed::Pause => TimeSpeed::Normal,
+                TimeSpeed::Normal => TimeSpeed::Fast,
+                TimeSpeed::Fast => TimeSpeed::Fast2,
+                TimeSpeed::Fast2 => TimeSpeed::Fast3,
+                TimeSpeed::Fast3 => TimeSpeed::Pause,
+            }
+        } else if key.key_code == KeyCode::BracketLeft {
+            *time_speed = match *time_speed {
+                TimeSpeed::Pause => TimeSpeed::Fast3,
+                TimeSpeed::Normal => TimeSpeed::Pause,
+                TimeSpeed::Fast => TimeSpeed::Normal,
+                TimeSpeed::Fast2 => TimeSpeed::Fast,
+                TimeSpeed::Fast3 => TimeSpeed::Fast2,
+            }
+        }
+    }
+
+    keyboard_input.clear();
+}
 
 #[derive(Default)]
 pub struct GameTimeContext {
@@ -110,5 +141,23 @@ pub struct GameTimeContext {
 impl GameTimeContext {
     pub fn set_relative_speed(&mut self, speed: f32) {
         self.relative_speed = speed;
+    }
+}
+
+#[cfg(feature = "dev")]
+mod dev {
+    use bevy::prelude::*;
+    use super::*;
+    use crate::dev_tools::*;
+
+    pub(crate) fn plugin(app: &mut App) {
+        app.add_systems(Update, show_gametime);
+    }
+
+    fn show_gametime(mut debug_planer: ResMut<DebugPanel>, day_passed: Res<DayPassed>, gametime: Res<GameTime>, time_speed: Res<TimeSpeed>) {
+        debug_planer.add("Day passed", format!("Day: {}", day_passed.0));
+        debug_planer.add("Gametime", format!("Time: {:.1}", gametime.elapsed_seconds()));
+
+        debug_planer.add("Time speed", format!("Time speed: {:?}", *time_speed));
     }
 }
