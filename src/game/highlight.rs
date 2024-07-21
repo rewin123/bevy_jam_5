@@ -21,7 +21,7 @@ fn recursive_add_highlight(entity : Entity, commands: &mut Commands, q_children:
     commands.entity(entity)
         .insert(
             OutlineBundle {
-                outline: OutlineVolume { visible: true, width: 3.0, colour: Color::linear_rgba(0.5, 0.5, 1.0, 0.5) },
+                outline: OutlineVolume { visible: true, width: 3.0, colour: Color::linear_rgba(1.0, 1.0, 0.0, 0.7) },
                 mode: OutlineMode::RealVertex,
                 ..default()
             }

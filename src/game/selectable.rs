@@ -69,6 +69,31 @@ fn selectable_add(
 
                     event.stop_propagation();
                 }
+            )).insert(On::<Pointer<Out>>::run(
+                |mut event : ListenerMut<Pointer<Out>>,
+                mut commands: Commands,
+                mut q_selectable: Query<Entity, With<Selectable>>| {
+                    if !q_selectable.contains(event.listener()) {
+                        return;
+                    }
+
+                    commands.trigger_targets(OnMouseOut, event.listener());
+                    info!("OnMouseOut {}", event.listener());
+                    event.stop_propagation();
+                }
+            ))
+            .insert(On::<Pointer<Over>>::run(
+                |mut event : ListenerMut<Pointer<Over>>,
+                mut commands: Commands,
+                mut q_selectable: Query<Entity, With<Selectable>>| {
+                    if !q_selectable.contains(event.listener()) {
+                        return;
+                    }
+
+                    commands.trigger_targets(OnMouseOver, event.listener());
+                    info!("OnMouseOver {}", event.listener());
+                    event.stop_propagation();
+                }
             ));
 
     }
