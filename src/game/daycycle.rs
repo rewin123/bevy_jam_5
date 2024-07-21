@@ -42,7 +42,7 @@ pub enum TimeSpeed {
 
 // Day duration in seconds
 #[derive(Resource)]
-pub struct DayDuration(f32);
+pub struct DayDuration(pub f32);
 
 #[derive(Resource)]
 pub struct DayPassed(u32);

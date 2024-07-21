@@ -10,7 +10,7 @@ use crate::game::{
 
 use super::{
     player::SpawnPlayer,
-    spawn_commands::{SpawnHydroponic, SpawnOxygenGenerator},
+    spawn_commands::{SpawnEarth, SpawnHydroponic, SpawnOxygenGenerator},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -113,6 +113,8 @@ fn spawn_level(
     commands.add(SpawnHydroponic {
         pos: Vec3::new(1.0, 0.1, 7.0),
     });
+
+    commands.add(SpawnEarth);
 }
 
 fn setup_camera(_: Trigger<SpawnLevel>, mut q_cameras: Query<&mut Transform, With<Camera>>) {
