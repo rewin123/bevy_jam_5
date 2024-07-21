@@ -5,18 +5,19 @@ use bevy::prelude::*;
 mod animation;
 pub mod assets;
 pub mod audio;
+pub mod auto_anim;
+mod character;
+pub mod components;
 mod daycycle;
 mod debt;
 mod highlight;
 mod map;
 mod movement;
+pub mod resources;
 mod selectable;
 pub mod spawn;
-pub mod ui;
-pub mod components;
-pub mod resources;
 pub mod sprite_material;
-pub mod auto_anim;
+pub mod ui;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
@@ -32,12 +33,13 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_plugins((
         daycycle::plugin,
+        character::plugin,
         debt::plugin,
         map::plugin,
         selectable::plugin,
         highlight::plugin,
         components::plugin,
         resources::plugin,
-        sprite_material::SpriteMaterialPlugin
+        sprite_material::SpriteMaterialPlugin,
     ));
 }
