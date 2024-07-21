@@ -13,16 +13,51 @@ use super::selectable::OnSelect;
 use super::spawn::level::SpawnLevel;
 
 pub(super) fn plugin(app: &mut App) {
-    app.observe(spawn_ui);
+    app.init_resource::<ContextMenu>();
+    app.observe(spawn_root_ui);
+    app.observe(set_context_menu_position);
+    app.observe(clear_context_menu_position);
+    // app.observe(spawn_ui);
 }
 
-fn spawn_ui(
-    _trigger: Trigger<OnSelect>,
+#[derive(Resource)]
+struct ContextMenu {
+    position: Option<Vec2>,
+    // TODO Add menu type, computer, metal, etc.
+}
+
+impl Default for ContextMenu {
+    fn default() -> Self {
+        Self { position: None }
+    }
+}
+
+fn spawn_root_ui(
+    _trigger: Trigger<SpawnLevel>,
+    camera_q: Query<Entity, With<IsDefaultUiCamera>>,
     mut commands: Commands,
+) {
+    let Ok(entity) = camera_q.get_single() else {
+        return ();
+    };
+
+    commands.spawn((ConfigMenu { camera: entity }.to_root(), ConfigUiComponent));
+}
+
+fn clear_context_menu_position(
+    _trigger: Trigger<OnDeselect>,
+    mut context_menu: ResMut<ContextMenu>,
+) {
+    context_menu.position = None;
+}
+
+fn set_context_menu_position(
+    _trigger: Trigger<OnSelect>,
     global_transform_q: Query<&GlobalTransform, Without<IsDefaultUiCamera>>,
     camera_q: Query<(Entity, &Camera, &GlobalTransform), With<IsDefaultUiCamera>>,
+    mut context_menu: ResMut<ContextMenu>,
 ) {
-    let Ok((entity, camera, camera_transform)) = camera_q.get_single() else {
+    let Ok((_, camera, camera_transform)) = camera_q.get_single() else {
         return ();
     };
     let Ok(transform) = global_transform_q.get(_trigger.entity()) else {
@@ -32,15 +67,7 @@ fn spawn_ui(
     let Some(position) = camera.world_to_viewport(camera_transform, transform.translation()) else {
         return ();
     };
-
-    commands.spawn((
-        ConfigMenu {
-            camera: entity,
-            position,
-        }
-        .to_root(),
-        ConfigUiComponent,
-    ));
+    context_menu.position = Some(position);
 }
 
 #[derive(Component, Clone)]
@@ -49,7 +76,6 @@ pub struct ConfigUiComponent;
 #[derive(Clone, PartialEq)]
 struct ConfigMenu {
     camera: Entity,
-    position: Vec2,
 }
 
 fn container_style(ss: &mut StyleBuilder) {
@@ -62,7 +88,7 @@ fn container_style(ss: &mut StyleBuilder) {
         .width(20)
         .height(20)
         .row_gap(4)
-        .background_color(colors::U2);
+        .background_color(colors::TRANSPARENT);
 }
 
 fn style_row(ss: &mut StyleBuilder) {
@@ -75,31 +101,38 @@ fn style_row(ss: &mut StyleBuilder) {
 impl ViewTemplate for ConfigMenu {
     type View = impl View;
     fn create(&self, cx: &mut Cx) -> Self::View {
-        let click = cx.create_callback(|| {
-            info!("Clicked!");
-        });
-        Element::<NodeBundle>::new()
-            .insert_dyn(TargetCamera, self.camera)
-            .style_dyn(
-                |position, style_builder| {
-                    style_builder
-                        .flex_direction(FlexDirection::Column)
-                        .position(ui::PositionType::Absolute)
-                        .padding(3)
-                        .top(position.y)
-                        .left(position.x)
-                        .width(100)
-                        .height(100)
-                        .row_gap(4)
-                        .background_color(colors::U2);
-                },
-                self.position,
-            )
-            .children((
-                "Variants",
-                Element::<NodeBundle>::new()
-                    .style(style_row)
-                    .children((Button::new().on_click(click).children("Default"),)),
-            ))
+        let context = cx.use_resource::<ContextMenu>();
+        let position = context.position;
+
+        // let click = cx.create_callback(|| {
+        //     info!("Clicked!");
+        // });
+        Element::<NodeBundle>::new().children(Cond::new(
+            position.is_some(),
+            Element::<NodeBundle>::new()
+                .insert_dyn(TargetCamera, self.camera)
+                .style_dyn(
+                    |position, style_builder| {
+                        style_builder
+                            .flex_direction(FlexDirection::Column)
+                            .position(ui::PositionType::Absolute)
+                            .padding(3)
+                            .top(position.unwrap().y)
+                            .left(position.unwrap().x)
+                            .width(100)
+                            .height(100)
+                            .row_gap(4)
+                            .background_color(colors::U2);
+                    },
+                    context.position,
+                )
+                .children((
+                    "Variants",
+                    Element::<NodeBundle>::new()
+                        .style(style_row)
+                        .children((Button::new().children("Default"),)),
+                )),
+            (),
+        ))
     }
 }
