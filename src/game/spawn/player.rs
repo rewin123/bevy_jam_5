@@ -40,13 +40,13 @@ fn spawn_player(
 
     commands.spawn((
         Name::new("Player"),
-        // Player,
+        Player,
         SceneBundle {
             scene: asset_server.load("models/guy.glb#Scene0"),
             transform: Transform::from_translation(Vec3::new(5.0, 0.7, 5.0)).with_scale(Vec3::splat(0.25)),
             ..default()
         },
-        // MovementController::default(),
-        // Movement { speed: 5.0 },
+        MovementController::default(),
+        Movement { speed: 5.0 },
     ));
 }
