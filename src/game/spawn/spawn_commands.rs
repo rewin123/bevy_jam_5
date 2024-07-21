@@ -69,3 +69,4 @@ impl Command for SpawnEarth {
             .insert(Earth);
     }
 }
+

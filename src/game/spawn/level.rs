@@ -1,6 +1,6 @@
 //! Spawn the main level by triggering other observers.
 
-use bevy::prelude::*;
+use bevy::{pbr::ExtendedMaterial, prelude::*};
 use rand::Rng;
 
 use crate::game::{daycycle::TimeSpeed, map::{ShipMap, Tile}, selectable::Selectable};
@@ -84,6 +84,8 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_serv
     });
 
     commands.add(SpawnEarth);
+
+    
 }
 
 
