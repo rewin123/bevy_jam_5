@@ -16,6 +16,7 @@ pub mod ui;
 pub mod components;
 pub mod resources;
 pub mod sprite_material;
+pub mod auto_anim;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
