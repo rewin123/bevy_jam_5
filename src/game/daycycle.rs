@@ -1,6 +1,13 @@
 use std::time::Duration;
 
-use bevy::{input::{keyboard::{Key, KeyboardInput}, ButtonState}, prelude::*, ui::update};
+use bevy::{
+    input::{
+        keyboard::{Key, KeyboardInput},
+        ButtonState,
+    },
+    prelude::*,
+    ui::update,
+};
 
 pub type GameTime = Time<GameTimeContext>;
 
@@ -16,17 +23,13 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_event::<NightStart>();
     app.add_event::<DayStart>();
 
-
-
     app.add_systems(PreUpdate, (time_speed, update_time).chain());
     app.add_systems(PreUpdate, day_events);
     app.add_systems(Update, change_time_speed);
 
-    
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
 }
-
 
 #[derive(Resource, Debug)]
 pub enum TimeSpeed {
@@ -34,9 +37,8 @@ pub enum TimeSpeed {
     Normal,
     Fast,
     Fast2,
-    Fast3
+    Fast3,
 }
-
 
 // Day duration in seconds
 #[derive(Resource)]
@@ -58,16 +60,15 @@ pub struct NightStart;
 pub struct DayStart;
 
 fn day_events(
-    mut commands: Commands, 
+    mut commands: Commands,
     day_duration: Res<DayDuration>,
-    mut day_pased: ResMut<DayPassed>, 
+    mut day_pased: ResMut<DayPassed>,
     gametime: Res<GameTime>,
     mut day_state: ResMut<DayState>,
-//events
+    //events
     mut night_start: EventWriter<NightStart>,
     mut day_start: EventWriter<DayStart>,
-) 
-{
+) {
     let day = gametime.elapsed_seconds() / day_duration.0;
 
     let day_count = day as u32;
@@ -106,7 +107,10 @@ fn update_time(mut gametime: ResMut<GameTime>, real_time: Res<Time>) {
     gametime.advance_by(Duration::from_secs_f32(delta));
 }
 
-fn change_time_speed(mut keyboard_input: EventReader<KeyboardInput>, mut time_speed: ResMut<TimeSpeed>) {
+fn change_time_speed(
+    mut keyboard_input: EventReader<KeyboardInput>,
+    mut time_speed: ResMut<TimeSpeed>,
+) {
     for key in keyboard_input.read() {
         if key.state != ButtonState::Pressed {
             continue;
@@ -135,7 +139,7 @@ fn change_time_speed(mut keyboard_input: EventReader<KeyboardInput>, mut time_sp
 
 #[derive(Default)]
 pub struct GameTimeContext {
-    relative_speed: f32
+    relative_speed: f32,
 }
 
 impl GameTimeContext {
@@ -146,17 +150,25 @@ impl GameTimeContext {
 
 #[cfg(feature = "dev")]
 mod dev {
-    use bevy::prelude::*;
     use super::*;
     use crate::dev_tools::*;
+    use bevy::prelude::*;
 
     pub(crate) fn plugin(app: &mut App) {
         app.add_systems(Update, show_gametime);
     }
 
-    fn show_gametime(mut debug_planer: ResMut<DebugPanel>, day_passed: Res<DayPassed>, gametime: Res<GameTime>, time_speed: Res<TimeSpeed>) {
+    fn show_gametime(
+        mut debug_planer: ResMut<DebugPanel>,
+        day_passed: Res<DayPassed>,
+        gametime: Res<GameTime>,
+        time_speed: Res<TimeSpeed>,
+    ) {
         debug_planer.add("Day passed", format!("Day: {}", day_passed.0));
-        debug_planer.add("Gametime", format!("Time: {:.1}", gametime.elapsed_seconds()));
+        debug_planer.add(
+            "Gametime",
+            format!("Time: {:.1}", gametime.elapsed_seconds()),
+        );
 
         debug_planer.add("Time speed", format!("Time speed: {:?}", *time_speed));
     }

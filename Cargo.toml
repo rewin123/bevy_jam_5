@@ -13,12 +13,18 @@ log = { version = "0.4", features = [
 ] }
 rand = "0.8"
 node_tree = {path = "node_tree"}
+bevy_quill = { version = "0.1.2"}
+bevy_quill_obsidian = { version = "0.1.0"}
+# Required for quill_obsidian
+bevy_mod_picking = { version = "0.20" }
+bevy_mod_stylebuilder = { version = "0.1.1" }
 
 [features]
 default = [
     # Default to a native dev build.
     "dev_native",
 ]
+amd_card = []
 dev = [
     # Improve compile times for dev builds by linking Bevy as a dynamic library.
     "bevy/dynamic_linking",

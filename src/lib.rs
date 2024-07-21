@@ -1,3 +1,4 @@
+#![feature(impl_trait_in_assoc_type)]
 #[cfg(feature = "dev")]
 mod dev_tools;
 mod game;
@@ -8,7 +9,14 @@ use bevy::{
     asset::AssetMetaCheck,
     audio::{AudioPlugin, Volume},
     prelude::*,
+    render::{
+        settings::{Backends, RenderCreation, WgpuSettings},
+        RenderPlugin,
+    },
 };
+use bevy_mod_picking::DefaultPickingPlugins;
+use bevy_quill::QuillPlugin;
+use bevy_quill_obsidian::ObsidianUiPlugin;
 
 pub struct AppPlugin;
 
@@ -24,33 +32,47 @@ impl Plugin for AppPlugin {
         app.add_systems(Startup, spawn_camera);
 
         // Add Bevy plugins.
-        app.add_plugins(
-            DefaultPlugins
-                .set(AssetPlugin {
-                    // Wasm builds will check for meta files (that don't exist) if this isn't set.
-                    // This causes errors and even panics on web build on itch.
-                    // See https://github.com/bevyengine/bevy_github_ci_template/issues/48.
-                    meta_check: AssetMetaCheck::Never,
+        let default_plugin = DefaultPlugins
+            .set(AssetPlugin {
+                // Wasm builds will check for meta files (that don't exist) if this isn't set.
+                // This causes errors and even panics on web build on itch.
+                // See https://github.com/bevyengine/bevy_github_ci_template/issues/48.
+                meta_check: AssetMetaCheck::Never,
+                ..default()
+            })
+            .set(WindowPlugin {
+                primary_window: Window {
+                    title: "bevy_quickstart".to_string(),
+                    canvas: Some("#bevy".to_string()),
+                    fit_canvas_to_parent: true,
+                    prevent_default_event_handling: true,
                     ..default()
-                })
-                .set(WindowPlugin {
-                    primary_window: Window {
-                        title: "bevy_quickstart".to_string(),
-                        canvas: Some("#bevy".to_string()),
-                        fit_canvas_to_parent: true,
-                        prevent_default_event_handling: true,
-                        ..default()
-                    }
-                    .into(),
-                    ..default()
-                })
-                .set(AudioPlugin {
-                    global_volume: GlobalVolume {
-                        volume: Volume::new(0.3),
-                    },
-                    ..default()
-                }),
-        );
+                }
+                .into(),
+                ..default()
+            })
+            .set(AudioPlugin {
+                global_volume: GlobalVolume {
+                    volume: Volume::new(0.3),
+                },
+                ..default()
+            });
+
+        // Related to an issue with WGPU AMD card on windows
+        // See https://github.com/gfx-rs/wgpu/issues/4247
+        #[cfg(feature = "amd_card")]
+        app.add_plugins(default_plugin.set(RenderPlugin {
+            render_creation: RenderCreation::Automatic(WgpuSettings {
+                backends: Some(Backends::DX12),
+                ..default()
+            }),
+            ..default()
+        }));
+
+        #[cfg(not(feature = "amd_card"))]
+        app.add_plugins(default_plugin);
+
+        app.add_plugins((DefaultPickingPlugins, QuillPlugin, ObsidianUiPlugin));
 
         // Add other plugins.
         app.add_plugins((game::plugin, screen::plugin, ui::plugin));
