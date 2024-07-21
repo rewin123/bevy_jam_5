@@ -85,7 +85,7 @@ fn selectable_add(
             .insert(On::<Pointer<Over>>::run(
                 |mut event : ListenerMut<Pointer<Over>>,
                 mut commands: Commands,
-                mut q_selectable: Query<Entity, With<Selectable>>| {
+                q_selectable: Query<Entity, With<Selectable>>| {
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }
