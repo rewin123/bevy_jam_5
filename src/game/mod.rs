@@ -9,6 +9,7 @@ mod movement;
 pub mod spawn;
 mod debt;
 mod daycycle;
+mod map;
 
 pub(super) fn plugin(app: &mut App) {
 
@@ -25,6 +26,7 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_plugins((
         daycycle::plugin,
-        debt::plugin
+        debt::plugin,
+        map::plugin
     ));
 }
