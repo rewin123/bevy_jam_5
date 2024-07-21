@@ -10,7 +10,6 @@ pub(crate) fn plugin(app: &mut App) {
 
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
-    
 }
 
 #[derive(Resource)]
@@ -30,7 +29,6 @@ impl Debt {
 
 impl Default for Debt {
     fn default() -> Self {
-
         let day_rate = 0.05;
         let day_duration = 30.0;
 
@@ -45,7 +43,6 @@ impl Default for Debt {
     }
 }
 
-
 fn increase_debt(time: Res<GameTime>, mut debt: ResMut<Debt>) {
     if time.elapsed_seconds() - debt.last_updated as f32 > 1.0 {
         debt.increase();
@@ -55,8 +52,8 @@ fn increase_debt(time: Res<GameTime>, mut debt: ResMut<Debt>) {
 
 #[cfg(feature = "dev")]
 mod dev {
-    use bevy::prelude::*;
     use crate::dev_tools::DebugPanel;
+    use bevy::prelude::*;
 
     use super::*;
 

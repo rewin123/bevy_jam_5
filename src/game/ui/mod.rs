@@ -8,6 +8,8 @@ use bevy_quill_obsidian::controls::{Button, ButtonVariant, IconButton};
 use bevy_quill_obsidian::size::Size;
 use bevy_quill_obsidian::RoundedCorners;
 
+use super::selectable::OnDeselect;
+use super::selectable::OnSelect;
 use super::spawn::level::SpawnLevel;
 
 pub(super) fn plugin(app: &mut App) {
@@ -15,20 +17,39 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn_ui(
-    _trigger: Trigger<SpawnLevel>,
+    _trigger: Trigger<OnSelect>,
     mut commands: Commands,
-    camera_q: Query<Entity, With<IsDefaultUiCamera>>,
+    global_transform_q: Query<&GlobalTransform, Without<IsDefaultUiCamera>>,
+    camera_q: Query<(Entity, &Camera, &GlobalTransform), With<IsDefaultUiCamera>>,
 ) {
-    let Ok(camera) = camera_q.get_single() else {
+    let Ok((entity, camera, camera_transform)) = camera_q.get_single() else {
+        return ();
+    };
+    let Ok(transform) = global_transform_q.get(_trigger.entity()) else {
         return ();
     };
 
-    commands.spawn(ConfigMenu { camera }.to_root());
+    let Some(position) = camera.world_to_viewport(camera_transform, transform.translation()) else {
+        return ();
+    };
+
+    commands.spawn((
+        ConfigMenu {
+            camera: entity,
+            position,
+        }
+        .to_root(),
+        ConfigUiComponent,
+    ));
 }
+
+#[derive(Component, Clone)]
+pub struct ConfigUiComponent;
 
 #[derive(Clone, PartialEq)]
 struct ConfigMenu {
     camera: Entity,
+    position: Vec2,
 }
 
 fn container_style(ss: &mut StyleBuilder) {
@@ -59,7 +80,21 @@ impl ViewTemplate for ConfigMenu {
         });
         Element::<NodeBundle>::new()
             .insert_dyn(TargetCamera, self.camera)
-            .style(container_style)
+            .style_dyn(
+                |position, style_builder| {
+                    style_builder
+                        .flex_direction(FlexDirection::Column)
+                        .position(ui::PositionType::Absolute)
+                        .padding(3)
+                        .top(position.y)
+                        .left(position.x)
+                        .width(100)
+                        .height(100)
+                        .row_gap(4)
+                        .background_color(colors::U2);
+                },
+                self.position,
+            )
             .children((
                 "Variants",
                 Element::<NodeBundle>::new()
