@@ -3,7 +3,7 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::game::{daycycle::TimeSpeed, map::{ShipMap, Tile}};
+use crate::game::{daycycle::TimeSpeed, map::{ShipMap, Tile}, selectable::Selectable};
 
 use super::player::SpawnPlayer;
 
@@ -35,7 +35,7 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_serv
         scene: asset_server.load("models/pc.glb#Scene0"),
         transform: Transform::from_translation(Vec3::new(4.0, 0.9, 5.0)).with_scale(Vec3::splat(0.5)),
         ..default()
-    });
+    }).insert(Selectable);
 }
 
 

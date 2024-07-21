@@ -1,0 +1,79 @@
+[package]
+name = "bevy_mod_outline"
+version = "0.8.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "A mesh outlining plugin for Bevy."
+readme = "README.md"
+homepage = "https://github.com/komadori/bevy_mod_outline/"
+repository = "https://github.com/komadori/bevy_mod_outline/"
+keywords = ["gamedev", "bevy", "outline"]
+categories = ["game-engines", "rendering"]
+
+[dependencies]
+bevy = { version = "0.14", default-features = false, features = [
+    "bevy_asset",
+    "bevy_render",
+    "bevy_scene",
+    "bevy_pbr",
+    "bevy_core_pipeline",
+] }
+bitfield = "0.15"
+interpolation = { version = "0.3", optional = true }
+thiserror = "1.0"
+nonmax = "0.5"
+wgpu-types = "0.20"
+
+[features]
+default = ["interpolation"]
+
+[dev-dependencies]
+bevy = { version = "0.14", default-features = false, features = [
+    "animation",
+    "bevy_gltf",
+    "bevy_pbr",
+    "bevy_sprite",
+    "bevy_state",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_winit",
+    "default_font",
+    "png",
+    "x11",
+    "ktx2",
+    "smaa_luts",
+    "tonemapping_luts",
+    "zstd",
+] }
+
+[[example]]
+name = "shapes"
+path = "examples/shapes.rs"
+
+[[example]]
+name = "pieces"
+path = "examples/pieces.rs"
+
+[[example]]
+name = "flying_objects"
+path = "examples/flying_objects.rs"
+
+[[example]]
+name = "render_layers"
+path = "examples/render_layers.rs"
+
+[[example]]
+name = "animated_fox"
+path = "examples/animated_fox.rs"
+
+[[example]]
+name = "hollow"
+path = "examples/hollow.rs"
+
+[[example]]
+name = "morph_targets"
+path = "examples/morph_targets.rs"
+
+[[example]]
+name = "ui_aa"
+path = "examples/ui_aa.rs"

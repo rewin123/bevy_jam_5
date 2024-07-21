@@ -16,8 +16,6 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_event::<NightStart>();
     app.add_event::<DayStart>();
 
-
-
     app.add_systems(PreUpdate, (time_speed, update_time).chain());
     app.add_systems(PreUpdate, day_events);
     app.add_systems(Update, change_time_speed);
