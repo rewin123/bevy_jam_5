@@ -3,7 +3,7 @@
 use bevy::{pbr::ExtendedMaterial, prelude::*};
 use rand::Rng;
 
-use crate::game::{daycycle::TimeSpeed, map::{ShipMap, Tile}, selectable::Selectable};
+use crate::game::{auto_anim::AutoAnim, components::fire::{FireSet, InFire}, daycycle::TimeSpeed, map::{ShipMap, Tile}, selectable::Selectable};
 
 use super::{player::SpawnPlayer, spawn_commands::{SpawnEarth, SpawnHydroponic, SpawnOxygenGenerator}};
 
@@ -15,7 +15,7 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(Event, Debug)]
 pub struct SpawnLevel;
 
-fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_server: Res<AssetServer>) {
+fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_server: Res<AssetServer>, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
     // The only thing we have in our level is a player,
     // but add things like walls etc. here.
     commands.trigger(SpawnPlayer);
@@ -73,7 +73,8 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_serv
         scene: asset_server.load("models/metal_trash.glb#Scene0"),
         transform: Transform::from_translation(Vec3::new(6.0, 0.1, 6.0)).with_scale(Vec3::splat(0.5)),
         ..default()
-    }).insert(Selectable);
+    }).insert(Selectable)
+    .insert(InFire::default());
 
     commands.add(SpawnOxygenGenerator {
         pos: Vec3::new(3.0, 0.1, 7.0),
@@ -84,6 +85,28 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_serv
     });
 
     commands.add(SpawnEarth);
+
+
+    // let plane = meshes.add(Plane3d::new(Vec3::Y, Vec2::splat(0.5)));
+    // let material = materials.add(StandardMaterial {
+    //     base_color_texture: Some(asset_server.load("images/fire_atlas.png")),
+    //     alpha_mode: AlphaMode::Blend,
+    //     ..default()
+    // });
+
+    // commands.spawn((
+    //     PbrBundle {
+    //         mesh: plane,
+    //         material,
+    //         transform: Transform::from_translation(Vec3::new(5.0, 3.0, 5.0)),
+    //         ..default()
+    //     },
+    //     AutoAnim {
+    //         set: FireSet,
+    //         timer: Timer::from_seconds(0.05, TimerMode::Repeating),
+    //         current_frame: 0
+    //     }
+    // ));
 
     
 }
