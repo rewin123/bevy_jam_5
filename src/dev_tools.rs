@@ -59,13 +59,13 @@ fn apply_debug_panel(
                 display: Display::Flex,
                 flex_direction: FlexDirection::Column,
                 position_type: PositionType::Absolute,
-                right: Val::Px(100.0),
+                right: Val::Px(0.0),
                 top: Val::Px(0.0),
                 border: UiRect::all(Val::Px(1.0)),
                 margin: UiRect::all(Val::Px(10.0)),
                 ..default()
             },
-            background_color: BackgroundColor(Color::linear_rgba(0.1, 0.1, 0.1, 0.5)),
+            background_color: BackgroundColor(Color::linear_rgba(0.01, 0.01, 0.01, 0.8)),
             border_color: BorderColor(Color::WHITE),
             border_radius: BorderRadius::all(Val::Px(5.0)),
             ..default()
