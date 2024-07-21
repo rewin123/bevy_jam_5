@@ -12,7 +12,7 @@ mod daycycle;
 
 pub(super) fn plugin(app: &mut App) {
 
-    // app.add_plugins(node_tree::NodumTreePlugin);
+    app.add_plugins(node_tree::NodumTreePlugin);
 
     app.add_plugins((
         animation::plugin,

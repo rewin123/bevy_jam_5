@@ -92,6 +92,23 @@ impl NodeTree {
     }
 }
 
+
+pub trait IntoNodeTree {
+    fn into_node_tree(self) -> NodeTree;   
+}
+
+impl IntoNodeTree for NodeTree {
+    fn into_node_tree(self) -> NodeTree {
+        self
+    }
+}
+
+impl<T: ToString> IntoNodeTree for T {
+    fn into_node_tree(self) -> NodeTree {
+        NodeTree::default().with_bundle(TextBundle::from_section(self.to_string(), TextStyle::default()))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

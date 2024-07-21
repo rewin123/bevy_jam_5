@@ -61,7 +61,7 @@ fn master_schedule_system(world : &mut World) {
     
 
     while world.resource::<SpawnedCount>().0 != 0 {
-        println!("{} entities spawned", world.resource::<SpawnedCount>().0);
+        // println!("{} entities spawned", world.resource::<SpawnedCount>().0);
         world.resource_mut::<SpawnedCount>().0 = 0;
         world.run_schedule(SpawnSchedule);
     }
@@ -186,7 +186,7 @@ fn children_cache_system(
 {
     // info!("Start child cache unwrap");
     for (entity, mut cache, children) in q_cache.iter_mut() {
-        info!("Unpacking {}", entity);
+        // info!("Unpacking {}", entity);
         let children_nodums = cache.0.take();
         if let Some(children_nodums) = children_nodums {
             let children_count = children_nodums.len();
@@ -205,7 +205,7 @@ fn children_cache_system(
                     child = commands.spawn_empty().id();    
                     commands.entity(entity).add_child(child);
                 }
-                info!("{} {}", entity, child);
+                // info!("{} {}", entity, child);
                 commands.add(InsertNodumEntity {
                     entity : child,
                     nodum : nodum
