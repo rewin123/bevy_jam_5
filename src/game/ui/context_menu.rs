@@ -1,6 +1,6 @@
 use bevy::{prelude::*, ui};
 use bevy_mod_stylebuilder::*;
-use bevy_quill::prelude::*;
+use bevy_quill::{prelude::*, Dynamic, IntoViewChild};
 use bevy_quill_obsidian::{colors, controls::Button};
 
 use super::{computer_menu, SelectedItem};
@@ -19,25 +19,30 @@ impl ViewTemplate for ContextMenu {
 
     fn create(&self, cx: &mut bevy_quill::Cx) -> Self::View {
         let context = cx.use_resource::<SelectedItem>();
-        let position = context.position;
+        let (_, position, resource_type) = context.item.unwrap();
 
         Element::<NodeBundle>::new()
             .style_dyn(
-                |position, style_builder| {
+                |pos, style_builder| {
                     style_builder
                         .flex_direction(FlexDirection::Column)
                         .position(ui::PositionType::Absolute)
                         .padding(3)
                         // Use the position of the context menu to position the menu
-                        .top(position.1.y)
-                        .left(position.1.x)
+                        .top(pos.y)
+                        .left(pos.x)
                         .width(100)
                         .height(100)
                         .row_gap(4)
                         .background_color(colors::U2);
                 },
-                position.unwrap(),
+                position,
             )
-            .children((computer_menu::ComputerMenu))
+            .children(Dynamic::new(match resource_type {
+                super::ResourceType::Computer => computer_menu::ComputerMenu.into_view_child(),
+                super::ResourceType::Unknown => Element::<NodeBundle>::new()
+                    .children("nothing")
+                    .into_view_child(),
+            }))
     }
 }
