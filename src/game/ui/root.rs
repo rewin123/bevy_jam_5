@@ -14,7 +14,11 @@ pub(super) struct RootUi {
 
 fn root_style(sb: &mut StyleBuilder) {
     // Use the full screen
-    sb.left(0).right(0).top(0).bottom(0).left(0);
+    sb.left(0)
+        .right(0)
+        .top(0)
+        .bottom(0)
+        .height(Val::Percent(100.0));
 }
 
 const RESOURCE_MENU_WIDTH: f32 = 200.0;
