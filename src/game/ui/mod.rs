@@ -51,6 +51,7 @@ fn clear_context_menu_position(
     context_menu.position = None;
 }
 
+// Set the position for the context Menu
 fn set_context_menu_position(
     _trigger: Trigger<OnSelect>,
     global_transform_q: Query<&GlobalTransform, Without<IsDefaultUiCamera>>,
@@ -91,34 +92,39 @@ impl ViewTemplate for ConfigMenu {
         let context = cx.use_resource::<ContextMenu>();
         let position = context.position;
 
-        Element::<NodeBundle>::new().children(Cond::new(
-            position.is_some(),
-            Element::<NodeBundle>::new()
-                .insert_dyn(TargetCamera, self.camera)
-                .style_dyn(
-                    |position, style_builder| {
-                        style_builder
-                            .flex_direction(FlexDirection::Column)
-                            .position(ui::PositionType::Absolute)
-                            .padding(3)
-                            .top(position.unwrap().y)
-                            .left(position.unwrap().x)
-                            .width(100)
-                            .height(100)
-                            .row_gap(4)
-                            .background_color(colors::U2);
-                    },
-                    context.position,
-                )
-                .children((
-                    "Actions",
-                    Element::<NodeBundle>::new()
-                        .style(style_row)
-                        .children((Button::new()
-                            .on_click(cx.create_callback(|| info!("clicked Recycle")))
-                            .children("Recycle"),)),
-                )),
-            (),
-        ))
+        Element::<NodeBundle>::new().children(
+            // If the position of the menu is `Some` we show the Context Menu
+            // Other wise we show nothing
+            Cond::new(
+                position.is_some(),
+                Element::<NodeBundle>::new()
+                    .insert_dyn(TargetCamera, self.camera)
+                    .style_dyn(
+                        |position, style_builder| {
+                            style_builder
+                                .flex_direction(FlexDirection::Column)
+                                .position(ui::PositionType::Absolute)
+                                .padding(3)
+                                // Use the position of the context menu to position the menu
+                                .top(position.unwrap().y)
+                                .left(position.unwrap().x)
+                                .width(100)
+                                .height(100)
+                                .row_gap(4)
+                                .background_color(colors::U2);
+                        },
+                        context.position,
+                    )
+                    .children((
+                        "Actions",
+                        Element::<NodeBundle>::new()
+                            .style(style_row)
+                            .children((Button::new()
+                                .on_click(cx.create_callback(|| info!("clicked Recycle")))
+                                .children("Recycle"),)),
+                    )),
+                (),
+            ),
+        )
     }
 }
