@@ -5,7 +5,7 @@ use rand::Rng;
 
 use crate::game::{daycycle::TimeSpeed, map::{ShipMap, Tile}, selectable::Selectable};
 
-use super::player::SpawnPlayer;
+use super::{player::SpawnPlayer, spawn_commands::SpawnOxygenGenerator};
 
 pub(super) fn plugin(app: &mut App) {
     app.observe(spawn_level);
@@ -21,7 +21,7 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_serv
     commands.trigger(SpawnPlayer);
 
     commands.spawn(DirectionalLightBundle {
-        transform: Transform::from_translation(Vec3::new(-5.0, 5.0, 5.0)).looking_at(Vec3::ZERO, Vec3::Y),
+        transform: Transform::from_translation(Vec3::new(2.0, 5.0, 2.0)).looking_at(Vec3::ZERO, Vec3::Y),
         directional_light: DirectionalLight {
             shadows_enabled: true,
             ..default()
@@ -74,6 +74,10 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_serv
         transform: Transform::from_translation(Vec3::new(6.0, 0.1, 6.0)).with_scale(Vec3::splat(0.5)),
         ..default()
     }).insert(Selectable);
+
+    commands.add(SpawnOxygenGenerator {
+        pos: Vec3::new(3.0, 0.1, 7.0),
+    });
 }
 
 
