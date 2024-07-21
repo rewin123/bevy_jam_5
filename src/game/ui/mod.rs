@@ -78,19 +78,6 @@ struct ConfigMenu {
     camera: Entity,
 }
 
-fn container_style(ss: &mut StyleBuilder) {
-    ss.display(Display::Flex)
-        .flex_direction(FlexDirection::Column)
-        .position(ui::PositionType::Absolute)
-        .padding(3)
-        .top(0)
-        .left(0)
-        .width(20)
-        .height(20)
-        .row_gap(4)
-        .background_color(colors::TRANSPARENT);
-}
-
 fn style_row(ss: &mut StyleBuilder) {
     ss.display(Display::Flex)
         .flex_direction(FlexDirection::Row)
@@ -104,9 +91,6 @@ impl ViewTemplate for ConfigMenu {
         let context = cx.use_resource::<ContextMenu>();
         let position = context.position;
 
-        // let click = cx.create_callback(|| {
-        //     info!("Clicked!");
-        // });
         Element::<NodeBundle>::new().children(Cond::new(
             position.is_some(),
             Element::<NodeBundle>::new()
@@ -127,10 +111,12 @@ impl ViewTemplate for ConfigMenu {
                     context.position,
                 )
                 .children((
-                    "Variants",
+                    "Actions",
                     Element::<NodeBundle>::new()
                         .style(style_row)
-                        .children((Button::new().children("Default"),)),
+                        .children((Button::new()
+                            .on_click(cx.create_callback(|| info!("clicked Recycle")))
+                            .children("Recycle"),)),
                 )),
             (),
         ))
