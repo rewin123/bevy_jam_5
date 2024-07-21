@@ -7,8 +7,10 @@ pub mod assets;
 pub mod audio;
 mod daycycle;
 mod debt;
+mod highlight;
 mod map;
 mod movement;
+mod selectable;
 pub mod spawn;
 pub mod ui;
 
@@ -24,5 +26,11 @@ pub(super) fn plugin(app: &mut App) {
         ui::plugin,
     ));
 
-    app.add_plugins((daycycle::plugin, debt::plugin, map::plugin));
+    app.add_plugins((
+        daycycle::plugin,
+        debt::plugin,
+        map::plugin,
+        selectable::plugin,
+        highlight::plugin,
+    ));
 }
