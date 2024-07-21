@@ -12,8 +12,11 @@ use super::selectable::OnDeselect;
 use super::selectable::OnSelect;
 use super::spawn::level::SpawnLevel;
 
+mod computer_menu;
+mod context_menu;
+
 pub(super) fn plugin(app: &mut App) {
-    app.init_resource::<ContextMenu>();
+    app.init_resource::<SelectedItem>();
     app.observe(spawn_root_ui);
     app.observe(set_context_menu_position);
     app.observe(clear_context_menu_position);
@@ -21,12 +24,12 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 #[derive(Resource)]
-struct ContextMenu {
-    position: Option<Vec2>,
+struct SelectedItem {
+    position: Option<(Entity, Vec2)>,
     // TODO Add menu type, computer, metal, etc.
 }
 
-impl Default for ContextMenu {
+impl Default for SelectedItem {
     fn default() -> Self {
         Self { position: None }
     }
@@ -46,7 +49,7 @@ fn spawn_root_ui(
 
 fn clear_context_menu_position(
     _trigger: Trigger<OnDeselect>,
-    mut context_menu: ResMut<ContextMenu>,
+    mut context_menu: ResMut<SelectedItem>,
 ) {
     context_menu.position = None;
 }
@@ -56,19 +59,20 @@ fn set_context_menu_position(
     _trigger: Trigger<OnSelect>,
     global_transform_q: Query<&GlobalTransform, Without<IsDefaultUiCamera>>,
     camera_q: Query<(Entity, &Camera, &GlobalTransform), With<IsDefaultUiCamera>>,
-    mut context_menu: ResMut<ContextMenu>,
+    mut context_menu: ResMut<SelectedItem>,
 ) {
+    let entity = _trigger.entity();
     let Ok((_, camera, camera_transform)) = camera_q.get_single() else {
         return ();
     };
-    let Ok(transform) = global_transform_q.get(_trigger.entity()) else {
+    let Ok(transform) = global_transform_q.get(entity) else {
         return ();
     };
 
     let Some(position) = camera.world_to_viewport(camera_transform, transform.translation()) else {
         return ();
     };
-    context_menu.position = Some(position);
+    context_menu.position = Some((entity, position));
 }
 
 #[derive(Component, Clone)]
@@ -89,42 +93,13 @@ fn style_row(ss: &mut StyleBuilder) {
 impl ViewTemplate for ConfigMenu {
     type View = impl View;
     fn create(&self, cx: &mut Cx) -> Self::View {
-        let context = cx.use_resource::<ContextMenu>();
+        let context = cx.use_resource::<SelectedItem>();
         let position = context.position;
 
         Element::<NodeBundle>::new().children(
             // If the position of the menu is `Some` we show the Context Menu
             // Other wise we show nothing
-            Cond::new(
-                position.is_some(),
-                Element::<NodeBundle>::new()
-                    .insert_dyn(TargetCamera, self.camera)
-                    .style_dyn(
-                        |position, style_builder| {
-                            style_builder
-                                .flex_direction(FlexDirection::Column)
-                                .position(ui::PositionType::Absolute)
-                                .padding(3)
-                                // Use the position of the context menu to position the menu
-                                .top(position.unwrap().y)
-                                .left(position.unwrap().x)
-                                .width(100)
-                                .height(100)
-                                .row_gap(4)
-                                .background_color(colors::U2);
-                        },
-                        context.position,
-                    )
-                    .children((
-                        "Actions",
-                        Element::<NodeBundle>::new()
-                            .style(style_row)
-                            .children((Button::new()
-                                .on_click(cx.create_callback(|| info!("clicked Recycle")))
-                                .children("Recycle"),)),
-                    )),
-                (),
-            ),
+            Cond::new(position.is_some(), context_menu::ContextMenu, ()),
         )
     }
 }
