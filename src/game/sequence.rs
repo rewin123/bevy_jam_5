@@ -44,7 +44,6 @@ impl ActionHolder {
     }
 }
 
-
 // Action sequence for character
 #[derive(Component, Default, Clone)]
 pub struct Sequence {
@@ -83,14 +82,10 @@ fn on_next_action(
     let target = trigger.entity();
     info!("OnNextAction {}", target);
     if let Ok(mut sequence) = q_players.get_mut(target) {
-        if !sequence.actions.is_empty() {
-            if sequence.active {
-                sequence.actions[0].action.terminate(&mut commands, target);
-                sequence.active = false;
-                sequence.actions.remove(0);
-            } else {
-               
-            }
+        if !sequence.actions.is_empty() && sequence.active {
+            sequence.actions[0].action.terminate(&mut commands, target);
+            sequence.active = false;
+            sequence.actions.remove(0);
         }
 
         if !sequence.actions.is_empty() {
@@ -112,11 +107,9 @@ fn new_sequence(
     match trigger.event().mode {
         NewMode::Replace => {
             if let Ok(mut sequence) = q_players.get_mut(target) {
-                if !sequence.actions.is_empty() {
-                    if sequence.active {
-                        sequence.actions[0].terminate(&mut commands, target);
-                        sequence.active = false;
-                    }
+                if !sequence.actions.is_empty() && sequence.active {
+                    sequence.actions[0].terminate(&mut commands, target);
+                    sequence.active = false;
                 }
                 sequence.actions.clear();
             }
@@ -128,13 +121,13 @@ fn new_sequence(
         }
         NewMode::Append => {
             if let Ok(mut sequence) = q_players.get_mut(target) {
-                if !sequence.actions.is_empty() {
-                    if sequence.active {
-                        sequence.actions[0].terminate(&mut commands, target);
-                        sequence.active = false;
-                    }
+                if !sequence.actions.is_empty() && sequence.active {
+                    sequence.actions[0].terminate(&mut commands, target);
+                    sequence.active = false;
                 }
-                sequence.actions.extend(trigger.event().actions.actions.iter().cloned());
+                sequence
+                    .actions
+                    .extend(trigger.event().actions.actions.iter().cloned());
                 commands.trigger_targets(NextAction, target);
             } else {
                 commands

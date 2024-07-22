@@ -54,7 +54,7 @@ fn add_target(
 
     if trigger.event().0 != MouseButton::Left {
         return;
-    } 
+    }
 
     let Ok(target_component) = q_selected.get(clicked_entity) else {
         return;
@@ -67,12 +67,14 @@ fn add_target(
     });
 
     if !q_player.is_empty() {
-        commands.trigger_targets(NewActionSequence {
-            actions: sequence,
-            mode: NewMode::Replace,
-        }, q_player.iter().next().unwrap());
+        commands.trigger_targets(
+            NewActionSequence {
+                actions: sequence,
+                mode: NewMode::Replace,
+            },
+            q_player.iter().next().unwrap(),
+        );
     }
-    
 }
 
 fn move_player_to_target(

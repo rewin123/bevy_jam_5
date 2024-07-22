@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+
 use bevy::prelude::*;
 
 use crate::game::{
@@ -19,11 +21,7 @@ pub(crate) fn plugin(app: &mut App) {
 
 const PC_WORK_GROUP: &str = "pc_work";
 
-
-fn auto_add_complex_moving(
-    mut commands: Commands,
-    q_new: Query<Entity, Added<Pc>>,
-) {
+fn auto_add_complex_moving(mut commands: Commands, q_new: Query<Entity, Added<Pc>>) {
     for entity in q_new.iter() {
         commands.entity(entity).insert(IgnorJustMoving);
     }
@@ -43,24 +41,23 @@ fn on_selected(
 
     if let Ok(pc_transform) = q_pcs.get_mut(target) {
         let mut sequence = Sequence::default();
-        sequence.push_with_group(GoToAction {
-            target,
-            target_pos: pc_transform.translation(),
-        }, PC_WORK_GROUP.to_string());
+        sequence.push_with_group(
+            GoToAction {
+                target,
+                target_pos: pc_transform.translation(),
+            },
+            PC_WORK_GROUP.to_string(),
+        );
         sequence.push_with_group(PcWorkAction, PC_WORK_GROUP.to_string());
         let targets = q_players
             .iter()
-            .filter_map(
-                |(entity, seq)| {
-                    if seq.actions.is_empty() {
-                        Some(entity)
-                    } else if seq.actions[0].group_name != PC_WORK_GROUP {
-                        Some(entity)
-                    } else {
-                        None
-                    }
-                },
-            )
+            .filter_map(|(entity, seq)| {
+                if seq.actions.is_empty() || seq.actions[0].group_name != PC_WORK_GROUP {
+                    Some(entity)
+                } else {
+                    None
+                }
+            })
             .collect::<Vec<_>>();
         if !targets.is_empty() {
             commands.trigger_targets(

@@ -58,7 +58,11 @@ fn clear_context_menu_position(
 #[derive(Event)]
 pub struct OpenContext(ResourceType);
 
-fn open_context(trigger: Trigger<OpenContextMenu>, computers_q: Query<&Pc>, mut commands: Commands) {
+fn open_context(
+    trigger: Trigger<OpenContextMenu>,
+    computers_q: Query<&Pc>,
+    mut commands: Commands,
+) {
     let entity = trigger.entity();
     if computers_q.contains(entity) {
         commands.trigger_targets(OpenContext(ResourceType::Computer), entity);
