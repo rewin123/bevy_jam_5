@@ -107,8 +107,7 @@ fn spawn_level(
         })
         .insert(Selectable)
         //add fire
-        .insert(InFire::default())
-        ;
+        .insert(InFire::default());
 
     commands.add(SpawnOxygenGenerator {
         pos: Vec3::new(3.0, 0.1, 7.0),
