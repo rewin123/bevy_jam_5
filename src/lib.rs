@@ -10,6 +10,12 @@ use bevy::{
     audio::{AudioPlugin, Volume},
     prelude::*,
 };
+// Related to an issue with WGPU AMD card on windows
+// See https://github.com/gfx-rs/wgpu/issues/4247
+#[cfg(feature = "amd_card")]
+use bevy::render::{
+    settings::Backends, settings::RenderCreation, settings::WgpuSettings, RenderPlugin,
+};
 use bevy_mod_picking::DefaultPickingPlugins;
 use bevy_quill::QuillPlugin;
 use bevy_quill_obsidian::ObsidianUiPlugin;
@@ -57,13 +63,15 @@ impl Plugin for AppPlugin {
         // Related to an issue with WGPU AMD card on windows
         // See https://github.com/gfx-rs/wgpu/issues/4247
         #[cfg(feature = "amd_card")]
-        app.add_plugins(default_plugin.set(RenderPlugin {
-            render_creation: RenderCreation::Automatic(WgpuSettings {
-                backends: Some(Backends::DX12),
+        {
+            app.add_plugins(default_plugin.set(RenderPlugin {
+                render_creation: RenderCreation::Automatic(WgpuSettings {
+                    backends: Some(Backends::DX12),
+                    ..default()
+                }),
                 ..default()
-            }),
-            ..default()
-        }));
+            }));
+        }
 
         #[cfg(not(feature = "amd_card"))]
         app.add_plugins(default_plugin);

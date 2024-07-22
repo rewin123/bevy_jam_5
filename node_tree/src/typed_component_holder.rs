@@ -1,22 +1,20 @@
-use std::{any::Any, sync::Arc};
 use bevy::prelude::*;
+use std::{any::Any, sync::Arc};
 
 pub struct TypedComponentHolder {
-    pub val : Box<dyn Any + Send + Sync>,
+    pub val: Box<dyn Any + Send + Sync>,
     pub insert_fn: Box<dyn Fn(&mut EntityWorldMut, Box<dyn Any + Send + Sync>) + Send + Sync>,
     pub write_fn: Box<dyn Fn(&mut EntityWorldMut, Box<dyn Any + Send + Sync>) + Send + Sync>,
     pub remove_fn: Arc<dyn Fn(&mut EntityWorldMut) + Send + Sync>,
 }
 
 pub struct StupidBox<T> {
-    pub val : T
+    pub val: T,
 }
 
-impl <T> StupidBox<T> {
-    fn new(val : T) -> Self {
-        Self {
-            val
-        }
+impl<T> StupidBox<T> {
+    fn new(val: T) -> Self {
+        Self { val }
     }
 
     fn into_inner(self) -> T {
@@ -24,22 +22,21 @@ impl <T> StupidBox<T> {
     }
 }
 
-
 impl TypedComponentHolder {
-    pub fn new<T : Component>(val : T) -> Self {
+    pub fn new<T: Component>(val: T) -> Self {
         Self {
-            val : Box::new(StupidBox::new(val)),
-            insert_fn : Box::new(|e, val| {
+            val: Box::new(StupidBox::new(val)),
+            insert_fn: Box::new(|e, val| {
                 let val = val.downcast::<StupidBox<T>>().unwrap();
                 e.insert(val.into_inner());
             }),
-            write_fn : Box::new(|e, val| {
+            write_fn: Box::new(|e, val| {
                 let val = val.downcast::<StupidBox<T>>().unwrap();
                 *e.get_mut::<T>().unwrap() = val.into_inner();
             }),
-            remove_fn : Arc::new(|e| {
+            remove_fn: Arc::new(|e| {
                 e.remove::<T>();
-            })
+            }),
         }
     }
 }
@@ -56,7 +53,10 @@ mod tests {
         let component = TestComponent(42);
         let holder = TypedComponentHolder::new(component.clone());
 
-        let boxed_component = holder.val.downcast_ref::<StupidBox<TestComponent>>().unwrap();
+        let boxed_component = holder
+            .val
+            .downcast_ref::<StupidBox<TestComponent>>()
+            .unwrap();
         assert_eq!(boxed_component.val, component);
     }
 
