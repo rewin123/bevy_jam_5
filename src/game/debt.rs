@@ -36,7 +36,7 @@ impl Default for Debt {
 
         let second_rate = (1.0f64 + day_rate).powf(1.0 / day_duration) - 1.0;
 
-        Debt {
+        Self {
             amount: 13000.0,
             day_rate: 0.05,
             second_rate: second_rate as f32,

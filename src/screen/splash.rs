@@ -97,7 +97,7 @@ impl UiImageFadeInOut {
         let fade = self.fade_duration / self.total_duration;
 
         // Regular trapezoid-shaped graph, flat at the top with alpha = 1.0.
-        ((1.0 - (2.0 * t - 1.0).abs()) / fade).min(1.0)
+        ((1.0 - 2f32.mul_add(t, -1.0).abs()) / fade).min(1.0)
     }
 }
 
@@ -109,7 +109,7 @@ fn tick_fade_in_out(time: Res<Time>, mut animation_query: Query<&mut UiImageFade
 
 fn apply_fade_in_out(mut animation_query: Query<(&UiImageFadeInOut, &mut UiImage)>) {
     for (anim, mut image) in &mut animation_query {
-        image.color.set_alpha(anim.alpha())
+        image.color.set_alpha(anim.alpha());
     }
 }
 

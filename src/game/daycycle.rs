@@ -44,7 +44,7 @@ pub struct DayDuration(pub f32);
 #[derive(Resource)]
 pub struct DayPassed(u32);
 
-#[derive(Resource, Reflect, PartialEq)]
+#[derive(Resource, Reflect, PartialEq, Eq)]
 pub enum DayState {
     Night,
     Day,

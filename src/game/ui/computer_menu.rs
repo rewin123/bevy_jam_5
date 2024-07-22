@@ -26,7 +26,7 @@ impl ViewTemplate for ComputerMenu {
                 .children((Button::new()
                     .on_click(cx.create_callback(|mut events: EventWriter<StartWorking>| {
                         events.send(StartWorking);
-                        info!("Clicked Work")
+                        info!("Clicked Work");
                     }))
                     .children("Work"),)),
         )

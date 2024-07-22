@@ -25,7 +25,7 @@ const RESOURCE_MENU_WIDTH: f32 = 200.0;
 const RESOURCE_MENU_PADDING: f32 = 20.0;
 
 fn o_slider_style(sb: &mut StyleBuilder) {
-    sb.width(RESOURCE_MENU_WIDTH - (RESOURCE_MENU_PADDING * 2.0))
+    sb.width(RESOURCE_MENU_PADDING.mul_add(-2.0, RESOURCE_MENU_WIDTH))
         .height(30);
 }
 

@@ -98,7 +98,7 @@ pub struct AnimRange {
 }
 
 impl AnimRange {
-    pub fn new(start: usize, end: usize) -> Self {
+    pub const fn new(start: usize, end: usize) -> Self {
         Self { start, end }
     }
 }

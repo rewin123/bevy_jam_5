@@ -40,7 +40,7 @@ fn trigger_interaction_sfx(
         match interaction {
             Interaction::Hovered => commands.trigger(PlaySfx::Key(SfxKey::ButtonHover)),
             Interaction::Pressed => commands.trigger(PlaySfx::Key(SfxKey::ButtonPress)),
-            _ => (),
+            Interaction::None => (),
         }
     }
 }

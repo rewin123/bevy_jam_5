@@ -30,11 +30,11 @@ impl ShipMap {
         }
     }
 
-    pub fn width(&self) -> usize {
+    pub const fn width(&self) -> usize {
         self.width
     }
 
-    pub fn height(&self) -> usize {
+    pub const fn height(&self) -> usize {
         self.height
     }
 

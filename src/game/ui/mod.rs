@@ -56,12 +56,8 @@ fn clear_context_menu_position(
 #[derive(Event)]
 pub struct OpenContext(ResourceType);
 
-fn open_context(
-    _trigger: Trigger<OnSelect>,
-    computers_q: Query<&Computer>,
-    mut commands: Commands,
-) {
-    let entity = _trigger.entity();
+fn open_context(trigger: Trigger<OnSelect>, computers_q: Query<&Computer>, mut commands: Commands) {
+    let entity = trigger.entity();
     if computers_q.contains(entity) {
         commands.trigger_targets(OpenContext(ResourceType::Computer), entity);
     } else {
@@ -71,12 +67,12 @@ fn open_context(
 
 // Set the position for the context Menu
 fn set_context_menu_position(
-    _trigger: Trigger<OpenContext>,
+    trigger: Trigger<OpenContext>,
     global_transform_q: Query<&GlobalTransform, Without<IsDefaultUiCamera>>,
     camera_q: Query<(Entity, &Camera, &GlobalTransform), With<IsDefaultUiCamera>>,
     mut context_menu: ResMut<SelectedItem>,
 ) {
-    let entity = _trigger.entity();
+    let entity = trigger.entity();
     let Ok((_, camera, camera_transform)) = camera_q.get_single() else {
         return;
     };
@@ -87,5 +83,5 @@ fn set_context_menu_position(
     let Some(position) = camera.world_to_viewport(camera_transform, transform.translation()) else {
         return;
     };
-    context_menu.item = Some((entity, position, _trigger.event().0));
+    context_menu.item = Some((entity, position, trigger.event().0));
 }
