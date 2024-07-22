@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 use super::{
     daycycle::GameTime,
-    selectable::{OnSelect, Selected},
-    sequence::{CharacterAction, NextAction},
+    selectable::OnMouseClick,
+    sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
     spawn::player::Player,
 };
 
@@ -13,6 +13,9 @@ pub(crate) fn plugin(app: &mut App) {
 }
 
 pub const PLAYER_SPEED: f32 = 5.0;
+
+#[derive(Component)]
+pub struct IgnorJustMoving;
 
 #[derive(Component)]
 struct DestinationTarget {
@@ -42,23 +45,35 @@ impl CharacterAction for GoToAction {
 }
 
 fn add_target(
-    trigger: Trigger<OnSelect>,
+    trigger: Trigger<OnMouseClick>,
     mut commands: Commands,
     q_player: Query<Entity, With<Player>>,
-    q_selected: Query<&GlobalTransform, With<Selected>>,
+    q_selected: Query<&GlobalTransform, Without<IgnorJustMoving>>,
 ) {
     let clicked_entity = trigger.entity();
 
-    let Ok(target_component) = q_selected.get_single() else {
+    if trigger.event().0 != MouseButton::Left {
+        return;
+    }
+
+    let Ok(target_component) = q_selected.get(clicked_entity) else {
         return;
     };
 
-    for player in q_player.iter() {
-        commands.entity(player).insert(DestinationTarget {
-            target: clicked_entity,
-            target_pos: target_component.translation(),
-            accept_radius: 0.5,
-        });
+    let mut sequence = Sequence::default();
+    sequence.push(GoToAction {
+        target: clicked_entity,
+        target_pos: target_component.translation(),
+    });
+
+    if !q_player.is_empty() {
+        commands.trigger_targets(
+            NewActionSequence {
+                actions: sequence,
+                mode: NewMode::Replace,
+            },
+            q_player.iter().next().unwrap(),
+        );
     }
 }
 

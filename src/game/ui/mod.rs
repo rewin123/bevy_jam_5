@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use bevy_quill::View;
 
 use super::components::pc::Pc;
-use super::selectable::OnDeselect;
-use super::selectable::OnSelect;
+use super::selectable::CloseContextMenu;
+use super::selectable::OpenContextMenu;
 use super::spawn::level::SpawnLevel;
 
 pub mod components;
@@ -49,7 +49,7 @@ fn spawn_root_ui(
 }
 
 fn clear_context_menu_position(
-    _trigger: Trigger<OnDeselect>,
+    _trigger: Trigger<CloseContextMenu>,
     mut context_menu: ResMut<SelectedItem>,
 ) {
     context_menu.item = None;
@@ -58,7 +58,11 @@ fn clear_context_menu_position(
 #[derive(Event)]
 pub struct OpenContext(ResourceType);
 
-fn open_context(trigger: Trigger<OnSelect>, computers_q: Query<&Pc>, mut commands: Commands) {
+fn open_context(
+    trigger: Trigger<OpenContextMenu>,
+    computers_q: Query<&Pc>,
+    mut commands: Commands,
+) {
     let entity = trigger.entity();
     if computers_q.contains(entity) {
         commands.trigger_targets(OpenContext(ResourceType::Computer), entity);

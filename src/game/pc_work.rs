@@ -5,7 +5,7 @@ use bevy::prelude::*;
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(PcWorkConfig {
-        work_time: 0.5,
+        work_time: 0.25,
         amount_after_work: 10.0,
     });
 
