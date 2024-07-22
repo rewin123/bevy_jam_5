@@ -49,12 +49,11 @@ fn update_pc_work(
     mut q_pc_work: Query<(Entity, &mut PcWork)>,
     mut work_config: ResMut<PcWorkConfig>,
     mut debt: ResMut<Debt>,
-    q_pcs: Query<&GlobalTransform, With<Pc>>
+    q_pcs: Query<&GlobalTransform, With<Pc>>,
 ) {
     for (entity, mut pc_work) in q_pc_work.iter_mut() {
         pc_work.work_time += time.delta_seconds();
         if pc_work.work_time >= work_config.work_time {
-
             let current_time = time.elapsed_seconds();
             if current_time - work_config.last_updated < 1.0 {
                 work_config.multiplier += 1;
@@ -69,24 +68,21 @@ fn update_pc_work(
             commands.entity(entity).remove::<PcWork>();
             commands.trigger_targets(NextAction, entity);
 
-
             if let Ok(pc_transform) = q_pcs.get_single() {
-
                 let text_style = TextStyle {
-                    color : Color::linear_rgb(0.0, 1.0, 0.0),
+                    color: Color::linear_rgb(0.0, 1.0, 0.0),
                     font_size: 94.0,
                     ..default()
                 };
-                commands.spawn(BillboardTextBundle {
-                    transform: Transform::from_translation(pc_transform.translation()).with_scale(Vec3::splat(0.01)),
-                    text: Text::from_section(format!("+{}$", dept_decrease), text_style),
-                    ..default()
-                } )
-                .insert(FlowUpText {
-                    lifetime: 1.0
-                });
+                commands
+                    .spawn(BillboardTextBundle {
+                        transform: Transform::from_translation(pc_transform.translation())
+                            .with_scale(Vec3::splat(0.01)),
+                        text: Text::from_section(format!("+{}$", dept_decrease), text_style),
+                        ..default()
+                    })
+                    .insert(FlowUpText { lifetime: 1.0 });
             }
-            
         }
     }
 }

@@ -12,11 +12,10 @@ pub struct FlowUpText {
     pub lifetime: f32,
 }
 
-
 fn flowing_up(
     mut commands: Commands,
     time: Res<GameTime>,
-    mut q_text: Query<(Entity, &mut Transform, &mut FlowUpText)>
+    mut q_text: Query<(Entity, &mut Transform, &mut FlowUpText)>,
 ) {
     for (e, mut transform, mut text) in q_text.iter_mut() {
         text.lifetime -= time.delta_seconds();
