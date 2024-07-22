@@ -23,6 +23,9 @@ pub struct OnMouseOver;
 #[derive(Event)]
 pub struct OnMouseOut;
 
+#[derive(Event)]
+pub struct OnMouseClick(pub MouseButton);
+
 fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Selectable>>) {
     for entity in q_selectable.iter() {
         commands
@@ -43,6 +46,13 @@ fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Sele
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }
+
+                    let mouse_button = match event.event.button {
+                        PointerButton::Primary => MouseButton::Left,
+                        PointerButton::Secondary => MouseButton::Right,
+                        PointerButton::Middle => MouseButton::Middle,
+                    };
+                    commands.trigger_targets(OnMouseClick(mouse_button), event.listener());
 
                     let is_selected = q_selected.contains(event.listener());
 

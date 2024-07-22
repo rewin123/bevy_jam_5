@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 use crate::game::{
     character::GoToAction,
-    pc_work::PcWorkAction,
-    selectable::OnSelect,
+    pc_work::{PcWork, PcWorkAction},
+    selectable::OnMouseClick,
     sequence::{NewActionSequence, NewMode, Sequence},
     spawn::player::Player,
 };
@@ -16,12 +16,16 @@ pub(crate) fn plugin(app: &mut App) {
 }
 
 fn on_selected(
-    trigger: Trigger<OnSelect>,
+    trigger: Trigger<OnMouseClick>,
     mut commands: Commands,
-    q_players: Query<Entity, With<Player>>,
+    q_players: Query<(Entity, Option<&PcWork>), With<Player>>,
     mut q_pcs: Query<&GlobalTransform, With<Pc>>,
 ) {
     let target = trigger.entity();
+
+    if trigger.event().0 != MouseButton::Left {
+        return;
+    }
 
     if let Ok(pc_transform) = q_pcs.get_mut(target) {
         let mut sequence = Sequence::default();
@@ -30,13 +34,27 @@ fn on_selected(
             target_pos: pc_transform.translation(),
         });
         sequence.push(PcWorkAction);
-        commands.trigger_targets(
-            NewActionSequence {
-                actions: sequence,
-                mode: NewMode::Replace,
-            },
-            q_players.iter().collect::<Vec<_>>(),
-        );
+        let targets = q_players
+            .iter()
+            .filter_map(
+                |(entity, pc)| {
+                    if pc.is_some() {
+                        None
+                    } else {
+                        Some(entity)
+                    }
+                },
+            )
+            .collect::<Vec<_>>();
+        if !targets.is_empty() {
+            commands.trigger_targets(
+                NewActionSequence {
+                    actions: sequence,
+                    mode: NewMode::Append,
+                },
+                targets,
+            );
+        }
 
         info!("PC working!");
     }
