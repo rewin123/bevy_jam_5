@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderBackground, StyleBuilderLayout};
 use bevy_quill::*;
 
-use crate::game::resources::{Oxygen, Water};
+use crate::game::resources::{Food, Oxygen, Water};
 
 use super::{
     components::resource_slider::ResourceSlider,
@@ -29,6 +29,7 @@ impl ViewTemplate for RootUi {
     fn create(&self, cx: &mut Cx) -> Self::View {
         let selected_item = cx.use_resource::<SelectedItem>();
         let oxygen = cx.use_resource::<Oxygen>();
+        let food = cx.use_resource::<Food>();
         let water = cx.use_resource::<Water>();
         let position = selected_item.item;
 
@@ -55,6 +56,10 @@ impl ViewTemplate for RootUi {
                         .limit(water.limit)
                         .amount(water.amount)
                         .label("Water"),
+                    ResourceSlider::new()
+                        .limit(food.limit)
+                        .amount(food.amount)
+                        .label("Food"),
                 )),
             // If the position of the menu is `Some` we show the Context Menu
             // Other wise we show nothing
