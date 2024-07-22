@@ -1,11 +1,14 @@
 use bevy::prelude::*;
 use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderBackground, StyleBuilderLayout};
 use bevy_quill::*;
-use bevy_quill_obsidian::controls::Slider;
 
 use crate::game::resources::{Oxygen, Water};
 
-use super::{context_menu, SelectedItem};
+use super::{
+    components::resource_slider::ResourceSlider,
+    constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH},
+    context_menu, SelectedItem,
+};
 
 #[derive(Clone, PartialEq)]
 pub(super) struct RootUi {
@@ -19,14 +22,6 @@ fn root_style(sb: &mut StyleBuilder) {
         .top(0)
         .bottom(0)
         .height(Val::Percent(100.0));
-}
-
-const RESOURCE_MENU_WIDTH: f32 = 200.0;
-const RESOURCE_MENU_PADDING: f32 = 20.0;
-
-fn o_slider_style(sb: &mut StyleBuilder) {
-    sb.width(RESOURCE_MENU_PADDING.mul_add(-2.0, RESOURCE_MENU_WIDTH))
-        .height(30);
 }
 
 impl ViewTemplate for RootUi {
@@ -52,18 +47,14 @@ impl ViewTemplate for RootUi {
                         .background_color(Srgba::new(1.0, 1.0, 1.0, 0.3));
                 })
                 .children((
-                    Slider::new()
-                        .range(0. ..=oxygen.limit)
-                        .disabled(true)
-                        .label("Oxygen")
-                        .style(o_slider_style)
-                        .value(oxygen.amount),
-                    Slider::new()
-                        .range(0. ..=water.limit)
-                        .disabled(true)
-                        .label("Water")
-                        .style(o_slider_style)
-                        .value(water.amount),
+                    ResourceSlider::new()
+                        .limit(oxygen.limit)
+                        .amount(oxygen.amount)
+                        .label("Oxygen"),
+                    ResourceSlider::new()
+                        .limit(water.limit)
+                        .amount(water.amount)
+                        .label("Water"),
                 )),
             // If the position of the menu is `Some` we show the Context Menu
             // Other wise we show nothing

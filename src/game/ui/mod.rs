@@ -6,7 +6,9 @@ use super::selectable::OnDeselect;
 use super::selectable::OnSelect;
 use super::spawn::level::SpawnLevel;
 
+pub mod components;
 mod computer_menu;
+pub mod constants;
 mod context_menu;
 mod root;
 
