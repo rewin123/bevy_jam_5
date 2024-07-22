@@ -19,6 +19,7 @@ bevy_quill_obsidian = { version = "0.1.0"}
 bevy_mod_stylebuilder = { version = "0.1.1" }
 bevy_mod_picking = "0.20.1"
 bevy_mod_outline = {path = "crates/bevy_mod_outline"}
+rand_distr = "0.4.3"
 
 
 [features]
