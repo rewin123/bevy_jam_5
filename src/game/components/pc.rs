@@ -41,6 +41,7 @@ fn on_selected(
 
     if let Ok(pc_transform) = q_pcs.get_mut(target) {
         let mut sequence = Sequence::default();
+        
         sequence.push_with_group(
             GoToAction {
                 target,
@@ -48,7 +49,11 @@ fn on_selected(
             },
             PC_WORK_GROUP.to_string(),
         );
-        sequence.push_with_group(PcWorkAction, PC_WORK_GROUP.to_string());
+        sequence.push_with_group(
+            PcWorkAction, 
+            PC_WORK_GROUP.to_string()
+        );
+
         let targets = q_players
             .iter()
             .filter_map(|(entity, seq)| {
@@ -59,6 +64,8 @@ fn on_selected(
                 }
             })
             .collect::<Vec<_>>();
+
+
         if !targets.is_empty() {
             commands.trigger_targets(
                 NewActionSequence {
