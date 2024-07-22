@@ -1,9 +1,7 @@
 use bevy::prelude::*;
-use crate::game::character::CharacterAction;
-
-use super::character::NextAction;
 use super::daycycle::GameTime;
 use super::debt::Debt;
+use super::sequence::{CharacterAction, NextAction};
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(PcWorkConfig {

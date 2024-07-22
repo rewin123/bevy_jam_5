@@ -19,6 +19,7 @@ pub mod spawn;
 pub mod sprite_material;
 pub mod ui;
 mod pc_work;
+mod sequence;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
@@ -43,5 +44,6 @@ pub(super) fn plugin(app: &mut App) {
         resources::plugin,
         sprite_material::SpriteMaterialPlugin,
         pc_work::plugin,
+        sequence::plugin,
     ));
 }

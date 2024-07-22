@@ -4,9 +4,9 @@ use bevy::prelude::*;
 
 use crate::game::{
     assets::{HandleMap, SceneKey},
-    components::fire::InFire,
+    components::{fire::InFire, pc::Pc},
     daycycle::TimeSpeed,
-    selectable::{Computer, Selectable},
+    selectable::Selectable,
 };
 
 use super::{
@@ -51,7 +51,7 @@ fn spawn_level(
             ..default()
         })
         .insert(Selectable)
-        .insert(Computer);
+        .insert(Pc);
 
     commands
         .spawn(SceneBundle {
@@ -108,9 +108,6 @@ fn spawn_level(
         .insert(Selectable)
         //add fire
         .insert(InFire::default())
-        
-        //remove fire
-        .remove::<InFire>()
         ;
 
     commands.add(SpawnOxygenGenerator {

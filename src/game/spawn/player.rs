@@ -3,7 +3,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    assets::{HandleMap, SceneKey}, character::Sequence, movement::{Movement, MovementController}
+    assets::{HandleMap, SceneKey}, movement::{Movement, MovementController}, sequence::Sequence
 };
 
 pub(super) fn plugin(app: &mut App) {

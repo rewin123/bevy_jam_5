@@ -8,8 +8,6 @@ pub(crate) fn plugin(app: &mut App) {
 #[derive(Component)]
 pub struct Selectable;
 
-#[derive(Component)]
-pub struct Computer;
 
 #[derive(Component)]
 pub struct Selected;

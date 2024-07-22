@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_quill::View;
 
-use super::selectable::Computer;
+use super::components::pc::Pc;
 use super::selectable::OnDeselect;
 use super::selectable::OnSelect;
 use super::spawn::level::SpawnLevel;
@@ -58,7 +58,7 @@ fn clear_context_menu_position(
 #[derive(Event)]
 pub struct OpenContext(ResourceType);
 
-fn open_context(trigger: Trigger<OnSelect>, computers_q: Query<&Computer>, mut commands: Commands) {
+fn open_context(trigger: Trigger<OnSelect>, computers_q: Query<&Pc>, mut commands: Commands) {
     let entity = trigger.entity();
     if computers_q.contains(entity) {
         commands.trigger_targets(OpenContext(ResourceType::Computer), entity);
