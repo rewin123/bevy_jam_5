@@ -32,5 +32,5 @@ fn plan_trouble(mut trouble_planner: ResMut<TroublePlanner>, time: Res<GameTime>
             trouble_planner.distribution -= 0.5; // linear difficulty
         }
     }
-    warn!("trouble planer {:?}", trouble_planner);
+    // warn!("trouble planer {:?}", trouble_planner);
 }

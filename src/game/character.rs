@@ -80,7 +80,7 @@ fn move_player_to_target(
             // the character should just spin on its y axis at the beginning
             transform.rotate_local_y(cos_result.y);
         } else {
-            commands.entity(target.target).remove::<DestinationTarget>();
+            commands.entity(player_entity).remove::<DestinationTarget>();
             commands.trigger_targets(NextAction, player_entity);
         }
     }

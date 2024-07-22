@@ -31,14 +31,14 @@ impl Debt {
 
 impl Default for Debt {
     fn default() -> Self {
-        let day_rate = 0.05;
+        let day_rate = 0.00;
         let day_duration = 30.0;
 
         let second_rate = (1.0f64 + day_rate).powf(1.0 / day_duration) - 1.0;
 
         Self {
             amount: 13000.0,
-            day_rate: 0.05,
+            day_rate: day_rate as f32,
             second_rate: second_rate as f32,
             last_updated: 0,
         }
