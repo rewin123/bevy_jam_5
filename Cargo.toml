@@ -89,3 +89,8 @@ inherits = "release"
 opt-level = 3
 # Keep debug information in the binary.
 strip = "none"
+
+[dev-dependencies.cargo-husky]
+version = "1"
+default-features = false
+features = ["user-hooks"]
