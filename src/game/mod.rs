@@ -18,6 +18,7 @@ mod selectable;
 pub mod spawn;
 pub mod sprite_material;
 pub mod ui;
+mod pc_work;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
@@ -41,5 +42,6 @@ pub(super) fn plugin(app: &mut App) {
         components::plugin,
         resources::plugin,
         sprite_material::SpriteMaterialPlugin,
+        pc_work::plugin,
     ));
 }

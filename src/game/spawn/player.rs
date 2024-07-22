@@ -3,8 +3,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    assets::{HandleMap, SceneKey},
-    movement::{Movement, MovementController},
+    assets::{HandleMap, SceneKey}, character::Sequence, movement::{Movement, MovementController}
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -43,5 +42,6 @@ fn spawn_player(
         },
         MovementController::default(),
         Movement { speed: 5.0 },
+        Sequence::default()
     ));
 }
