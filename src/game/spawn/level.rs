@@ -3,6 +3,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
+    assets::{HandleMap, SceneKey},
     components::fire::InFire,
     daycycle::TimeSpeed,
     selectable::{Computer, Selectable},
@@ -24,6 +25,7 @@ pub struct SpawnLevel;
 fn spawn_level(
     _trigger: Trigger<SpawnLevel>,
     mut commands: Commands,
+    scene_handler: Res<HandleMap<SceneKey>>,
     asset_server: Res<AssetServer>,
 ) {
     // The only thing we have in our level is a player,
@@ -44,7 +46,7 @@ fn spawn_level(
 
     commands
         .spawn(SceneBundle {
-            scene: asset_server.load("models/pc.glb#Scene0"),
+            scene: scene_handler[&SceneKey::Pc].clone_weak(),
             transform: Transform::from_translation(Vec3::new(4.0, 0.9, 5.0))
                 .with_scale(Vec3::splat(0.5)),
             ..default()

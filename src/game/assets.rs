@@ -13,6 +13,9 @@ pub(super) fn plugin(app: &mut App) {
 
     app.register_type::<HandleMap<SoundtrackKey>>();
     app.init_resource::<HandleMap<SoundtrackKey>>();
+
+    app.register_type::<HandleMap<SceneKey>>();
+    app.init_resource::<HandleMap<SceneKey>>();
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Reflect)]
@@ -99,6 +102,23 @@ impl FromWorld for HandleMap<SoundtrackKey> {
             ),
         ]
         .into()
+    }
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Reflect)]
+pub enum SceneKey {
+    Pc,
+    Gameplay,
+}
+
+impl AssetKey for SceneKey {
+    type Asset = Scene;
+}
+
+impl FromWorld for HandleMap<SceneKey> {
+    fn from_world(world: &mut World) -> Self {
+        let asset_server = world.resource::<AssetServer>();
+        [(SceneKey::Pc, asset_server.load("models/pc.glb#Scene0"))].into()
     }
 }
 
