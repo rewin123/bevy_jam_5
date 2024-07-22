@@ -4,7 +4,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<Water>();
     app.init_resource::<BadWater>();
     app.init_resource::<Oxygen>();
-    app.init_resource::<OxygenGenerator>();
+    app.init_resource::<OxygenRecycler>();
     app.init_resource::<Pee>();
     app.init_resource::<Food>();
     app.init_resource::<Hydrogen>();
@@ -13,6 +13,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<MetalTrash>();
     app.init_resource::<Metal>();
     app.init_resource::<Temperature>();
+    app.init_resource::<HydroponicsMachine>();
 
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
@@ -67,14 +68,13 @@ impl Default for Oxygen {
     }
 }
 
-/// Oxygen in ship air
 #[derive(Resource)]
-pub struct OxygenGenerator {
+pub struct OxygenRecycler {
     pub oxygen_generation_rate: f32,
     pub co2_consumption_rate: f32,
 }
 
-impl Default for OxygenGenerator {
+impl Default for OxygenRecycler {
     fn default() -> Self {
         Self {
             oxygen_generation_rate: 1.0,
@@ -114,6 +114,11 @@ pub struct Food {
 }
 
 #[derive(Resource, Default)]
+pub struct HydroponicsMachine {
+    pub food_generation_rate: f32,
+}
+
+#[derive(Resource, Default)]
 pub struct Hydrogen {
     pub amount: f32,
     pub limit: f32,
@@ -148,7 +153,7 @@ mod dev {
         water: Res<Water>,
         bad_water: Res<BadWater>,
         oxygen: Res<Oxygen>,
-        oxygen_generator: Res<OxygenGenerator>,
+        oxygen_recycler: Res<OxygenRecycler>,
         pee: Res<Pee>,
         food: Res<Food>,
         hydrogen: Res<Hydrogen>,
@@ -171,10 +176,10 @@ mod dev {
             format!("Oxygen: {}/{}", oxygen.amount as i32, oxygen.limit),
         );
         debug_panel.add(
-            "Oxygen Generation",
+            "Oxygen Recycling",
             format!(
-                "Oxygen Generation (o / co2): {}/{}",
-                oxygen_generator.oxygen_generation_rate, oxygen_generator.co2_consumption_rate,
+                "Oxygen Recycling (o / co2): {}/{}",
+                oxygen_recycler.oxygen_generation_rate, oxygen_recycler.co2_consumption_rate,
             ),
         );
         debug_panel.add("Pee", format!("Pee: {}/{}", pee.amount, pee.limit));
