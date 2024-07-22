@@ -4,12 +4,12 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<Water>();
     app.init_resource::<BadWater>();
     app.init_resource::<Oxygen>();
-    app.init_resource::<OxygenInAir>();
+    app.init_resource::<OxygenGenerator>();
     app.init_resource::<Pee>();
     app.init_resource::<Food>();
     app.init_resource::<Hydrogen>();
     app.init_resource::<Electricity>();
-    app.init_resource::<CarbonInAir>();
+    app.init_resource::<CarbonDioxide>();
     app.init_resource::<MetalTrash>();
     app.init_resource::<Metal>();
     app.init_resource::<Temperature>();
@@ -54,6 +54,7 @@ pub struct BadWater {
 pub struct Oxygen {
     pub amount: f32,
     pub limit: f32,
+    pub consumption_rate: f32,
 }
 
 impl Default for Oxygen {
@@ -61,22 +62,43 @@ impl Default for Oxygen {
         Self {
             amount: 50.0,
             limit: 100.0,
+            consumption_rate: 2.0,
         }
     }
 }
 
 /// Oxygen in ship air
-#[derive(Resource, Default)]
-pub struct OxygenInAir {
-    pub amount: f32,
-    pub limit: f32,
+#[derive(Resource)]
+pub struct OxygenGenerator {
+    pub oxygen_generation_rate: f32,
+    pub co2_consumption_rate: f32,
+}
+
+impl Default for OxygenGenerator {
+    fn default() -> Self {
+        Self {
+            oxygen_generation_rate: 1.0,
+            co2_consumption_rate: 1.0,
+        }
+    }
 }
 
 /// How many carbon is in the air. If its too many, then you will die
-#[derive(Resource, Default)]
-pub struct CarbonInAir {
+#[derive(Resource)]
+pub struct CarbonDioxide {
     pub amount: f32,
     pub limit: f32,
+    pub generation_rate: f32,
+}
+
+impl Default for CarbonDioxide {
+    fn default() -> Self {
+        Self {
+            amount: 0.0,
+            limit: 100.0,
+            generation_rate: 1.0,
+        }
+    }
 }
 
 #[derive(Resource, Default)]
@@ -126,12 +148,12 @@ mod dev {
         water: Res<Water>,
         bad_water: Res<BadWater>,
         oxygen: Res<Oxygen>,
-        oxygen_in_air: Res<OxygenInAir>,
+        oxygen_generator: Res<OxygenGenerator>,
         pee: Res<Pee>,
         food: Res<Food>,
         hydrogen: Res<Hydrogen>,
         electricity: Res<Electricity>,
-        carbon_in_air: Res<CarbonInAir>,
+        carbon_in_air: Res<CarbonDioxide>,
         temperature: Res<Temperature>,
     ) {
         debug_panel.add("Metal", format!("Metal: {}", metal.amount));
@@ -146,13 +168,13 @@ mod dev {
         );
         debug_panel.add(
             "Oxygen",
-            format!("Oxygen: {}/{}", oxygen.amount, oxygen.limit),
+            format!("Oxygen: {}/{}", oxygen.amount as i32, oxygen.limit),
         );
         debug_panel.add(
-            "Oxygen in air",
+            "Oxygen Generation",
             format!(
-                "Oxygen in air: {}/{}",
-                oxygen_in_air.amount, oxygen_in_air.limit
+                "Oxygen Generation (o / co2): {}/{}",
+                oxygen_generator.oxygen_generation_rate, oxygen_generator.co2_consumption_rate,
             ),
         );
         debug_panel.add("Pee", format!("Pee: {}/{}", pee.amount, pee.limit));

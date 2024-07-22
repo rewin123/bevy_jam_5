@@ -14,6 +14,7 @@ mod highlight;
 mod map;
 mod movement;
 mod pc_work;
+mod resource_flow;
 pub mod resources;
 mod selectable;
 mod sequence;
@@ -47,5 +48,6 @@ pub(super) fn plugin(app: &mut App) {
         sprite_material::SpriteMaterialPlugin,
         pc_work::plugin,
         sequence::plugin,
+        resource_flow::plugin,
     ));
 }
