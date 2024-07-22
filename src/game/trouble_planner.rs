@@ -13,6 +13,7 @@ pub struct TroublePlanner {
 pub const MIN_DISTRIBUTION: f32 = 5.0;
 pub const DEFAULT_PEACE_TIME: f32 = 10.0;
 pub const DEFAULT_DISTRIBUTION: f32 = 10.0;
+pub const DIFFICULTY_PROGRESSION: f32 = 0.5;
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(TroublePlanner {
@@ -32,9 +33,6 @@ fn plan_trouble(
     trouble_planner.peace_time -= time.delta_seconds();
 
     if trouble_planner.peace_time <= 0.0 {
-        // todo: put something in fires
-        // todo: choose random elements to set in fire.
-
         let items = q_selectable.iter().collect::<Vec<_>>();
         let mut rng = rand::thread_rng();
         let index = rng.gen_range(0..items.len());
@@ -45,7 +43,7 @@ fn plan_trouble(
         let v = poi.sample(&mut rand::thread_rng());
         trouble_planner.peace_time = v;
         if trouble_planner.distribution < MIN_DISTRIBUTION {
-            trouble_planner.distribution -= 0.5; // linear difficulty
+            trouble_planner.distribution -= DIFFICULTY_PROGRESSION;
         }
     }
 }
