@@ -42,19 +42,21 @@ fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Sele
                  mut commands: Commands,
                  q_selected: Query<Entity, With<Selected>>,
                  q_selectable: Query<Entity, With<Selectable>>| {
+                    // Only trigger handle on selecteable entities
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }
 
                     let is_selected = q_selected.contains(event.listener());
-                    if is_selected {
-                        // Deselect will be in for loop
-                        for entity in q_selected.iter() {
-                            commands.entity(entity).remove::<Selected>();
-                            commands.trigger_targets(OnDeselect, entity);
-                            println!("OnDeselect {}", entity);
-                        }
-                    } else {
+
+                    // Clear old selections
+                    for entity in q_selected.iter() {
+                        commands.entity(entity).remove::<Selected>();
+                        commands.trigger_targets(OnDeselect, entity);
+                        println!("OnDeselect {}", entity);
+                    }
+                    // If the element wasn't previously selected, marked it as selected
+                    if !is_selected {
                         commands.entity(event.listener()).insert(Selected);
                         commands.trigger_targets(OnSelect, event.listener());
                         println!("OnSelect {}", event.listener());
