@@ -69,9 +69,11 @@ pub struct Movement {
 fn apply_movement(
     time: Res<GameTime>,
     mut movement_query: Query<(&MovementController, &Movement, &mut Transform)>,
-    mut q_camera: Query<&Transform, (With<Camera>, Without<Movement>)>
+    q_camera: Query<&Transform, (With<Camera>, Without<Movement>)>,
 ) {
-    let Ok(cam_transform) = q_camera.get_single() else {return;};
+    let Ok(cam_transform) = q_camera.get_single() else {
+        return;
+    };
 
     for (controller, movement, mut transform) in &mut movement_query {
         let velocity = movement.speed * controller.0;

@@ -8,16 +8,13 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(PreUpdate, in_fire);
 }
 
-
 #[derive(Default, Component)]
 pub struct InFire {
-    pub fire_created: bool
+    pub fire_created: bool,
 }
 
 #[derive(Component)]
 pub struct FireFor(Entity);
-
-
 
 fn in_fire(
     mut commands: Commands,
@@ -26,9 +23,10 @@ fn in_fire(
     mut q_in_fire: Query<(Entity, &mut InFire, &Transform)>,
     mut fire: Query<(Entity, &mut FireFor)>,
     mut q_cameras: Query<&Transform, With<Camera>>,
-
 ) {
-    let Ok(cam_transform) = q_cameras.get_single() else {return;};
+    let Ok(cam_transform) = q_cameras.get_single() else {
+        return;
+    };
 
     for (entity, mut in_fire, transform) in q_in_fire.iter_mut() {
         if !in_fire.fire_created {
@@ -36,7 +34,10 @@ fn in_fire(
 
             info!("Spawn fire {}", entity);
 
-            let mesh = meshes.add(Plane3d::new(Vec3::new(0.0, 0.0, 1.0).normalize(), Vec2::splat(1.5)));
+            let mesh = meshes.add(Plane3d::new(
+                Vec3::new(0.0, 0.0, 1.0).normalize(),
+                Vec2::splat(1.5),
+            ));
             let material = materials.add(StandardMaterial {
                 alpha_mode: AlphaMode::Blend,
                 cull_mode: None,
@@ -47,19 +48,19 @@ fn in_fire(
                 .looking_at(cam_transform.translation, Vec3::Y);
             // fire_transform.rotate_z(std::f32::consts::FRAC_PI_2);
 
-
-            commands.spawn(SpatialBundle::from_transform(fire_transform))
-                .insert(FireFor(entity)).with_children(|children| {
-                    children.spawn(
-                        PbrBundle {
+            commands
+                .spawn(SpatialBundle::from_transform(fire_transform))
+                .insert(FireFor(entity))
+                .with_children(|children| {
+                    children
+                        .spawn(PbrBundle {
                             mesh: mesh.clone(),
                             material: material.clone(),
                             transform: Transform::from_translation(Vec3::new(0.0, 1.5, -0.5)),
                             ..default()
-                        }
-                    ).insert(AutoAnim::new(FireSet, 0.05));
-            });
-        
+                        })
+                        .insert(AutoAnim::new(FireSet, 0.05));
+                });
         }
     }
 
@@ -69,7 +70,6 @@ fn in_fire(
         }
     }
 }
-
 
 #[derive(Default)]
 pub struct FireSet;

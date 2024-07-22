@@ -30,8 +30,6 @@ fn spawn_player(
     mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
-    
-
     // let capsule = asset_server.load("models/guy.glb#Scene0");
     // let material = StandardMaterial {
     //     base_color: Color::linear_rgb(1.0, 0.0, 0.0),
@@ -43,7 +41,8 @@ fn spawn_player(
         Player,
         SceneBundle {
             scene: asset_server.load("models/guy.glb#Scene0"),
-            transform: Transform::from_translation(Vec3::new(5.0, 0.7, 5.0)).with_scale(Vec3::splat(0.25)),
+            transform: Transform::from_translation(Vec3::new(5.0, 0.7, 5.0))
+                .with_scale(Vec3::splat(0.25)),
             ..default()
         },
         MovementController::default(),

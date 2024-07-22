@@ -4,24 +4,21 @@ pub mod map_generator;
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, update_map);
-    app.add_plugins(map_generator::plugin);   
+    app.add_plugins(map_generator::plugin);
 }
-
-
-
 
 #[derive(Clone)]
 pub enum Tile {
     Wall,
     Floor,
-    Nothing
+    Nothing,
 }
 
 #[derive(Component)]
 pub struct ShipMap {
     tiles: Vec<Tile>,
     width: usize,
-    height: usize
+    height: usize,
 }
 
 impl ShipMap {
@@ -29,7 +26,7 @@ impl ShipMap {
         Self {
             tiles: vec![Tile::Nothing; width * height],
             width,
-            height
+            height,
         }
     }
 
@@ -57,11 +54,10 @@ fn update_map(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     for (entity, map, children) in &mut q_maps {
-
         info!("Updating map {}", entity);
 
         let cube = meshes.add(Cuboid::new(1.0, 2.0, 1.0));
-        let material = materials.add( StandardMaterial {
+        let material = materials.add(StandardMaterial {
             base_color: Color::linear_rgb(0.8, 0.7, 0.6),
             ..default()
         });
@@ -93,22 +89,27 @@ fn update_map(
                 let tile = &map.tiles[y * map.width + x];
                 match tile {
                     Tile::Wall => {
-                        let id = commands.spawn(wall_pbr.clone())
-                            .insert(Transform::from_translation(Vec3::new(x as f32, 1.0, y as f32)))
+                        let id = commands
+                            .spawn(wall_pbr.clone())
+                            .insert(Transform::from_translation(Vec3::new(
+                                x as f32, 1.0, y as f32,
+                            )))
                             .id();
                         commands.entity(entity).add_child(id);
-                    },
+                    }
                     Tile::Floor => {
-                        let id = commands.spawn(floor_pbr.clone())
-                            .insert(Transform::from_translation(Vec3::new(x as f32, 0.0, y as f32)))
+                        let id = commands
+                            .spawn(floor_pbr.clone())
+                            .insert(Transform::from_translation(Vec3::new(
+                                x as f32, 0.0, y as f32,
+                            )))
                             .id();
 
                         commands.entity(entity).add_child(id);
-                    },
-                    Tile::Nothing => {},
-                }       
+                    }
+                    Tile::Nothing => {}
+                }
             }
         }
     }
 }
-

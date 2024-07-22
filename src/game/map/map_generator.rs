@@ -1,12 +1,11 @@
-use bevy::prelude::*;
 use crate::game::spawn::level::SpawnLevel;
+use bevy::prelude::*;
 
 use super::*;
 
 pub(crate) fn plugin(app: &mut App) {
     app.observe(spawn_map);
 }
-
 
 fn spawn_map(_: Trigger<SpawnLevel>, mut commands: Commands) {
     let mut map = ShipMap::new(10, 10);
@@ -27,8 +26,5 @@ fn spawn_map(_: Trigger<SpawnLevel>, mut commands: Commands) {
         map.set(map.width() - 1, y, Tile::Wall);
     }
 
-    commands.spawn((
-        SpatialBundle::default(),
-        map
-    ));
+    commands.spawn((SpatialBundle::default(), map));
 }

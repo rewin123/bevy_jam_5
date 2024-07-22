@@ -4,7 +4,9 @@ use bevy::{pbr::ExtendedMaterial, prelude::*};
 use rand::Rng;
 
 use crate::game::{
-    auto_anim::AutoAnim, components::fire::{FireSet, InFire}, daycycle::TimeSpeed,
+    auto_anim::AutoAnim,
+    components::fire::{FireSet, InFire},
+    daycycle::TimeSpeed,
     selectable::{Computer, Selectable},
 };
 
@@ -21,7 +23,13 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(Event, Debug)]
 pub struct SpawnLevel;
 
-fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_server: Res<AssetServer>, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
+fn spawn_level(
+    _trigger: Trigger<SpawnLevel>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
     // The only thing we have in our level is a player,
     // but add things like walls etc. here.
     commands.trigger(SpawnPlayer);
@@ -93,12 +101,15 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_serv
         })
         .insert(Selectable);
 
-    commands.spawn(SceneBundle {
-        scene: asset_server.load("models/metal_trash.glb#Scene0"),
-        transform: Transform::from_translation(Vec3::new(6.0, 0.1, 6.0)).with_scale(Vec3::splat(0.5)),
-        ..default()
-    }).insert(Selectable)
-    .insert(InFire::default());
+    commands
+        .spawn(SceneBundle {
+            scene: asset_server.load("models/metal_trash.glb#Scene0"),
+            transform: Transform::from_translation(Vec3::new(6.0, 0.1, 6.0))
+                .with_scale(Vec3::splat(0.5)),
+            ..default()
+        })
+        .insert(Selectable)
+        .insert(InFire::default());
 
     commands.add(SpawnOxygenGenerator {
         pos: Vec3::new(3.0, 0.1, 7.0),
@@ -109,7 +120,6 @@ fn spawn_level(_trigger: Trigger<SpawnLevel>, mut commands: Commands, asset_serv
     });
 
     commands.add(SpawnEarth);
-    
 }
 
 fn setup_camera(_: Trigger<SpawnLevel>, mut q_cameras: Query<&mut Transform, With<Camera>>) {

@@ -4,7 +4,9 @@ use bevy::{
     pbr::{ExtendedMaterial, MaterialExtension},
     prelude::*,
     render::{
-        mesh::Indices, render_asset::RenderAssetUsages, render_resource::{AsBindGroup, PrimitiveTopology, ShaderRef}
+        mesh::Indices,
+        render_asset::RenderAssetUsages,
+        render_resource::{AsBindGroup, PrimitiveTopology, ShaderRef},
     },
 };
 

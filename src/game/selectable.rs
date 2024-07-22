@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_mod_outline::*;
 use bevy_mod_picking::prelude::*;
 
 pub(crate) fn plugin(app: &mut App) {
@@ -27,7 +26,7 @@ pub struct OnMouseOver;
 #[derive(Event)]
 pub struct OnMouseOut;
 
-fn selectable_add(mut commands: Commands, mut q_selectable: Query<Entity, Added<Selectable>>) {
+fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Selectable>>) {
     for entity in q_selectable.iter() {
         commands
             .entity(entity)
@@ -41,8 +40,8 @@ fn selectable_add(mut commands: Commands, mut q_selectable: Query<Entity, Added<
             .insert(On::<Pointer<Click>>::run(
                 |mut event: ListenerMut<Pointer<Click>>,
                  mut commands: Commands,
-                 mut q_selected: Query<Entity, With<Selected>>,
-                 mut q_selectable: Query<Entity, With<Selectable>>| {
+                q_selected: Query<Entity, With<Selected>>,
+                q_selectable: Query<Entity, With<Selectable>>| {
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }
@@ -67,7 +66,7 @@ fn selectable_add(mut commands: Commands, mut q_selectable: Query<Entity, Added<
             .insert(On::<Pointer<Out>>::run(
                 |mut event: ListenerMut<Pointer<Out>>,
                  mut commands: Commands,
-                 mut q_selectable: Query<Entity, With<Selectable>>| {
+                q_selectable: Query<Entity, With<Selectable>>| {
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }

@@ -1,3 +1,13 @@
+# Highest apartment in the World
+
+## Description 
+
+Mortgage is really skyrocketing now a days in Canada, so we found you this amazing apartment at the top of the world with an insanely good mortgage deal. The problem is, you might need to be extra careful managing your sewer.
+
+In this amazing game by ________, you will have to pay your mortgage installs, while you manage your resources to reduce costs. Just beware that every now and then, stuff breaks and blowup. The cycle of life we can say
+
+## Docs
+
 Design doc - https://docs.google.com/document/d/1Fmn5A9aLNOFJ0A6bqsuo7XWaz2jTZ0GFZmN9Elpx3E4/edit?usp=sharing
 
 Miro design board - https://miro.com/welcomeonboard/aE5wcUFEUGJybGdJT1NHcXBybzBKanpWMDhXaEtNUWJlSWNDcmhvSVEzeFFEam5la3ZmZFlPWGc4OVFSS1k2UHwzNDU4NzY0NTk0ODE4NTA1NTkxfDI=?share_link_id=472846460666

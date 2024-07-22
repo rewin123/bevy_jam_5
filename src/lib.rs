@@ -9,10 +9,6 @@ use bevy::{
     asset::AssetMetaCheck,
     audio::{AudioPlugin, Volume},
     prelude::*,
-    render::{
-        settings::{Backends, RenderCreation, WgpuSettings},
-        RenderPlugin,
-    },
 };
 use bevy_mod_picking::DefaultPickingPlugins;
 use bevy_quill::QuillPlugin;
@@ -42,7 +38,7 @@ impl Plugin for AppPlugin {
             })
             .set(WindowPlugin {
                 primary_window: Window {
-                    title: "bevy_quickstart".to_string(),
+                    title: "Highest Apartment in the World".to_string(),
                     canvas: Some("#bevy".to_string()),
                     fit_canvas_to_parent: true,
                     prevent_default_event_handling: true,
