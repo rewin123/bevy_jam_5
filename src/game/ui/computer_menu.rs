@@ -1,9 +1,8 @@
 use bevy::{prelude::*, ui};
 use bevy_mod_stylebuilder::*;
 use bevy_quill::prelude::*;
-use bevy_quill_obsidian::controls::Button;
 
-use super::StartWorking;
+use super::{components::action_button::ActionButton, StartWorking};
 
 #[derive(Clone, PartialEq)]
 pub(super) struct ComputerMenu;
@@ -23,12 +22,12 @@ impl ViewTemplate for ComputerMenu {
             "Actions",
             Element::<NodeBundle>::new()
                 .style(style_row)
-                .children((Button::new()
+                .children((ActionButton::new()
                     .on_click(cx.create_callback(|mut events: EventWriter<StartWorking>| {
                         events.send(StartWorking);
                         info!("Clicked Work");
                     }))
-                    .children("Work"),)),
+                    .label("Work"),)),
         )
     }
 }
