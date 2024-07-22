@@ -56,6 +56,7 @@ fn move_player_to_target(
 
         if distance > target.accept_radius {
             transform.translation += direction * time.delta_seconds() * PLAYER_SPEED;
+            // the character should just spin on its y axis at the beginning
             transform.rotate_local_y(cos_result.y);
         } else {
         }
