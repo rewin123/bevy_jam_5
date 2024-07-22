@@ -2,7 +2,10 @@
 
 use bevy::prelude::*;
 
-use crate::game::movement::{Movement, MovementController};
+use crate::game::{
+    assets::{HandleMap, SceneKey},
+    movement::{Movement, MovementController},
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.observe(spawn_player);
@@ -21,7 +24,7 @@ fn spawn_player(
     mut commands: Commands,
     // mut meshes: ResMut<Assets<Mesh>>,
     // mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
+    scene_handler: Res<HandleMap<SceneKey>>,
 ) {
     // let capsule = asset_server.load("models/guy.glb#Scene0");
     // let material = StandardMaterial {
@@ -33,7 +36,7 @@ fn spawn_player(
         Name::new("Player"),
         Player,
         SceneBundle {
-            scene: asset_server.load("models/guy.glb#Scene0"),
+            scene: scene_handler[&SceneKey::Player].clone_weak(),
             transform: Transform::from_translation(Vec3::new(5.0, 0.7, 5.0))
                 .with_scale(Vec3::splat(0.25)),
             ..default()

@@ -108,7 +108,16 @@ impl FromWorld for HandleMap<SoundtrackKey> {
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Reflect)]
 pub enum SceneKey {
     Pc,
-    Gameplay,
+    WaterTank,
+    OxygenTank,
+    BadWaterTank,
+    HydrogenTank,
+    PeeWaterTank,
+    MetalTrash,
+    Player,
+    Hydroponic,
+    OxygenGenerator,
+    Earth,
 }
 
 impl AssetKey for SceneKey {
@@ -118,7 +127,47 @@ impl AssetKey for SceneKey {
 impl FromWorld for HandleMap<SceneKey> {
     fn from_world(world: &mut World) -> Self {
         let asset_server = world.resource::<AssetServer>();
-        [(SceneKey::Pc, asset_server.load("models/pc.glb#Scene0"))].into()
+        [
+            (SceneKey::Pc, asset_server.load("models/pc.glb#Scene0")),
+            (
+                SceneKey::WaterTank,
+                asset_server.load("models/water_tank.glb#Scene0"),
+            ),
+            (
+                SceneKey::OxygenTank,
+                asset_server.load("models/oxygen_tank.glb#Scene0"),
+            ),
+            (
+                SceneKey::BadWaterTank,
+                asset_server.load("models/bad_water_tank.glb#Scene0"),
+            ),
+            (
+                SceneKey::PeeWaterTank,
+                asset_server.load("models/pee_tank.glb#Scene0"),
+            ),
+            (
+                SceneKey::HydrogenTank,
+                asset_server.load("models/hydrogen_tank.glb#Scene0"),
+            ),
+            (
+                SceneKey::MetalTrash,
+                asset_server.load("models/metal_trash.glb#Scene0"),
+            ),
+            (SceneKey::Player, asset_server.load("models/guy.glb#Scene0")),
+            (
+                SceneKey::Earth,
+                asset_server.load("models/earth.glb#Scene0"),
+            ),
+            (
+                SceneKey::Hydroponic,
+                asset_server.load("models/hydroponic.glb#Scene0"),
+            ),
+            (
+                SceneKey::OxygenGenerator,
+                asset_server.load("models/oxygen_generator.glb#Scene0"),
+            ),
+        ]
+        .into()
     }
 }
 

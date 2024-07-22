@@ -1,6 +1,10 @@
 use bevy::{ecs::world::Command, prelude::*};
 
-use crate::game::{components::earth::Earth, selectable::Selectable};
+use crate::game::{
+    assets::{HandleMap, SceneKey},
+    components::earth::Earth,
+    selectable::Selectable,
+};
 
 pub struct SpawnOxygenGenerator {
     pub pos: Vec3,
@@ -8,9 +12,8 @@ pub struct SpawnOxygenGenerator {
 
 impl Command for SpawnOxygenGenerator {
     fn apply(self, world: &mut World) {
-        let scene = world
-            .resource::<AssetServer>()
-            .load("models/oxygen_generator.glb#Scene0");
+        let scene =
+            world.resource::<HandleMap<SceneKey>>()[&SceneKey::OxygenGenerator].clone_weak();
 
         let bundle = SceneBundle {
             scene,
@@ -28,9 +31,7 @@ pub struct SpawnHydroponic {
 
 impl Command for SpawnHydroponic {
     fn apply(self, world: &mut World) {
-        let scene = world
-            .resource::<AssetServer>()
-            .load("models/hydroponic.glb#Scene0");
+        let scene = world.resource::<HandleMap<SceneKey>>()[&SceneKey::Hydroponic].clone_weak();
 
         let bundle = SceneBundle {
             scene,
@@ -46,9 +47,7 @@ pub struct SpawnEarth;
 
 impl Command for SpawnEarth {
     fn apply(self, world: &mut World) {
-        let scene = world
-            .resource::<AssetServer>()
-            .load("models/earth.glb#Scene0");
+        let scene = world.resource::<HandleMap<SceneKey>>()[&SceneKey::Earth].clone_weak();
         let dir = Vec3::new(-0.0, -1.0, -0.0).normalize();
 
         let earth_r = 6371000.0; // 6 371 km
