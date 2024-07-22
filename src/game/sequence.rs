@@ -28,14 +28,50 @@ pub trait CharacterAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity); // Start the action with trigger
     fn terminate(&self, commands: &mut Commands, target: Entity);
 }
+#[derive(Clone)]
+pub struct ActionHolder {
+    pub action: Arc<dyn CharacterAction + Send + Sync>,
+    pub group_name: String,
+}
+
+impl ActionHolder {
+    pub fn trigger_start(&self, commands: &mut Commands, target: Entity) {
+        self.action.trigger_start(commands, target);
+    }
+
+    pub fn terminate(&self, commands: &mut Commands, target: Entity) {
+        self.action.terminate(commands, target);
+    }
+}
+
 
 // Action sequence for character
-#[derive(Component, Default)]
-pub struct Sequence(Vec<Arc<dyn CharacterAction + Send + Sync>>);
+#[derive(Component, Default, Clone)]
+pub struct Sequence {
+    pub actions: Vec<ActionHolder>,
+    pub active: bool,
+}
 
 impl Sequence {
     pub fn push<T: CharacterAction + Send + Sync + 'static>(&mut self, action: T) {
-        self.0.push(Arc::new(action));
+        self.actions.push(ActionHolder {
+            action: Arc::new(action),
+            group_name: "".to_string(),
+        });
+        if self.actions.len() == 1 {
+            self.active = false;
+        }
+    }
+
+    pub fn push_with_group<T: CharacterAction + Send + Sync + 'static>(
+        &mut self,
+        action: T,
+        group_name: String,
+    ) {
+        self.actions.push(ActionHolder {
+            action: Arc::new(action),
+            group_name,
+        });
     }
 }
 
@@ -47,13 +83,19 @@ fn on_next_action(
     let target = trigger.entity();
     info!("OnNextAction {}", target);
     if let Ok(mut sequence) = q_players.get_mut(target) {
-        if !sequence.0.is_empty() {
-            sequence.0.remove(0);
+        if !sequence.actions.is_empty() {
+            if sequence.active {
+                sequence.actions[0].action.terminate(&mut commands, target);
+                sequence.active = false;
+                sequence.actions.remove(0);
+            } else {
+               
+            }
         }
 
-        if !sequence.0.is_empty() {
-            let action = &mut sequence.0[0];
-            action.trigger_start(&mut commands, target);
+        if !sequence.actions.is_empty() {
+            sequence.actions[0].trigger_start(&mut commands, target);
+            sequence.active = true;
         }
     }
 }
@@ -70,31 +112,34 @@ fn new_sequence(
     match trigger.event().mode {
         NewMode::Replace => {
             if let Ok(mut sequence) = q_players.get_mut(target) {
-                if !sequence.0.is_empty() {
-                    sequence.0[0].terminate(&mut commands, target);
+                if !sequence.actions.is_empty() {
+                    if sequence.active {
+                        sequence.actions[0].terminate(&mut commands, target);
+                        sequence.active = false;
+                    }
                 }
-                sequence.0.clear();
+                sequence.actions.clear();
             }
 
             commands
                 .entity(target)
-                .insert(Sequence(trigger.event().actions.0.clone()));
+                .insert(trigger.event().actions.clone());
             commands.trigger_targets(NextAction, target);
         }
         NewMode::Append => {
             if let Ok(mut sequence) = q_players.get_mut(target) {
-                if !sequence.0.is_empty() {
-                    sequence.0.append(&mut trigger.event().actions.0.clone());
-                } else {
-                    commands
-                        .entity(target)
-                        .insert(Sequence(trigger.event().actions.0.clone()));
-                    commands.trigger_targets(NextAction, target);
+                if !sequence.actions.is_empty() {
+                    if sequence.active {
+                        sequence.actions[0].terminate(&mut commands, target);
+                        sequence.active = false;
+                    }
                 }
+                sequence.actions.extend(trigger.event().actions.actions.iter().cloned());
+                commands.trigger_targets(NextAction, target);
             } else {
                 commands
                     .entity(target)
-                    .insert(Sequence(trigger.event().actions.0.clone()));
+                    .insert(trigger.event().actions.clone());
                 commands.trigger_targets(NextAction, target);
             }
         }

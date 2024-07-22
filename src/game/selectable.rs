@@ -26,6 +26,12 @@ pub struct OnMouseOut;
 #[derive(Event)]
 pub struct OnMouseClick(pub MouseButton);
 
+#[derive(Event)]
+pub struct OpenContextMenu;
+
+#[derive(Event)]
+pub struct CloseContextMenu;
+
 fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Selectable>>) {
     for entity in q_selectable.iter() {
         commands
@@ -60,12 +66,18 @@ fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Sele
                     for entity in q_selected.iter() {
                         commands.entity(entity).remove::<Selected>();
                         commands.trigger_targets(OnDeselect, entity);
+                        if mouse_button == MouseButton::Right {
+                            commands.trigger_targets(CloseContextMenu, entity);
+                        }
                         println!("OnDeselect {}", entity);
                     }
                     // If the element wasn't previously selected, marked it as selected
                     if !is_selected {
                         commands.entity(event.listener()).insert(Selected);
                         commands.trigger_targets(OnSelect, event.listener());
+                        if mouse_button == MouseButton::Right {
+                            commands.trigger_targets(OpenContextMenu, event.listener());
+                        }
                         println!("OnSelect {}", event.listener());
                     }
 
