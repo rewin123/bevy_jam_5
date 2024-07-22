@@ -40,8 +40,8 @@ fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Sele
             .insert(On::<Pointer<Click>>::run(
                 |mut event: ListenerMut<Pointer<Click>>,
                  mut commands: Commands,
-                q_selected: Query<Entity, With<Selected>>,
-                q_selectable: Query<Entity, With<Selectable>>| {
+                 q_selected: Query<Entity, With<Selected>>,
+                 q_selectable: Query<Entity, With<Selectable>>| {
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }
@@ -66,7 +66,7 @@ fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Sele
             .insert(On::<Pointer<Out>>::run(
                 |mut event: ListenerMut<Pointer<Out>>,
                  mut commands: Commands,
-                q_selectable: Query<Entity, With<Selectable>>| {
+                 q_selectable: Query<Entity, With<Selectable>>| {
                     if !q_selectable.contains(event.listener()) {
                         return;
                     }

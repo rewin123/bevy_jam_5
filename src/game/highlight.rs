@@ -39,11 +39,7 @@ fn add_highlight(
     }
 }
 
-fn recursive_add_highlight(
-    entity: Entity,
-    commands: &mut Commands,
-    q_children: &Query<&Children>,
-) {
+fn recursive_add_highlight(entity: Entity, commands: &mut Commands, q_children: &Query<&Children>) {
     commands.entity(entity).insert(OutlineBundle {
         outline: OutlineVolume {
             visible: true,

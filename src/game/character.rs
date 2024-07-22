@@ -4,7 +4,7 @@ use super::{
     daycycle::GameTime,
     movement::MovementController,
     selectable::{OnSelect, Selected},
-    spawn::player::Player,
+    spawn::player::{self, Player},
 };
 
 pub const PLAYER_SPEED: f32 = 5.0;
@@ -50,11 +50,13 @@ fn move_player_to_target(
         let player_position = transform.translation;
         let target_position = target.target_pos;
 
+        let cos_result = Quat::from_scaled_axis(player_position - target_position);
         let direction = (target_position - player_position).normalize();
         let distance = player_position.distance(target_position);
 
         if distance > target.accept_radius {
             transform.translation += direction * time.delta_seconds() * PLAYER_SPEED;
+            transform.rotation = Quat::from_rotation_y(transform.rotation.y + cos_result.y);
         } else {
         }
     }
