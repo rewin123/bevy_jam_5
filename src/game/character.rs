@@ -56,7 +56,7 @@ fn move_player_to_target(
 
         if distance > target.accept_radius {
             transform.translation += direction * time.delta_seconds() * PLAYER_SPEED;
-            transform.rotation = Quat::from_rotation_y(transform.rotation.y + cos_result.y);
+            transform.rotate_local_y(cos_result.y);
         } else {
         }
     }
