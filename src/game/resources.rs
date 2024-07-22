@@ -107,15 +107,32 @@ pub struct Pee {
     pub limit: f32,
 }
 
-#[derive(Resource, Default)]
+#[derive(Resource)]
 pub struct Food {
     pub amount: f32,
     pub limit: f32,
 }
 
-#[derive(Resource, Default)]
+impl Default for Food {
+    fn default() -> Self {
+        Self {
+            amount: 10.0,
+            limit: 100.0,
+        }
+    }
+}
+
+#[derive(Resource)]
 pub struct HydroponicsMachine {
     pub food_generation_rate: f32,
+}
+
+impl Default for HydroponicsMachine {
+    fn default() -> Self {
+        Self {
+            food_generation_rate: 10.0,
+        }
+    }
 }
 
 #[derive(Resource, Default)]
@@ -183,7 +200,10 @@ mod dev {
             ),
         );
         debug_panel.add("Pee", format!("Pee: {}/{}", pee.amount, pee.limit));
-        debug_panel.add("Food", format!("Food: {}/{}", food.amount, food.limit));
+        debug_panel.add(
+            "Food",
+            format!("Food: {}/{}", food.amount as i32, food.limit),
+        );
         debug_panel.add(
             "Hydrogen",
             format!("Hydrogen: {}/{}", hydrogen.amount, hydrogen.limit),
