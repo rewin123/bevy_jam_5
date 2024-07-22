@@ -1,4 +1,4 @@
-use bevy::{prelude::*, render::render_resource::Face};
+use bevy::prelude::*;
 
 use crate::game::auto_anim::{AnimRange, AnimSet, AutoAnim, AutoAnimPlugin};
 
@@ -22,7 +22,7 @@ fn in_fire(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut q_in_fire: Query<(Entity, &mut InFire, &Transform)>,
     mut fire: Query<(Entity, &mut FireFor)>,
-    mut q_cameras: Query<&Transform, With<Camera>>,
+    q_cameras: Query<&Transform, With<Camera>>,
 ) {
     let Ok(cam_transform) = q_cameras.get_single() else {
         return;
@@ -44,7 +44,7 @@ fn in_fire(
                 ..default()
             });
 
-            let mut fire_transform = Transform::from_translation(transform.translation)
+            let fire_transform = Transform::from_translation(transform.translation)
                 .looking_at(cam_transform.translation, Vec3::Y);
             // fire_transform.rotate_z(std::f32::consts::FRAC_PI_2);
 

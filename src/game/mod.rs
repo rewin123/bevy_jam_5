@@ -17,7 +17,10 @@ pub mod resources;
 mod selectable;
 pub mod spawn;
 pub mod sprite_material;
+mod trouble_planner;
 pub mod ui;
+mod pc_work;
+mod sequence;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
@@ -33,6 +36,7 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_plugins((
         daycycle::plugin,
+        trouble_planner::plugin,
         character::plugin,
         debt::plugin,
         map::plugin,
@@ -41,5 +45,7 @@ pub(super) fn plugin(app: &mut App) {
         components::plugin,
         resources::plugin,
         sprite_material::SpriteMaterialPlugin,
+        pc_work::plugin,
+        sequence::plugin,
     ));
 }

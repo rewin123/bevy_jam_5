@@ -1,12 +1,14 @@
 use bevy::prelude::*;
 use bevy_quill::View;
 
-use super::selectable::Computer;
+use super::components::pc::Pc;
 use super::selectable::OnDeselect;
 use super::selectable::OnSelect;
 use super::spawn::level::SpawnLevel;
 
+pub mod components;
 mod computer_menu;
+pub mod constants;
 mod context_menu;
 mod root;
 
@@ -28,16 +30,10 @@ enum ResourceType {
     // Placeholder
     Unknown,
 }
-#[derive(Resource)]
+#[derive(Resource, Default)]
 struct SelectedItem {
     // Wrap everything in an Option because on Quill we can't query for `Option<Res<...>>`
     item: Option<(Entity, Vec2, ResourceType)>,
-}
-
-impl Default for SelectedItem {
-    fn default() -> Self {
-        Self { item: None }
-    }
 }
 
 fn spawn_root_ui(
@@ -46,7 +42,7 @@ fn spawn_root_ui(
     mut commands: Commands,
 ) {
     let Ok(entity) = camera_q.get_single() else {
-        return ();
+        return;
     };
 
     commands.spawn(root::RootUi { camera: entity }.to_root());
@@ -62,12 +58,8 @@ fn clear_context_menu_position(
 #[derive(Event)]
 pub struct OpenContext(ResourceType);
 
-fn open_context(
-    _trigger: Trigger<OnSelect>,
-    computers_q: Query<&Computer>,
-    mut commands: Commands,
-) {
-    let entity = _trigger.entity();
+fn open_context(trigger: Trigger<OnSelect>, computers_q: Query<&Pc>, mut commands: Commands) {
+    let entity = trigger.entity();
     if computers_q.contains(entity) {
         commands.trigger_targets(OpenContext(ResourceType::Computer), entity);
     } else {
@@ -77,21 +69,21 @@ fn open_context(
 
 // Set the position for the context Menu
 fn set_context_menu_position(
-    _trigger: Trigger<OpenContext>,
+    trigger: Trigger<OpenContext>,
     global_transform_q: Query<&GlobalTransform, Without<IsDefaultUiCamera>>,
     camera_q: Query<(Entity, &Camera, &GlobalTransform), With<IsDefaultUiCamera>>,
     mut context_menu: ResMut<SelectedItem>,
 ) {
-    let entity = _trigger.entity();
+    let entity = trigger.entity();
     let Ok((_, camera, camera_transform)) = camera_q.get_single() else {
-        return ();
+        return;
     };
     let Ok(transform) = global_transform_q.get(entity) else {
-        return ();
+        return;
     };
 
     let Some(position) = camera.world_to_viewport(camera_transform, transform.translation()) else {
-        return ();
+        return;
     };
-    context_menu.item = Some((entity, position, _trigger.event().0));
+    context_menu.item = Some((entity, position, trigger.event().0));
 }

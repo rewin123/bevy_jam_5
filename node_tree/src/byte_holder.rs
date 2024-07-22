@@ -1,34 +1,35 @@
-use std::{alloc::Layout, sync::atomic::{AtomicPtr, Ordering}};
-
-
+use std::{
+    alloc::Layout,
+    sync::atomic::{AtomicPtr, Ordering},
+};
 
 pub struct ByteHolder {
-    pub bytes : AtomicPtr<u8>,
+    pub bytes: AtomicPtr<u8>,
     pub layout: Layout,
-    pub need_drop : bool
+    pub need_drop: bool,
 }
 
 impl ByteHolder {
-
-
-    pub fn from_ref<T>(value : &T) -> Self {
-        let bytes = unsafe { std::slice::from_raw_parts(value as *const T as *const u8, std::mem::size_of::<T>()) };
+    pub fn from_ref<T>(value: &T) -> Self {
+        let bytes = unsafe {
+            std::slice::from_raw_parts(value as *const T as *const u8, std::mem::size_of::<T>())
+        };
 
         Self::from_slice(bytes, Layout::new::<T>())
     }
 
-    pub fn from_slice(bytes : &[u8], layout : Layout) -> Self {
+    pub fn from_slice(bytes: &[u8], layout: Layout) -> Self {
         let ptr = unsafe { std::alloc::alloc(layout) };
         for (idx, byte) in bytes.iter().enumerate() {
             unsafe {
                 std::ptr::write(ptr.offset(idx as isize), *byte);
             }
-        } 
+        }
 
         Self {
-            bytes : AtomicPtr::<u8>::new(ptr),
+            bytes: AtomicPtr::<u8>::new(ptr),
             layout,
-            need_drop : true
+            need_drop: true,
         }
     }
 
@@ -103,7 +104,12 @@ mod tests {
     #[test]
     fn test_downcast_ref() {
         let value: u32 = 42;
-        let bytes = unsafe { std::slice::from_raw_parts(&value as *const u32 as *const u8, std::mem::size_of::<u32>()) };
+        let bytes = unsafe {
+            std::slice::from_raw_parts(
+                &value as *const u32 as *const u8,
+                std::mem::size_of::<u32>(),
+            )
+        };
         let layout = Layout::new::<u32>();
         let byte_holder = ByteHolder::from_slice(bytes, layout);
 
@@ -114,7 +120,12 @@ mod tests {
     #[test]
     fn test_downcast_mut() {
         let value: u32 = 42;
-        let bytes = unsafe { std::slice::from_raw_parts(&value as *const u32 as *const u8, std::mem::size_of::<u32>()) };
+        let bytes = unsafe {
+            std::slice::from_raw_parts(
+                &value as *const u32 as *const u8,
+                std::mem::size_of::<u32>(),
+            )
+        };
         let layout = Layout::new::<u32>();
         let mut byte_holder = ByteHolder::from_slice(bytes, layout);
 
@@ -126,7 +137,12 @@ mod tests {
     #[test]
     fn test_downcast_box() {
         let value: u32 = 42;
-        let bytes = unsafe { std::slice::from_raw_parts(&value as *const u32 as *const u8, std::mem::size_of::<u32>()) };
+        let bytes = unsafe {
+            std::slice::from_raw_parts(
+                &value as *const u32 as *const u8,
+                std::mem::size_of::<u32>(),
+            )
+        };
         let layout = Layout::new::<u32>();
         let byte_holder = ByteHolder::from_slice(bytes, layout);
 

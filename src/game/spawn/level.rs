@@ -1,13 +1,12 @@
 //! Spawn the main level by triggering other observers.
 
-use bevy::{pbr::ExtendedMaterial, prelude::*};
-use rand::Rng;
+use bevy::prelude::*;
 
 use crate::game::{
-    auto_anim::AutoAnim,
-    components::fire::{FireSet, InFire},
+    assets::{HandleMap, SceneKey},
+    components::{fire::InFire, pc::Pc},
     daycycle::TimeSpeed,
-    selectable::{Computer, Selectable},
+    selectable::Selectable,
 };
 
 use super::{
@@ -26,9 +25,7 @@ pub struct SpawnLevel;
 fn spawn_level(
     _trigger: Trigger<SpawnLevel>,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    scene_handler: Res<HandleMap<SceneKey>>,
 ) {
     // The only thing we have in our level is a player,
     // but add things like walls etc. here.
@@ -48,17 +45,17 @@ fn spawn_level(
 
     commands
         .spawn(SceneBundle {
-            scene: asset_server.load("models/pc.glb#Scene0"),
+            scene: scene_handler[&SceneKey::Pc].clone_weak(),
             transform: Transform::from_translation(Vec3::new(4.0, 0.9, 5.0))
                 .with_scale(Vec3::splat(0.5)),
             ..default()
         })
         .insert(Selectable)
-        .insert(Computer);
+        .insert(Pc);
 
     commands
         .spawn(SceneBundle {
-            scene: asset_server.load("models/water_tank.glb#Scene0"),
+            scene: scene_handler[&SceneKey::WaterTank].clone_weak(),
             transform: Transform::from_translation(Vec3::new(5.0, 0.1, 2.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
@@ -67,7 +64,7 @@ fn spawn_level(
 
     commands
         .spawn(SceneBundle {
-            scene: asset_server.load("models/oxygen_tank.glb#Scene0"),
+            scene: scene_handler[&SceneKey::OxygenTank].clone_weak(),
             transform: Transform::from_translation(Vec3::new(5.0, 0.1, 1.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
@@ -76,7 +73,7 @@ fn spawn_level(
 
     commands
         .spawn(SceneBundle {
-            scene: asset_server.load("models/bad_water_tank.glb#Scene0"),
+            scene: scene_handler[&SceneKey::BadWaterTank].clone_weak(),
             transform: Transform::from_translation(Vec3::new(3.0, 0.1, 1.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
@@ -85,7 +82,7 @@ fn spawn_level(
 
     commands
         .spawn(SceneBundle {
-            scene: asset_server.load("models/hydrogen_tank.glb#Scene0"),
+            scene: scene_handler[&SceneKey::HydrogenTank].clone_weak(),
             transform: Transform::from_translation(Vec3::new(3.0, 0.1, 2.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
@@ -94,7 +91,7 @@ fn spawn_level(
 
     commands
         .spawn(SceneBundle {
-            scene: asset_server.load("models/pee_tank.glb#Scene0"),
+            scene: scene_handler[&SceneKey::PeeWaterTank].clone_weak(),
             transform: Transform::from_translation(Vec3::new(3.0, 0.1, 3.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
@@ -103,13 +100,15 @@ fn spawn_level(
 
     commands
         .spawn(SceneBundle {
-            scene: asset_server.load("models/metal_trash.glb#Scene0"),
+            scene: scene_handler[&SceneKey::MetalTrash].clone_weak(),
             transform: Transform::from_translation(Vec3::new(6.0, 0.1, 6.0))
                 .with_scale(Vec3::splat(0.5)),
             ..default()
         })
         .insert(Selectable)
-        .insert(InFire::default());
+        //add fire
+        .insert(InFire::default())
+        ;
 
     commands.add(SpawnOxygenGenerator {
         pos: Vec3::new(3.0, 0.1, 7.0),

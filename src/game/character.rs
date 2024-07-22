@@ -1,24 +1,47 @@
 use bevy::prelude::*;
+use std::sync::Arc;
 
 use super::{
-    daycycle::GameTime,
-    movement::MovementController,
-    selectable::{OnSelect, Selected},
-    spawn::player::{self, Player},
+    daycycle::GameTime, selectable::{OnSelect, Selected}, sequence::{CharacterAction, NextAction}, spawn::player::Player
 };
+
+
+pub(crate) fn plugin(app: &mut App) {
+    app.add_systems(Update, move_player_to_target);
+    app.observe(add_target);
+}
+
+
+
+
 
 pub const PLAYER_SPEED: f32 = 5.0;
 
 #[derive(Component)]
 struct DestinationTarget {
+    #[allow(dead_code)]
     pub target: Entity,
     pub target_pos: Vec3,
     pub accept_radius: f32,
 }
 
-pub(crate) fn plugin(app: &mut App) {
-    app.add_systems(Update, move_player_to_target);
-    app.observe(add_target);
+pub struct GoToAction {
+    pub target: Entity,
+    pub target_pos: Vec3,
+}
+
+impl CharacterAction for GoToAction {
+    fn trigger_start(&self, commands: &mut Commands, target: Entity) {
+        commands.entity(target).insert(DestinationTarget {
+            target: self.target,
+            target_pos: self.target_pos,
+            accept_radius: 0.5,
+        });
+    }
+
+    fn terminate(&self, commands: &mut Commands, target: Entity) {
+        commands.entity(target).remove::<DestinationTarget>();
+    }
 }
 
 fn add_target(
@@ -43,10 +66,11 @@ fn add_target(
 }
 
 fn move_player_to_target(
+    mut commands: Commands,
     time: Res<GameTime>,
-    mut query: Query<(&mut Transform, &DestinationTarget), With<Player>>,
+    mut query: Query<(Entity, &mut Transform, &DestinationTarget), With<Player>>,
 ) {
-    for (mut transform, target) in query.iter_mut() {
+    for (player_entity, mut transform, target) in query.iter_mut() {
         let player_position = transform.translation;
         let target_position = target.target_pos;
 
@@ -59,6 +83,8 @@ fn move_player_to_target(
             // the character should just spin on its y axis at the beginning
             transform.rotate_local_y(cos_result.y);
         } else {
+            commands.entity(target.target).remove::<DestinationTarget>();
+            commands.trigger_targets(NextAction, player_entity);
         }
     }
 }

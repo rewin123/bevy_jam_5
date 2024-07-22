@@ -2,13 +2,8 @@
 
 use bevy::prelude::*;
 
-use crate::{
-    game::{
-        animation::PlayerAnimation,
-        assets::{HandleMap, ImageKey},
-        movement::{Movement, MovementController, WrapWithinWindow},
-    },
-    screen::Screen,
+use crate::game::{
+    assets::{HandleMap, SceneKey}, movement::{Movement, MovementController}, sequence::Sequence
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -26,9 +21,9 @@ pub struct Player;
 fn spawn_player(
     _trigger: Trigger<SpawnPlayer>,
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
+    // mut meshes: ResMut<Assets<Mesh>>,
+    // mut materials: ResMut<Assets<StandardMaterial>>,
+    scene_handler: Res<HandleMap<SceneKey>>,
 ) {
     // let capsule = asset_server.load("models/guy.glb#Scene0");
     // let material = StandardMaterial {
@@ -40,12 +35,13 @@ fn spawn_player(
         Name::new("Player"),
         Player,
         SceneBundle {
-            scene: asset_server.load("models/guy.glb#Scene0"),
+            scene: scene_handler[&SceneKey::Player].clone_weak(),
             transform: Transform::from_translation(Vec3::new(5.0, 0.7, 5.0))
                 .with_scale(Vec3::splat(0.25)),
             ..default()
         },
         MovementController::default(),
         Movement { speed: 5.0 },
+        Sequence::default()
     ));
 }

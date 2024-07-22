@@ -155,7 +155,7 @@ pub(super) fn plugin(app: &mut App) {
 pub struct SpawnMonster;
 
 fn on_spawn_monster(
-    _trigger: Trigger<SpawnMonster>,
+    trigger: Trigger<SpawnMonster>,
     mut commands: Commands,
 ) {
     commands.spawn((

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_mod_outline::*;
 
-use super::selectable::{OnDeselect, OnMouseOut, OnMouseOver, OnSelect};
+use super::selectable::{OnMouseOut, OnMouseOver};
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_plugins((

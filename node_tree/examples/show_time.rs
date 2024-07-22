@@ -13,7 +13,6 @@ Key features demonstrated:
 This example uses Bevy game engine with the Nodum plugin to create a simple, dynamic UI that updates in real-time, showcasing the power and simplicity of using Nodum for entity management in game development.
 */
 
-
 use bevy::prelude::*;
 use node_tree::{tree::NodeTree, *};
 
@@ -23,7 +22,7 @@ fn main() {
         .add_plugins(NodumTreePlugin)
         .add_systems(Startup, setup)
         .add_systems(Update, time_text)
-        .run();    
+        .run();
 }
 
 // Component to mark the entity that will display time
@@ -31,17 +30,13 @@ fn main() {
 struct TimeMarker;
 
 // Setup function to initialize the camera and time marker
-fn setup(mut commands : Commands) {
+fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
     commands.spawn(TimeMarker);
 }
 
 // System to update and display the elapsed time
-fn time_text(
-    mut commands : Commands,
-    time: Res<Time>,
-    q_times: Query<Entity, With<TimeMarker>>,
-) {
+fn time_text(mut commands: Commands, time: Res<Time>, q_times: Query<Entity, With<TimeMarker>>) {
     // Calculate the number of seconds elapsed
     let secs = time.elapsed_seconds() as usize;
     // Determine the number of child elements to display (cycles between 1 and 5)
@@ -52,30 +47,28 @@ fn time_text(
         let mut children = vec![];
         // Create child Nodum entities with text displaying elapsed time
         for i in 0..child_count {
-            children.push(
-                NodeTree::default()
-                    .with_bundle(TextBundle::from_section(format!("{}", time.elapsed_seconds()), TextStyle::default())),
-            );
+            children.push(NodeTree::default().with_bundle(TextBundle::from_section(
+                format!("{}", time.elapsed_seconds()),
+                TextStyle::default(),
+            )));
         }
 
         // Insert a new Nodum entity as a child of the TimeMarker entity
-        commands.add(
-            InsertNodumEntity {
-                entity: e,
-                nodum: NodeTree::default()
-                    .with_bundle(NodeBundle {
-                        style: Style {
-                            width: Val::Percent(100.0),
-                            height: Val::Percent(100.0),
-                            display: Display::Flex,
-                            flex_direction: FlexDirection::Column,
-                            ..default()
-                        },
+        commands.add(InsertNodumEntity {
+            entity: e,
+            nodum: NodeTree::default()
+                .with_bundle(NodeBundle {
+                    style: Style {
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        display: Display::Flex,
+                        flex_direction: FlexDirection::Column,
                         ..default()
-                    })
-                    .with_children(children),
-            }
-        );
+                    },
+                    ..default()
+                })
+                .with_children(children),
+        });
         println!("spawned");
     }
 }

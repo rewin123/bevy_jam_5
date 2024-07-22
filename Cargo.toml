@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT OR Apache-2.0 OR CC0-1.0"
 
 [dependencies]
-bevy = { version = "0.14", features = ["wayland", "jpeg"] }
+bevy = { version = "0.14", features = ["jpeg"] }
 # Disable low-severity logs at compile time for performance.
 log = { version = "0.4", features = [
     "max_level_debug",
@@ -19,6 +19,7 @@ bevy_quill_obsidian = { version = "0.1.0"}
 bevy_mod_stylebuilder = { version = "0.1.1" }
 bevy_mod_picking = "0.20.1"
 bevy_mod_outline = {path = "crates/bevy_mod_outline"}
+rand_distr = "0.4.3"
 
 
 [features]
@@ -45,9 +46,11 @@ dev_native = [
 [lints.clippy]
 # Bevy supplies arguments to systems via dependency injection, so it's natural for systems to
 # request more than 7 arguments -- which triggers this lint.
+missing_const_for_fn = "deny"
 too_many_arguments = "allow"
 # Queries that access many components may trigger this lint.
 type_complexity = "allow"
+redundant_pub_crate = "allow"
 
 # Compile with Performance Optimizations:
 # https://bevyengine.org/learn/quick-start/getting-started/setup/#compile-with-performance-optimizations
@@ -89,3 +92,5 @@ inherits = "release"
 opt-level = 3
 # Keep debug information in the binary.
 strip = "none"
+
+

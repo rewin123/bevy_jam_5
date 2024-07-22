@@ -1,49 +1,54 @@
-use std::{any::TypeId, ptr::NonNull, sync::{atomic::Ordering, Arc}};
-use bevy::{prelude::*, ptr::OwningPtr};
 use crate::ByteHolder;
-
-
+use bevy::{prelude::*, ptr::OwningPtr};
+use std::{
+    any::TypeId,
+    ptr::NonNull,
+    sync::{atomic::Ordering, Arc},
+};
 
 pub struct RawComponentHolder {
     pub val: ByteHolder,
+    #[allow(dead_code)]
     type_id: TypeId,
     pub insert_fn: Box<dyn Fn(&mut EntityWorldMut, ByteHolder) + Send + Sync>,
     pub write_fn: Box<dyn Fn(&mut EntityWorldMut, ByteHolder) + Send + Sync>,
     pub remove_fn: Arc<dyn Fn(&mut EntityWorldMut) + Send + Sync>,
 }
 
-
 impl RawComponentHolder {
-    pub fn new(val : ByteHolder, type_id : TypeId) -> Self {
+    pub fn new(val: ByteHolder, type_id: TypeId) -> Self {
         Self {
             val,
             type_id,
-            insert_fn : Box::new(move |e: &mut EntityWorldMut, data| {
+            insert_fn: Box::new(move |e: &mut EntityWorldMut, data| {
                 let c_id = e.world().components().get_id(type_id).unwrap();
                 unsafe {
-                    e.insert_by_id(c_id, OwningPtr::new(NonNull::new(data.bytes.load(Ordering::SeqCst)).unwrap()));
+                    e.insert_by_id(
+                        c_id,
+                        OwningPtr::new(NonNull::new(data.bytes.load(Ordering::SeqCst)).unwrap()),
+                    );
                 }
             }),
-            write_fn : Box::new(move |e, data| {
+            write_fn: Box::new(move |e, data| {
                 let c_id = e.world().components().get_id(type_id).unwrap();
                 unsafe {
-                    e.insert_by_id(c_id, OwningPtr::new(NonNull::new(data.bytes.load(Ordering::SeqCst)).unwrap()));
+                    e.insert_by_id(
+                        c_id,
+                        OwningPtr::new(NonNull::new(data.bytes.load(Ordering::SeqCst)).unwrap()),
+                    );
                 }
             }),
-            remove_fn : Arc::new(move |e| {
+            remove_fn: Arc::new(move |e| {
                 let c_id = e.world().components().get_id(type_id).unwrap();
                 e.remove_by_id(c_id);
-            })
+            }),
         }
     }
 
     pub fn get<'a, T>(&'a self) -> Option<&T> {
-        Some(unsafe { 
-            self.val.downcast_ref()
-        })
+        Some(unsafe { self.val.downcast_ref() })
     }
 }
-
 
 #[cfg(test)]
 mod tests {

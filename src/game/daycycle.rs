@@ -1,16 +1,13 @@
 use std::time::Duration;
 
 use bevy::{
-    input::{
-        keyboard::{Key, KeyboardInput},
-        ButtonState,
-    },
+    input::{keyboard::KeyboardInput, ButtonState},
     prelude::*,
-    ui::update,
 };
 
 pub type GameTime = Time<GameTimeContext>;
 
+#[allow(dead_code)]
 pub struct GameTimePlugin;
 
 pub(crate) fn plugin(app: &mut App) {
@@ -47,7 +44,7 @@ pub struct DayDuration(pub f32);
 #[derive(Resource)]
 pub struct DayPassed(u32);
 
-#[derive(Resource, Reflect, PartialEq)]
+#[derive(Resource, Reflect, PartialEq, Eq)]
 pub enum DayState {
     Night,
     Day,
@@ -60,7 +57,6 @@ pub struct NightStart;
 pub struct DayStart;
 
 fn day_events(
-    mut commands: Commands,
     day_duration: Res<DayDuration>,
     mut day_pased: ResMut<DayPassed>,
     gametime: Res<GameTime>,
@@ -78,16 +74,12 @@ fn day_events(
     }
 
     let day_time = day - day_count as f32;
-    if day_time > 0.3 && day_time < 0.7 {
-        if *day_state != DayState::Day {
-            *day_state = DayState::Day;
-            night_start.send(NightStart);
-        }
-    } else {
-        if *day_state != DayState::Night {
-            *day_state = DayState::Night;
-            night_start.send(NightStart);
-        }
+    if day_time > 0.3 && day_time < 0.7 && *day_state != DayState::Day {
+        *day_state = DayState::Day;
+        night_start.send(NightStart);
+    } else if *day_state != DayState::Night {
+        *day_state = DayState::Night;
+        night_start.send(NightStart);
     }
 }
 
@@ -152,7 +144,6 @@ impl GameTimeContext {
 mod dev {
     use super::*;
     use crate::dev_tools::*;
-    use bevy::prelude::*;
 
     pub(crate) fn plugin(app: &mut App) {
         app.add_systems(Update, show_gametime);
