@@ -28,7 +28,7 @@ fn plan_trouble(mut trouble_planner: ResMut<TroublePlanner>, time: Res<GameTime>
         let poi = Poisson::new(trouble_planner.distribution).unwrap();
         let v = poi.sample(&mut rand::thread_rng());
         trouble_planner.peace_time = v;
-        if trouble_planner.distribution < MIN_DISTRIBUTION {
+        if trouble_planner.distribution > MIN_DISTRIBUTION {
             trouble_planner.distribution -= 0.5; // linear difficulty
         }
     }
