@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_mod_outline::*;
 
-use super::selectable::{OnDeselect, OnMouseOut, OnMouseOver, OnSelect};
+use super::selectable::{OnMouseOut, OnMouseOver};
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -39,11 +39,7 @@ fn add_highlight(
     }
 }
 
-fn recursive_add_highlight(
-    entity: Entity,
-    commands: &mut Commands,
-    q_children: &Query<&Children>,
-) {
+fn recursive_add_highlight(entity: Entity, commands: &mut Commands, q_children: &Query<&Children>) {
     commands.entity(entity).insert(OutlineBundle {
         outline: OutlineVolume {
             visible: true,

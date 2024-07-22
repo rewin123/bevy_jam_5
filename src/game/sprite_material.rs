@@ -10,6 +10,7 @@ use bevy::{
     },
 };
 
+#[allow(dead_code)]
 pub fn create_plane_mesh() -> Mesh {
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::all())
         .with_inserted_attribute(
@@ -38,6 +39,7 @@ pub fn create_plane_mesh() -> Mesh {
     mesh
 }
 
+#[allow(dead_code)]
 pub type SpriteMaterial = ExtendedMaterial<StandardMaterial, SpriteExtension>;
 
 pub struct SpriteMaterialPlugin;

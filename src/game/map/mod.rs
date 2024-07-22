@@ -1,4 +1,4 @@
-use bevy::{prelude::*, render::mesh::primitives};
+use bevy::prelude::*;
 
 pub mod map_generator;
 

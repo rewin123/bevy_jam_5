@@ -1,7 +1,4 @@
-use bevy::{
-    ecs::{system::RunSystemOnce, world::Command},
-    prelude::*,
-};
+use bevy::{ecs::world::Command, prelude::*};
 
 use crate::game::{components::earth::Earth, selectable::Selectable};
 

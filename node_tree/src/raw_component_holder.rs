@@ -6,6 +6,7 @@ use crate::ByteHolder;
 
 pub struct RawComponentHolder {
     pub val: ByteHolder,
+    #[allow(dead_code)]
     type_id: TypeId,
     pub insert_fn: Box<dyn Fn(&mut EntityWorldMut, ByteHolder) + Send + Sync>,
     pub write_fn: Box<dyn Fn(&mut EntityWorldMut, ByteHolder) + Send + Sync>,

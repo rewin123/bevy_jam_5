@@ -41,23 +41,21 @@ impl NodeTree {
         }));
 
         let mut owning_ptrs = vec![];
-        unsafe {
-            bundle.get_components(&mut |storage, ptr| {
-                let idx = owning_ptrs.len();
-                let info = components.get_info(local_ids[idx]).unwrap();
-                let layout = info.layout();
-                unsafe {
-                    //create flat array
-                    let slice = std::slice::from_raw_parts_mut(ptr.as_ptr() as *mut u8, layout.size());
-                    //move owning to own bytes
-                    let byte_holder = ByteHolder::from_slice(slice, layout);
-                    
-
-                    owning_ptrs.push(byte_holder);
-                }
+        bundle.get_components(&mut |_storage, ptr| {
+            let idx = owning_ptrs.len();
+            let info = components.get_info(local_ids[idx]).unwrap();
+            let layout = info.layout();
+            unsafe {
+                //create flat array
+                let slice = std::slice::from_raw_parts_mut(ptr.as_ptr() as *mut u8, layout.size());
+                //move owning to own bytes
+                let byte_holder = ByteHolder::from_slice(slice, layout);
                 
-            });
-        }
+
+                owning_ptrs.push(byte_holder);
+            }
+            
+        });
 
         for (idx, ptr) in owning_ptrs.into_iter().enumerate() {
             let id = local_ids[idx];

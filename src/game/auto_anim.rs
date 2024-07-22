@@ -1,4 +1,4 @@
-use bevy::{prelude::*, render::render_resource::Face};
+use bevy::prelude::*;
 
 pub trait AnimSet {
     fn get_folder_path() -> String;
@@ -31,7 +31,7 @@ fn auto_anim<T: AnimSet + Send + Sync + 'static>(
     mut commands: Commands,
     mut auto_anim_query: Query<(Entity, &mut AutoAnim<T>)>,
     time: Res<Time>,
-    mut materials: ResMut<MaterialStorage<T>>,
+    materials: Res<MaterialStorage<T>>,
 ) {
     for (entity, mut auto_anim) in auto_anim_query.iter_mut() {
         if auto_anim.timer.tick(time.delta()).just_finished() {

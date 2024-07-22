@@ -2,7 +2,6 @@ use bevy::prelude::*;
 
 use super::{
     daycycle::GameTime,
-    movement::MovementController,
     selectable::{OnSelect, Selected},
     spawn::player::Player,
 };
@@ -11,6 +10,7 @@ pub const PLAYER_SPEED: f32 = 5.0;
 
 #[derive(Component)]
 struct DestinationTarget {
+    #[allow(dead_code)]
     pub target: Entity,
     pub target_pos: Vec3,
     pub accept_radius: f32,
@@ -55,7 +55,6 @@ fn move_player_to_target(
 
         if distance > target.accept_radius {
             transform.translation += direction * time.delta_seconds() * PLAYER_SPEED;
-        } else {
         }
     }
 }

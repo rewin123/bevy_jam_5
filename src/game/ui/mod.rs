@@ -28,16 +28,10 @@ enum ResourceType {
     // Placeholder
     Unknown,
 }
-#[derive(Resource)]
+#[derive(Resource, Default)]
 struct SelectedItem {
     // Wrap everything in an Option because on Quill we can't query for `Option<Res<...>>`
     item: Option<(Entity, Vec2, ResourceType)>,
-}
-
-impl Default for SelectedItem {
-    fn default() -> Self {
-        Self { item: None }
-    }
 }
 
 fn spawn_root_ui(
@@ -46,7 +40,7 @@ fn spawn_root_ui(
     mut commands: Commands,
 ) {
     let Ok(entity) = camera_q.get_single() else {
-        return ();
+        return;
     };
 
     commands.spawn(root::RootUi { camera: entity }.to_root());
@@ -84,14 +78,14 @@ fn set_context_menu_position(
 ) {
     let entity = _trigger.entity();
     let Ok((_, camera, camera_transform)) = camera_q.get_single() else {
-        return ();
+        return;
     };
     let Ok(transform) = global_transform_q.get(entity) else {
-        return ();
+        return;
     };
 
     let Some(position) = camera.world_to_viewport(camera_transform, transform.translation()) else {
-        return ();
+        return;
     };
     context_menu.item = Some((entity, position, _trigger.event().0));
 }

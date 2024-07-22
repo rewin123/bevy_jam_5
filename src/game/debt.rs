@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use super::daycycle::GameTime;
 
+#[allow(dead_code)]
 pub struct DebtPlugin;
 
 pub(crate) fn plugin(app: &mut App) {
@@ -15,6 +16,7 @@ pub(crate) fn plugin(app: &mut App) {
 #[derive(Resource)]
 pub struct Debt {
     pub amount: f32,
+    #[allow(dead_code)]
     pub day_rate: f32,
     pub second_rate: f32,
 

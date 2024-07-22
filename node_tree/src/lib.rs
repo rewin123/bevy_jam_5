@@ -11,12 +11,12 @@ use component_holder::*;
 use tree::*;
 
 
-use std::{alloc::Layout, any::{Any, TypeId}, mem::ManuallyDrop, ptr::NonNull, sync::{atomic::{AtomicPtr, Ordering}, Arc}};
+use std::{any::TypeId, sync::Arc};
 
 use bevy::{
     app::MainScheduleOrder, ecs::{
-        bundle::{Bundle, DynamicBundle}, component::{ComponentDescriptor, Components}, reflect::ReflectCommandExt, schedule::ScheduleLabel, storage::Storages, system::EntityCommands, world::{Command, CommandQueue}
-    }, prelude::*, ptr::OwningPtr, reflect::TypeData, utils::HashMap
+        schedule::ScheduleLabel,  world::Command
+    }, prelude::*, 
 };
 
 pub mod prelude {
@@ -103,11 +103,11 @@ impl Command for InsertNodumEntity {
 
         world.resource_mut::<SpawnedCount>().0 += 1;
 
-        let mut new_component_types = components
+        let new_component_types = components
             .iter().map(|(k, _)| *k)
             .collect::<Vec<_>>();
 
-        let mut components_ids = new_component_types
+        let components_ids = new_component_types
             .iter()
             .map(|k| {
                 
@@ -138,7 +138,7 @@ impl Command for InsertNodumEntity {
             component_types : new_component_types.clone(),
             remove_fns : Vec::new()
         };
-        components.into_iter().enumerate().for_each(|(idx, (k, v))| {
+        components.into_iter().for_each(| (k, v)| {
             match v {
                 ComponentHolder::Raw(v) => {
                     if e.contains_type_id(k) {

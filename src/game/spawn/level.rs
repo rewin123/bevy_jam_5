@@ -1,11 +1,9 @@
 //! Spawn the main level by triggering other observers.
 
-use bevy::{pbr::ExtendedMaterial, prelude::*};
-use rand::Rng;
+use bevy::prelude::*;
 
 use crate::game::{
-    auto_anim::AutoAnim,
-    components::fire::{FireSet, InFire},
+    components::fire::InFire,
     daycycle::TimeSpeed,
     selectable::{Computer, Selectable},
 };
@@ -27,8 +25,6 @@ fn spawn_level(
     _trigger: Trigger<SpawnLevel>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // The only thing we have in our level is a player,
     // but add things like walls etc. here.

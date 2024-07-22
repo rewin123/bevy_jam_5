@@ -93,4 +93,4 @@ strip = "none"
 [dev-dependencies.cargo-husky]
 version = "1"
 default-features = false
-features = ["user-hooks"]
+features = ["run-for-all", "precommit-hook", "run-cargo-fmt", "run-cargo-clippy"]
