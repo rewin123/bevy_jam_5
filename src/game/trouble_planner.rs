@@ -1,10 +1,15 @@
-use crate::game::daycycle::GameTime;
+use crate::game::{
+    components::metal_trash::MetalTrashInFloor, daycycle::GameTime, resources::MetalTrash,
+};
 use bevy::prelude::*;
 use rand::prelude::*;
 use rand_distr::{Distribution, Poisson};
 
 use super::{
-    character::DestinationTarget, components::fire::InFire, selectable::Selectable,
+    assets::{HandleMap, SceneKey},
+    character::DestinationTarget,
+    components::fire::InFire,
+    selectable::Selectable,
     spawn::player::Player,
 };
 
@@ -26,13 +31,21 @@ pub(crate) fn plugin(app: &mut App) {
 
     app.add_systems(Update, plan_trouble);
     app.add_systems(Update, fix_trouble);
+    app.add_systems(Update, tick_fire);
 }
 
 fn plan_trouble(
     mut commands: Commands,
     mut trouble_planner: ResMut<TroublePlanner>,
     time: Res<GameTime>,
-    q_selectable: Query<Entity, (With<Selectable>, Without<InFire>)>,
+    q_selectable: Query<
+        Entity,
+        (
+            With<Selectable>,
+            Without<InFire>,
+            Without<MetalTrashInFloor>,
+        ),
+    >,
 ) {
     trouble_planner.peace_time -= time.delta_seconds();
 
@@ -41,7 +54,10 @@ fn plan_trouble(
         let mut rng = rand::thread_rng();
         let index = rng.gen_range(0..items.len());
 
-        commands.entity(items[index]).insert(InFire::default());
+        commands.entity(items[index]).insert(InFire {
+            fire_created: false,
+            started_at: time.elapsed_seconds(),
+        });
 
         let poi = Poisson::new(trouble_planner.distribution).unwrap();
         let v = poi.sample(&mut rand::thread_rng());
@@ -69,6 +85,30 @@ fn fix_trouble(
                     commands.entity(target.target).remove::<InFire>();
                 }
             }
+        }
+    }
+}
+
+const FIRE_TIMER: f32 = 10.0;
+
+// Fire will destroy things if they are burning for X amount of time
+fn tick_fire(
+    mut commands: Commands,
+    scene_handler: Res<HandleMap<SceneKey>>,
+    q_items_in_fire: Query<(Entity, &InFire, &Transform)>,
+    gametime: Res<GameTime>,
+) {
+    for (entity, fire, transform) in q_items_in_fire.iter() {
+        if (fire.started_at + FIRE_TIMER) < gametime.elapsed_seconds() {
+            commands
+                .spawn(SceneBundle {
+                    scene: scene_handler[&SceneKey::MetalTrash].clone_weak(),
+                    transform: transform.clone(),
+                    ..default()
+                })
+                .insert(Selectable)
+                .insert(MetalTrashInFloor);
+            commands.entity(entity).despawn_recursive();
         }
     }
 }

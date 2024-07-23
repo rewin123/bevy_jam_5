@@ -105,7 +105,6 @@ fn fire_oxigen(
     q_in_fire: Query<Entity, With<InFire>>,
 ) {
     let count = q_in_fire.iter().count();
-    info!("Fire Oxigen count: {}", count);
     if count > 0 {
         let consuming = count as f32 * 3.0;
 

@@ -10,7 +10,11 @@ pub(crate) fn plugin(app: &mut App) {
 
 #[derive(Default, Component)]
 pub struct InFire {
+    /// If the fire mesh has been spawned
     pub fire_created: bool,
+    /// The seconds when the fire started
+    /// Based on the [`GameTime`]
+    pub started_at: f32,
 }
 
 #[derive(Component)]
