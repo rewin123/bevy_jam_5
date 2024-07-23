@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use bevy::prelude::*;
 
 use super::{
@@ -7,7 +9,10 @@ use super::{
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, (update_oxygen_and_co2, update_food));
-    app.add_systems(PostUpdate, bad_air_death);
+    app.add_systems(PostUpdate, (
+        bad_air_death,
+        too_many_oxigen_death,
+    ));
 }
 
 fn update_oxygen_and_co2(
@@ -56,6 +61,16 @@ fn bad_air_death(
     if *time_speed != TimeSpeed::Pause && (oxygen.amount <= 0.0 || co2.amount >= co2.limit) {
         death.send(PlayerDied(DeathCause::Suffocated));
         info!("No more air, o2: {}, co2 {}", oxygen.amount, co2.amount);
+    }
+}
+
+fn too_many_oxigen_death(
+    oxygen: Res<Oxygen>,
+    mut death: EventWriter<PlayerDied>,
+    time_speed: Res<TimeSpeed>,
+) {
+    if *time_speed != TimeSpeed::Pause && oxygen.amount >= oxygen.limit {
+        death.send(PlayerDied(DeathCause::TooManyOxigen));
     }
 }
 

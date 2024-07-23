@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use std::time::Duration;
 
 use bevy::{
@@ -54,6 +56,7 @@ pub enum DayState {
 
 pub enum DeathCause {
     Suffocated,
+    TooManyOxigen
 }
 
 #[derive(Event)]

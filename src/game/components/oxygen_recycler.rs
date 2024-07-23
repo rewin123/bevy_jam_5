@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    character::GoToAction,
+    character::{CharState, CharacterStates, GoToAction},
     daycycle::GameTime,
     resources::OxygenRecycling,
     selectable::OnMouseClick,
@@ -86,12 +86,13 @@ impl CharacterAction for OxygenRecyclerAction {
 fn update_oxygen_recycler_work(
     time: Res<GameTime>,
     mut commands: Commands,
-    mut q_oxygen_recycler_work: Query<(Entity, &mut OxygenRecyclerWork)>,
+    mut q_oxygen_recycler_work: Query<(Entity, &mut OxygenRecyclerWork, &mut CharacterStates)>,
     // work_config: Res<PcWorkConfig>,
     mut oxygen_recycling: ResMut<OxygenRecycling>,
 ) {
-    for (entity, mut or_work) in q_oxygen_recycler_work.iter_mut() {
+    for (entity, mut or_work, mut states) in q_oxygen_recycler_work.iter_mut() {
         or_work.work_time += time.delta_seconds();
+        states.add(CharState::Working);
         if or_work.work_time >= 0.25 {
             oxygen_recycling.working = !oxygen_recycling.working;
             commands.entity(entity).remove::<OxygenRecyclerWork>();
