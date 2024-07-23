@@ -29,6 +29,8 @@ fn on_selected(
     if let Ok(metal_trash_pile_transform) = q_metal_trash_piles.get_mut(target) {
         let mut sequence = Sequence::default();
 
+        warn!("tbeaulieu2: metal trash working");
+
         sequence.push_with_group(
             GoToAction {
                 target,
