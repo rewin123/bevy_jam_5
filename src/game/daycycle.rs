@@ -19,11 +19,15 @@ pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(DayState::Day);
     app.insert_resource(GameTime::default());
 
+    app.init_state::<PlayerState>();
     app.add_event::<NightStart>();
     app.add_event::<DayStart>();
     app.add_event::<PlayerDied>();
 
-    app.add_systems(PreUpdate, stop_game_on_death);
+    app.add_systems(
+        PreUpdate,
+        stop_game_on_death.run_if(in_state(PlayerState::Alive)),
+    );
     app.add_systems(PreUpdate, (time_speed, update_time).chain());
     app.add_systems(PreUpdate, day_events);
     app.add_systems(Update, change_time_speed);
@@ -41,6 +45,14 @@ pub enum TimeSpeed {
     Fast3,
 }
 
+#[derive(States, Default, Debug, Hash, PartialEq, Eq, Clone)]
+pub enum PlayerState {
+    #[default]
+    Alive,
+    Dead,
+    Won,
+}
+
 // Day duration in seconds
 #[derive(Resource)]
 pub struct DayDuration(pub f32);
@@ -56,7 +68,7 @@ pub enum DayState {
 
 pub enum DeathCause {
     Suffocated,
-    TooManyOxigen
+    TooManyOxigen,
 }
 
 #[derive(Event)]
@@ -144,9 +156,11 @@ fn change_time_speed(
 fn stop_game_on_death(
     mut death_events: EventReader<PlayerDied>,
     mut time_speed: ResMut<TimeSpeed>,
+    mut next_state: ResMut<NextState<PlayerState>>,
 ) {
     for _ in death_events.read() {
         *time_speed = TimeSpeed::Pause;
+        next_state.set(PlayerState::Dead);
     }
 }
 
