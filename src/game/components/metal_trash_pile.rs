@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::game::{
     character::GoToAction,
-    metal_trash::{GatherMetalTrashWork, GatherMetalWorkAction},
+    metal_trash::GatherMetalWorkAction,
     selectable::OnMouseClick,
     sequence::{NewActionSequence, NewMode, Sequence},
     spawn::{player::Player, spawn_commands::MetalTrashPile},
