@@ -60,6 +60,18 @@ fn in_fire(
                             ..default()
                         })
                         .insert(AutoAnim::new(FireSet, 0.01));
+
+                    children.spawn(PointLightBundle {
+                        transform: Transform::from_translation(Vec3::new(0.0, 1.0, -1.0).normalize()),
+                        point_light: PointLight {
+                            color: Color::linear_rgb(1.0, 123.0 / 255.0, 0.0),
+                            intensity: 1000000.0,
+                            range: 2.0,
+                            radius: 0.5,
+                            ..default()
+                        },
+                        ..default()
+                    });
                 });
         }
     }
@@ -70,6 +82,9 @@ fn in_fire(
         }
     }
 }
+
+
+
 
 #[derive(Default)]
 pub struct FireSet;

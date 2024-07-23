@@ -176,8 +176,6 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
     for (mut state, mut spawner) in q_char.iter_mut() {
         let state = state.get_importantest_state();
 
-        info!("State: {:?}", state);
-
         let usual_text = TextStyle::default();
         let warning_text = TextStyle {
             color: Color::linear_rgb(1.0, 0.0, 0.0),

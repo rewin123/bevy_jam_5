@@ -32,10 +32,11 @@ fn spawn_level(
     commands.trigger(SpawnPlayer);
 
     commands.spawn(DirectionalLightBundle {
-        transform: Transform::from_translation(Vec3::new(2.0, 5.0, 2.0))
+        transform: Transform::from_translation(Vec3::new(2.0, 5.0, 0.0))
             .looking_at(Vec3::ZERO, Vec3::Y),
         directional_light: DirectionalLight {
             shadows_enabled: true,
+            illuminance: 2000.0,
             ..default()
         },
         ..default()
@@ -118,6 +119,8 @@ fn spawn_level(
     });
 
     commands.add(SpawnEarth);
+
+
 }
 
 fn setup_camera(_: Trigger<SpawnLevel>, mut q_cameras: Query<&mut Transform, With<Camera>>) {
