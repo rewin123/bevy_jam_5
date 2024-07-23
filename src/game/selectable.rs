@@ -93,7 +93,6 @@ fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Sele
                     }
 
                     commands.trigger_targets(OnMouseOut, event.listener());
-                    info!("OnMouseOut {}", event.listener());
                     event.stop_propagation();
                 },
             ))
@@ -106,7 +105,6 @@ fn selectable_add(mut commands: Commands, q_selectable: Query<Entity, Added<Sele
                     }
 
                     commands.trigger_targets(OnMouseOver, event.listener());
-                    info!("OnMouseOver {}", event.listener());
                     event.stop_propagation();
                 },
             ));

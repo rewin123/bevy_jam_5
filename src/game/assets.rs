@@ -98,7 +98,7 @@ impl FromWorld for HandleMap<SoundtrackKey> {
             ),
             (
                 SoundtrackKey::Gameplay,
-                asset_server.load("audio/soundtracks/Fluffing A Duck.ogg"),
+                asset_server.load("audio/soundtracks/Cyberpunk-Moonlight-Sonata-v2.ogg"),
             ),
         ]
         .into()

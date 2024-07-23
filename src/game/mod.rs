@@ -6,6 +6,7 @@ mod animation;
 pub mod assets;
 pub mod audio;
 pub mod auto_anim;
+pub mod bilboard_state;
 pub mod character;
 pub mod components;
 mod daycycle;
@@ -49,5 +50,6 @@ pub(super) fn plugin(app: &mut App) {
         pc_work::plugin,
         sequence::plugin,
         resource_flow::plugin,
+        bilboard_state::plugin,
     ));
 }
