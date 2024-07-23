@@ -16,6 +16,31 @@ pub(super) fn plugin(app: &mut App) {
 
     app.register_type::<HandleMap<SceneKey>>();
     app.init_resource::<HandleMap<SceneKey>>();
+
+    app.register_type::<HandleMap<FontKey>>();
+    app.init_resource::<HandleMap<FontKey>>();
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Reflect)]
+pub enum FontKey {
+    Pixel,
+}
+
+impl AssetKey for FontKey {
+    type Asset = Font;
+}
+
+impl FromWorld for HandleMap<FontKey> {
+    fn from_world(world: &mut World) -> Self {
+        let asset_server = world.resource::<AssetServer>();
+        [(
+            FontKey::Pixel,
+            asset_server.load(
+                "fonts/upheaval-tt-brk/upheavtt.ttf",
+            ),
+        )]
+        .into()
+    }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Reflect)]
