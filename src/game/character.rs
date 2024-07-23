@@ -5,6 +5,7 @@ use bevy::{prelude::*, utils::HashSet};
 use super::{
     bilboard_state::{BillboardContent, BillboardSpawner},
     daycycle::GameTime,
+    resources::Oxygen,
     selectable::OnMouseClick,
     sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
     spawn::player::Player,
@@ -15,6 +16,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.observe(add_target);
 
     app.add_systems(PreUpdate, clear_states);
+    app.add_systems(Update, check_oxigen);
     app.add_systems(PostUpdate, (print_state,));
 }
 
@@ -120,6 +122,9 @@ pub enum CharState {
     WantDrink,
     WantOxigen,
     WantPee,
+
+    TooManyOxigen,
+
     Dead,
 }
 
@@ -133,6 +138,7 @@ impl CharState {
             CharState::WantSleep => 4,
             CharState::WantDrink => 5,
             CharState::WantOxigen => 6,
+            CharState::TooManyOxigen => 6,
             CharState::WantPee => 7,
             CharState::Dead => 8,
         }
@@ -194,6 +200,9 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
             CharState::WantOxigen => {
                 BillboardContent::Text(Text::from_section("Want oxigen", warning_text))
             }
+            CharState::TooManyOxigen => {
+                BillboardContent::Text(Text::from_section("Too many oxigen", warning_text))
+            }
             CharState::WantPee => {
                 BillboardContent::Text(Text::from_section("Want pee", warning_text))
             }
@@ -202,5 +211,15 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
 
         spawner.content = content;
         spawner.set_changed();
+    }
+}
+
+fn check_oxigen(mut q_char: Query<&mut CharacterStates>, oxigen: Res<Oxygen>) {
+    for mut states in q_char.iter_mut() {
+        if oxigen.amount <= 10.0 {
+            states.add(CharState::WantOxigen);
+        } else if oxigen.amount > oxigen.limit * 0.9 {
+            states.add(CharState::TooManyOxigen);
+        }
     }
 }

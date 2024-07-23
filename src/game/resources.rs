@@ -79,9 +79,9 @@ pub struct OxygenRecycling {
 impl Default for OxygenRecycling {
     fn default() -> Self {
         Self {
-            oxygen_generation_rate: 1.5,
+            oxygen_generation_rate: 5.5,
             // While on, consumes a bit more than is generated
-            co2_consumption_rate: 1.5,
+            co2_consumption_rate: 5.5,
             working: true,
         }
     }

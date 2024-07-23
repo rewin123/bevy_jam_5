@@ -40,8 +40,8 @@ fn spawn_player(
         Player,
         SceneBundle {
             scene: scene_handler[&SceneKey::Player].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(5.0, 0.7, 5.0))
-                .with_scale(Vec3::splat(0.25)),
+            transform: Transform::from_translation(Vec3::new(5.0, 0.0, 5.0))
+                .with_scale(Vec3::splat(0.2)),
             ..default()
         },
         MovementController::default(),
