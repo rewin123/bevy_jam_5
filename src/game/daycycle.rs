@@ -19,7 +19,9 @@ pub(crate) fn plugin(app: &mut App) {
 
     app.add_event::<NightStart>();
     app.add_event::<DayStart>();
+    app.add_event::<PlayerDied>();
 
+    app.add_systems(PreUpdate, stop_game_on_death);
     app.add_systems(PreUpdate, (time_speed, update_time).chain());
     app.add_systems(PreUpdate, day_events);
     app.add_systems(Update, change_time_speed);
@@ -28,7 +30,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_plugins(dev::plugin);
 }
 
-#[derive(Resource, Debug)]
+#[derive(Resource, Debug, PartialEq, Eq)]
 pub enum TimeSpeed {
     Pause,
     Normal,
@@ -49,6 +51,13 @@ pub enum DayState {
     Night,
     Day,
 }
+
+pub enum DeathCause {
+    Suffocated,
+}
+
+#[derive(Event)]
+pub struct PlayerDied(pub DeathCause);
 
 #[derive(Event)]
 pub struct NightStart;
@@ -127,6 +136,15 @@ fn change_time_speed(
     }
 
     keyboard_input.clear();
+}
+
+fn stop_game_on_death(
+    mut death_events: EventReader<PlayerDied>,
+    mut time_speed: ResMut<TimeSpeed>,
+) {
+    for _ in death_events.read() {
+        *time_speed = TimeSpeed::Pause;
+    }
 }
 
 #[derive(Default)]
