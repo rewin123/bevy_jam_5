@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderBackground, StyleBuilderLayout};
 use bevy_quill::*;
 
-use crate::game::resources::{CarbonDioxide, Food, Oxygen, OxygenRecycling, Water};
+use crate::game::{daycycle::GameTime, resources::{CarbonDioxide, Food, OldOxygen, Oxygen, OxygenRecycling, Water}};
 
 use super::{
     components::resource_slider::ResourceSlider,
@@ -29,17 +29,17 @@ impl ViewTemplate for RootUi {
     fn create(&self, cx: &mut Cx) -> Self::View {
         let selected_item = cx.use_resource::<SelectedItem>();
         let oxygen = cx.use_resource::<Oxygen>();
+        let old_oxugen = cx.use_resource::<OldOxygen>();
         let oxygen_recycling = cx.use_resource::<OxygenRecycling>();
         let co2 = cx.use_resource::<CarbonDioxide>();
         let food = cx.use_resource::<Food>();
         let water = cx.use_resource::<Water>();
+        let gametime = cx.use_resource::<GameTime>();
         let position = selected_item.item;
 
-        let oxygen_status = if oxygen_recycling.working {
-            oxygen_recycling.oxygen_generation_rate - oxygen.consumption_rate
-        } else {
-            -oxygen.consumption_rate
-        };
+        let oxygen_status = (oxygen.amount - old_oxugen.0) / gametime.delta_seconds();
+        let oxygen_status = oxygen_status.round();
+         
         let co2_status = if oxygen_recycling.working {
             -(oxygen_recycling.co2_consumption_rate - co2.generation_rate)
         } else {
@@ -63,7 +63,7 @@ impl ViewTemplate for RootUi {
                     ResourceSlider::new()
                         .limit(oxygen.limit)
                         .amount(oxygen.amount)
-                        .label(format!("Oxygen ({:+})", oxygen_status)),
+                        .label(format!("Oxygen ({:+.0})", oxygen_status)),
                     ResourceSlider::new()
                         .limit(co2.limit)
                         .amount(co2.amount)

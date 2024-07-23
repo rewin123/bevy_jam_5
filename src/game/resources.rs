@@ -4,6 +4,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<Water>();
     app.init_resource::<BadWater>();
     app.init_resource::<Oxygen>();
+    app.init_resource::<OldOxygen>();
     app.init_resource::<OxygenRecycling>();
     app.init_resource::<Pee>();
     app.init_resource::<Food>();
@@ -14,6 +15,8 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<Metal>();
     app.init_resource::<Temperature>();
     app.init_resource::<FoodGeneration>();
+
+    app.add_systems(PreUpdate, store_oxygen_step);
 
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
@@ -57,6 +60,9 @@ pub struct Oxygen {
     pub limit: f32,
     pub consumption_rate: f32,
 }
+
+#[derive(Resource, Default)]
+pub struct OldOxygen(pub f32);
 
 impl Default for Oxygen {
     fn default() -> Self {
@@ -154,6 +160,13 @@ pub struct Electricity {
 #[derive(Resource, Default)]
 pub struct Temperature {
     pub amount: f32,
+}
+
+fn store_oxygen_step(
+    oxygen: Res<Oxygen>,
+    mut old_oxygen: ResMut<OldOxygen>,
+) {
+    old_oxygen.0 = oxygen.amount;
 }
 
 #[cfg(feature = "dev")]
