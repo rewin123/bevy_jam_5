@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use crate::game::{
     assets::{HandleMap, SceneKey},
     bilboard_state::{BillboardContent, BillboardSpawner},
+    character::CharacterStates,
     movement::{Movement, MovementController},
     sequence::Sequence,
 };
@@ -50,5 +51,6 @@ fn spawn_player(
             content: BillboardContent::Text(Text::from_section("Hungry", TextStyle::default())),
             size: Vec2::new(1.0, 1.0),
         },
+        CharacterStates::default(),
     ));
 }

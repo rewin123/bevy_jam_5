@@ -1,5 +1,6 @@
 use crate::game::components::flowup_text::FlowUpText;
 
+use super::character::{CharState, CharacterStates};
 use super::components::pc::Pc;
 use super::daycycle::GameTime;
 use super::debt::Debt;
@@ -46,12 +47,14 @@ impl CharacterAction for PcWorkAction {
 fn update_pc_work(
     mut commands: Commands,
     time: Res<GameTime>,
-    mut q_pc_work: Query<(Entity, &mut PcWork)>,
+    mut q_pc_work: Query<(Entity, &mut PcWork, &mut CharacterStates)>,
     mut work_config: ResMut<PcWorkConfig>,
     mut debt: ResMut<Debt>,
     q_pcs: Query<&GlobalTransform, With<Pc>>,
 ) {
-    for (entity, mut pc_work) in q_pc_work.iter_mut() {
+    for (entity, mut pc_work, mut states) in q_pc_work.iter_mut() {
+        states.add(CharState::Working);
+
         pc_work.work_time += time.delta_seconds();
         if pc_work.work_time >= work_config.work_time {
             let current_time = time.elapsed_seconds();

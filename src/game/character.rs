@@ -1,6 +1,9 @@
-use bevy::prelude::*;
+#![allow(unused)]
+
+use bevy::{prelude::*, utils::HashSet};
 
 use super::{
+    bilboard_state::{BillboardContent, BillboardSpawner},
     daycycle::GameTime,
     selectable::OnMouseClick,
     sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
@@ -10,6 +13,9 @@ use super::{
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, move_player_to_target);
     app.observe(add_target);
+
+    app.add_systems(PreUpdate, clear_states);
+    app.add_systems(PostUpdate, (print_state,));
 }
 
 pub const PLAYER_SPEED: f32 = 5.0;
@@ -98,5 +104,103 @@ fn move_player_to_target(
             commands.entity(player_entity).remove::<DestinationTarget>();
             commands.trigger_targets(NextAction, player_entity);
         }
+    }
+}
+
+/// State logic
+
+#[derive(Default, PartialEq, Clone, Copy, Hash, Eq, Debug)]
+pub enum CharState {
+    #[default]
+    Idle,
+    Working,
+    Peeing,
+    WantEat,
+    WantSleep,
+    WantDrink,
+    WantOxigen,
+    WantPee,
+    Dead,
+}
+
+impl CharState {
+    fn weight(&self) -> i32 {
+        match self {
+            CharState::Idle => 0,
+            CharState::Working => 1,
+            CharState::Peeing => 2,
+            CharState::WantEat => 3,
+            CharState::WantSleep => 4,
+            CharState::WantDrink => 5,
+            CharState::WantOxigen => 6,
+            CharState::WantPee => 7,
+            CharState::Dead => 8,
+        }
+    }
+}
+
+#[derive(Component, Default)]
+pub struct CharacterStates {
+    pub states: HashSet<CharState>,
+}
+
+impl CharacterStates {
+    pub fn get_importantest_state(&self) -> CharState {
+        let mut state = CharState::Idle;
+        for s in self.states.iter() {
+            if s.weight() > state.weight() {
+                state = *s;
+            }
+        }
+        state
+    }
+
+    pub fn add(&mut self, state: CharState) {
+        self.states.insert(state);
+    }
+}
+
+fn clear_states(mut q: Query<&mut CharacterStates>) {
+    for mut state in q.iter_mut() {
+        state.states.clear();
+    }
+}
+
+fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>) {
+    for (mut state, mut spawner) in q_char.iter_mut() {
+        let state = state.get_importantest_state();
+
+        info!("State: {:?}", state);
+
+        let usual_text = TextStyle::default();
+        let warning_text = TextStyle {
+            color: Color::linear_rgb(1.0, 0.0, 0.0),
+            ..default()
+        };
+
+        let content = match state {
+            CharState::Idle => BillboardContent::None,
+            CharState::Working => BillboardContent::Text(Text::from_section("Working", usual_text)),
+            CharState::Peeing => BillboardContent::Text(Text::from_section("Peeing", usual_text)),
+            CharState::WantEat => {
+                BillboardContent::Text(Text::from_section("Want eat", warning_text))
+            }
+            CharState::WantSleep => {
+                BillboardContent::Text(Text::from_section("Want sleep", warning_text))
+            }
+            CharState::WantDrink => {
+                BillboardContent::Text(Text::from_section("Want drink", warning_text))
+            }
+            CharState::WantOxigen => {
+                BillboardContent::Text(Text::from_section("Want oxigen", warning_text))
+            }
+            CharState::WantPee => {
+                BillboardContent::Text(Text::from_section("Want pee", warning_text))
+            }
+            CharState::Dead => BillboardContent::Text(Text::from_section("Dead", warning_text)),
+        };
+
+        spawner.content = content;
+        spawner.set_changed();
     }
 }

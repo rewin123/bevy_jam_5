@@ -7,7 +7,10 @@ use bevy_mod_billboard::{
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(PostUpdate, sync_inner);
-    app.add_systems(Update, (manage_billboard, sync_billboard_position));
+    app.add_systems(
+        PreUpdate,
+        (manage_billboard, apply_deferred, sync_billboard_position).chain(),
+    );
 }
 
 #[derive(Component)]
