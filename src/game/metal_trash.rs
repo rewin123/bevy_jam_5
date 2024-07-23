@@ -14,7 +14,7 @@ use super::{
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(GatherMetalTrashWorkConfig {
         work_time: 0.25,
-        amount_after_work: 10.0,
+        amount_after_work: 5.0,
         multiplier: 1,
         last_updated: 0.0,
     });
@@ -75,7 +75,7 @@ fn update_gather_metal_work(
             );
             let metal_trash_collected =
                 metal_config.amount_after_work * metal_config.multiplier as f32;
-            metal_trash.amount -= metal_trash_collected;
+            metal_trash.amount += metal_trash_collected;
 
             commands.entity(entity).remove::<GatherMetalTrashWork>();
             commands.trigger_targets(NextAction, entity);
