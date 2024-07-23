@@ -59,7 +59,7 @@ fn in_fire(
                             transform: Transform::from_translation(Vec3::new(0.0, 1.5, -0.5)),
                             ..default()
                         })
-                        .insert(AutoAnim::new(FireSet, 0.05));
+                        .insert(AutoAnim::new(FireSet, 0.01));
                 });
         }
     }
