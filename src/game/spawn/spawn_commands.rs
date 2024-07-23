@@ -94,3 +94,16 @@ impl Command for SpawnEarth {
         world.spawn(bundle).insert(Earth);
     }
 }
+
+/*
+    commands
+        .spawn(SceneBundle {
+            scene: scene_handler[&SceneKey::MetalTrash].clone_weak(),
+            transform: Transform::from_translation(Vec3::new(6.0, 0.1, 6.0))
+                .with_scale(Vec3::splat(0.5)),
+            ..default()
+        })
+        .insert(Selectable)
+        //add fire
+        .insert(InFire::default());
+*/
