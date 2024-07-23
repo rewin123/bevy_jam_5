@@ -31,7 +31,7 @@ pub(crate) fn plugin(app: &mut App) {
 
     app.add_systems(Update, plan_trouble);
     app.add_systems(Update, fix_trouble);
-    app.add_systems(Update, tick_fire);
+    app.add_systems(PostUpdate, tick_fire);
 }
 
 fn plan_trouble(
@@ -89,8 +89,6 @@ fn fix_trouble(
     }
 }
 
-const FIRE_TIMER: f32 = 10.0;
-
 // Fire will destroy things if they are burning for X amount of time
 fn tick_fire(
     mut commands: Commands,
@@ -99,7 +97,7 @@ fn tick_fire(
     gametime: Res<GameTime>,
 ) {
     for (entity, fire, transform) in q_items_in_fire.iter() {
-        if (fire.started_at + FIRE_TIMER) < gametime.elapsed_seconds() {
+        if fire.time_ended(gametime.elapsed_seconds()) {
             commands
                 .spawn(SceneBundle {
                     scene: scene_handler[&SceneKey::MetalTrash].clone_weak(),

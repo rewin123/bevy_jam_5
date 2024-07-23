@@ -36,6 +36,18 @@ pub enum BillboardContent {
     None,
 }
 
+impl BillboardContent {
+    pub fn time_remaining(seconds_remaining: f32) -> Self {
+        BillboardContent::Text(Text::from_section(
+            format!("Destroyed in {}", seconds_remaining as i32),
+            TextStyle {
+                color: Color::linear_rgb(1.0, 0.1, 0.1),
+                ..default()
+            },
+        ))
+    }
+}
+
 fn sync_inner(
     mut commands: Commands,
     mut q_without_inner: Query<(Entity, &mut BillboardSpawner), Without<BillboardInner>>,
