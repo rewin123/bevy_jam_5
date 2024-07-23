@@ -11,8 +11,10 @@ pub mod character;
 pub mod components;
 mod daycycle;
 mod debt;
+pub mod device_state;
 mod highlight;
 mod map;
+mod metal_trash;
 mod movement;
 mod pc_work;
 mod resource_flow;
@@ -23,7 +25,6 @@ pub mod spawn;
 pub mod sprite_material;
 mod trouble_planner;
 pub mod ui;
-pub mod device_state;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
@@ -49,6 +50,7 @@ pub(super) fn plugin(app: &mut App) {
         resources::plugin,
         sprite_material::SpriteMaterialPlugin,
         pc_work::plugin,
+        metal_trash::plugin,
         sequence::plugin,
         resource_flow::plugin,
         bilboard_state::plugin,

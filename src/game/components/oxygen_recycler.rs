@@ -1,15 +1,22 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    bilboard_state::BillboardContent, character::{CharState, CharacterStates, GoToAction}, daycycle::GameTime, device_state::{DevceStatePlugin, DeviceState}, resources::OxygenRecycling, selectable::OnMouseClick, sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence}, spawn::{player::Player, spawn_commands::OxygenRecyler}
+    bilboard_state::BillboardContent,
+    character::{CharState, CharacterStates, GoToAction},
+    daycycle::GameTime,
+    device_state::{DeviceState, DeviceStatePlugin},
+    resources::OxygenRecycling,
+    selectable::OnMouseClick,
+    sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
+    spawn::{player::Player, spawn_commands::OxygenRecyler},
 };
 
 pub(super) fn plugin(app: &mut App) {
     app.observe(on_selected);
     app.add_systems(Update, update_oxygen_recycler_work);
-    app.add_systems(Update, update_oxigen_recycler_state);
+    app.add_systems(Update, update_oxygen_recycler_state);
 
-    app.add_plugins(DevceStatePlugin::<OxygenRegenratorState>::default());
+    app.add_plugins(DeviceStatePlugin::<OxygenRegenratorState>::default());
 }
 
 #[derive(Component, PartialEq, Clone)]
@@ -22,7 +29,13 @@ impl DeviceState for OxygenRegenratorState {
     fn content(&self) -> BillboardContent {
         match self {
             OxygenRegenratorState::Idle => BillboardContent::None,
-            OxygenRegenratorState::Work => BillboardContent::Text(Text::from_section("Oxigen++", TextStyle {color: Color::linear_rgb(0.1, 0.1, 1.0), ..default()})),
+            OxygenRegenratorState::Work => BillboardContent::Text(Text::from_section(
+                "Oxigen++",
+                TextStyle {
+                    color: Color::linear_rgb(0.1, 0.1, 1.0),
+                    ..default()
+                },
+            )),
         }
     }
 }
@@ -114,20 +127,16 @@ fn update_oxygen_recycler_work(
     }
 }
 
-fn update_oxigen_recycler_state(
+fn update_oxygen_recycler_state(
     mut commands: Commands,
     q_oxygen_recyclers: Query<Entity, With<OxygenRecyler>>,
     recycling: Res<OxygenRecycling>,
 ) {
     for entity in q_oxygen_recyclers.iter() {
         if recycling.working {
-            commands
-                .entity(entity)
-                .insert(OxygenRegenratorState::Work);
+            commands.entity(entity).insert(OxygenRegenratorState::Work);
         } else {
-            commands
-                .entity(entity)
-                .insert(OxygenRegenratorState::Idle);
+            commands.entity(entity).insert(OxygenRegenratorState::Idle);
         }
     }
 }

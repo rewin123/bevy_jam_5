@@ -2,35 +2,34 @@ use bevy::prelude::*;
 
 use super::bilboard_state::{BillboardContent, BillboardSinPos, BillboardSpawner};
 
-pub struct DevceStatePlugin<T: DeviceState> {
-    _phantom: std::marker::PhantomData<T>
+pub struct DeviceStatePlugin<T: DeviceState> {
+    _phantom: std::marker::PhantomData<T>,
 }
 
-impl<T: DeviceState> Default for DevceStatePlugin<T> {
+impl<T: DeviceState> Default for DeviceStatePlugin<T> {
     fn default() -> Self {
-        Self { _phantom: std::marker::PhantomData }
+        Self {
+            _phantom: std::marker::PhantomData,
+        }
     }
 }
 
-impl<T: DeviceState> Plugin for DevceStatePlugin<T> {
+impl<T: DeviceState> Plugin for DeviceStatePlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_systems(PreUpdate, render_state::<T>);
     }
 }
 
-
-pub trait DeviceState : PartialEq + Component + Clone {
+pub trait DeviceState: PartialEq + Component + Clone {
     fn content(&self) -> BillboardContent;
 }
 
 #[derive(Component)]
 struct Old<T: DeviceState>(T);
 
-
-
 fn render_state<T: DeviceState>(
     mut commands: Commands,
-    q_devices: Query<(Entity, &T, Option<&Old<T>>), Changed<T>>
+    q_devices: Query<(Entity, &T, Option<&Old<T>>), Changed<T>>,
 ) {
     for (e, new, old) in q_devices.iter() {
         let mut need_rerender = false;
@@ -51,10 +50,7 @@ fn render_state<T: DeviceState>(
                 size: Vec2::new(1.0, 1.0),
             };
 
-            commands
-                .entity(e)
-                .insert(spawner)
-                .insert(BillboardSinPos);
+            commands.entity(e).insert(spawner).insert(BillboardSinPos);
         }
     }
 }
