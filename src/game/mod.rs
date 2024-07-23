@@ -6,7 +6,7 @@ mod animation;
 pub mod assets;
 pub mod audio;
 pub mod auto_anim;
-mod character;
+pub mod character;
 pub mod components;
 mod daycycle;
 mod debt;

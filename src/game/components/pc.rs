@@ -3,7 +3,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    character::{GoToAction, IgnorJustMoving},
+    character::{GoToAction, IgnoreJustMoving},
     pc_work::PcWorkAction,
     selectable::OnMouseClick,
     sequence::{NewActionSequence, NewMode, Sequence},
@@ -26,7 +26,7 @@ fn auto_add_complex_moving(
     q_new: Query<Entity, Or<(Added<Pc>, Added<OxygenRecyler>)>>,
 ) {
     for entity in q_new.iter() {
-        commands.entity(entity).insert(IgnorJustMoving);
+        commands.entity(entity).insert(IgnoreJustMoving);
     }
 }
 
