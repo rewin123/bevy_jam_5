@@ -3,7 +3,10 @@ use bevy::prelude::*;
 use rand::prelude::*;
 use rand_distr::{Distribution, Poisson};
 
-use super::{components::fire::InFire, selectable::Selectable};
+use super::{
+    character::DestinationTarget, components::fire::InFire, selectable::Selectable,
+    spawn::player::Player,
+};
 
 #[derive(Resource, Debug)]
 pub struct TroublePlanner {
@@ -22,6 +25,7 @@ pub(crate) fn plugin(app: &mut App) {
     });
 
     app.add_systems(Update, plan_trouble);
+    app.add_systems(Update, fix_trouble);
 }
 
 fn plan_trouble(
@@ -44,6 +48,27 @@ fn plan_trouble(
         trouble_planner.peace_time = v;
         if trouble_planner.distribution < MIN_DISTRIBUTION {
             trouble_planner.distribution -= DIFFICULTY_PROGRESSION;
+        }
+    }
+}
+
+fn fix_trouble(
+    mut commands: Commands,
+    mut query: Query<(&mut Transform, &DestinationTarget), With<Player>>,
+    q_items_in_fire: Query<Entity, With<InFire>>,
+) {
+    for (transform, target) in query.iter_mut() {
+        let player_position = transform.translation;
+        let target_position = target.target_pos;
+
+        let distance = player_position.distance(target_position);
+
+        if distance <= target.accept_radius {
+            for items_in_fire in q_items_in_fire.iter() {
+                if target.target == items_in_fire {
+                    commands.entity(target.target).remove::<InFire>();
+                }
+            }
         }
     }
 }

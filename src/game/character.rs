@@ -15,10 +15,10 @@ pub(crate) fn plugin(app: &mut App) {
 pub const PLAYER_SPEED: f32 = 5.0;
 
 #[derive(Component)]
-pub struct IgnorJustMoving;
+pub struct IgnoreJustMoving;
 
 #[derive(Component)]
-struct DestinationTarget {
+pub struct DestinationTarget {
     #[allow(dead_code)]
     pub target: Entity,
     pub target_pos: Vec3,
@@ -48,7 +48,7 @@ fn add_target(
     trigger: Trigger<OnMouseClick>,
     mut commands: Commands,
     q_player: Query<Entity, With<Player>>,
-    q_selected: Query<&GlobalTransform, Without<IgnorJustMoving>>,
+    q_selected: Query<&GlobalTransform, Without<IgnoreJustMoving>>,
 ) {
     let clicked_entity = trigger.entity();
 
