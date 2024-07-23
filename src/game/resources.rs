@@ -4,7 +4,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<Water>();
     app.init_resource::<BadWater>();
     app.init_resource::<Oxygen>();
-    app.init_resource::<OxygenRecycler>();
+    app.init_resource::<OxygenRecycling>();
     app.init_resource::<Pee>();
     app.init_resource::<Food>();
     app.init_resource::<Hydrogen>();
@@ -13,7 +13,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<MetalTrash>();
     app.init_resource::<Metal>();
     app.init_resource::<Temperature>();
-    app.init_resource::<HydroponicsMachine>();
+    app.init_resource::<FoodGeneration>();
 
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
@@ -63,22 +63,26 @@ impl Default for Oxygen {
         Self {
             amount: 50.0,
             limit: 100.0,
-            consumption_rate: 2.0,
+            consumption_rate: 1.0,
         }
     }
 }
 
+/// Resource for OxygenRecycling configuration
 #[derive(Resource)]
-pub struct OxygenRecycler {
+pub struct OxygenRecycling {
     pub oxygen_generation_rate: f32,
     pub co2_consumption_rate: f32,
+    pub working: bool,
 }
 
-impl Default for OxygenRecycler {
+impl Default for OxygenRecycling {
     fn default() -> Self {
         Self {
-            oxygen_generation_rate: 1.0,
-            co2_consumption_rate: 1.0,
+            oxygen_generation_rate: 1.5,
+            // While on, consumes a bit more than is generated
+            co2_consumption_rate: 1.5,
+            working: true,
         }
     }
 }
@@ -123,14 +127,14 @@ impl Default for Food {
 }
 
 #[derive(Resource)]
-pub struct HydroponicsMachine {
-    pub food_generation_rate: f32,
+pub struct FoodGeneration {
+    pub generation_rate: f32,
 }
 
-impl Default for HydroponicsMachine {
+impl Default for FoodGeneration {
     fn default() -> Self {
         Self {
-            food_generation_rate: 10.0,
+            generation_rate: 1.0,
         }
     }
 }
@@ -170,7 +174,7 @@ mod dev {
         water: Res<Water>,
         bad_water: Res<BadWater>,
         oxygen: Res<Oxygen>,
-        oxygen_recycler: Res<OxygenRecycler>,
+        oxygen_recycler: Res<OxygenRecycling>,
         pee: Res<Pee>,
         food: Res<Food>,
         hydrogen: Res<Hydrogen>,
@@ -216,7 +220,7 @@ mod dev {
             "Carbon in air",
             format!(
                 "Carbon in air: {}/{}",
-                carbon_in_air.amount, carbon_in_air.limit
+                carbon_in_air.amount as i32, carbon_in_air.limit
             ),
         );
         debug_panel.add(

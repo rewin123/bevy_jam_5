@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use super::{
     daycycle::GameTime,
-    resources::{CarbonDioxide, Food, HydroponicsMachine, Oxygen, OxygenRecycler},
+    resources::{CarbonDioxide, Food, FoodGeneration, Oxygen, OxygenRecycling},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -10,24 +10,37 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn update_oxygen_and_co2(
-    oxygen_recycler: ResMut<OxygenRecycler>,
+    oxygen_recycling: ResMut<OxygenRecycling>,
     mut oxygen: ResMut<Oxygen>,
     mut co2: ResMut<CarbonDioxide>,
     gametime: Res<GameTime>,
 ) {
+    let recycling = oxygen_recycling.working;
+
     // Oxygen
+    let oxygen_generation = if recycling {
+        oxygen_recycling.oxygen_generation_rate
+    } else {
+        0.0
+    };
     oxygen.amount = calculate_new_amount(
         oxygen.amount,
-        oxygen_recycler.oxygen_generation_rate,
+        oxygen_generation,
         oxygen.consumption_rate,
         gametime.delta_seconds(),
         oxygen.limit,
     );
+
     // Carbond Dioxide
+    let co2_consumption = if recycling {
+        oxygen_recycling.co2_consumption_rate
+    } else {
+        0.0
+    };
     co2.amount = calculate_new_amount(
         co2.amount,
         co2.generation_rate,
-        oxygen_recycler.co2_consumption_rate,
+        co2_consumption,
         gametime.delta_seconds(),
         co2.limit,
     );
@@ -35,12 +48,12 @@ fn update_oxygen_and_co2(
 
 fn update_food(
     mut food: ResMut<Food>,
-    hydroponics_machine: Res<HydroponicsMachine>,
+    food_generation: Res<FoodGeneration>,
     gametime: Res<GameTime>,
 ) {
     food.amount = calculate_new_amount(
         food.amount,
-        hydroponics_machine.food_generation_rate,
+        food_generation.generation_rate,
         0.0,
         gametime.delta_seconds(),
         food.limit,

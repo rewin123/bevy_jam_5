@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderBackground, StyleBuilderLayout};
 use bevy_quill::*;
 
-use crate::game::resources::{Food, Oxygen, Water};
+use crate::game::resources::{CarbonDioxide, Food, Oxygen, OxygenRecycling, Water};
 
 use super::{
     components::resource_slider::ResourceSlider,
@@ -29,10 +29,22 @@ impl ViewTemplate for RootUi {
     fn create(&self, cx: &mut Cx) -> Self::View {
         let selected_item = cx.use_resource::<SelectedItem>();
         let oxygen = cx.use_resource::<Oxygen>();
+        let oxygen_recycling = cx.use_resource::<OxygenRecycling>();
+        let co2 = cx.use_resource::<CarbonDioxide>();
         let food = cx.use_resource::<Food>();
         let water = cx.use_resource::<Water>();
         let position = selected_item.item;
 
+        let oxygen_status = if oxygen_recycling.working {
+            oxygen_recycling.oxygen_generation_rate - oxygen.consumption_rate
+        } else {
+            -oxygen.consumption_rate
+        };
+        let co2_status = if oxygen_recycling.working {
+            -(oxygen_recycling.co2_consumption_rate - co2.generation_rate)
+        } else {
+            co2.generation_rate
+        };
         Element::<NodeBundle>::new().style(root_style).children((
             Element::<NodeBundle>::new()
                 .style(|sb: &mut StyleBuilder| {
@@ -51,7 +63,11 @@ impl ViewTemplate for RootUi {
                     ResourceSlider::new()
                         .limit(oxygen.limit)
                         .amount(oxygen.amount)
-                        .label("Oxygen"),
+                        .label(format!("Oxygen ({:+})", oxygen_status)),
+                    ResourceSlider::new()
+                        .limit(co2.limit)
+                        .amount(co2.amount)
+                        .label(format!("CO2 ({:+})", co2_status)),
                     ResourceSlider::new()
                         .limit(water.limit)
                         .amount(water.amount)

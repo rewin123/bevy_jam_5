@@ -7,7 +7,7 @@ use crate::game::{
     pc_work::PcWorkAction,
     selectable::OnMouseClick,
     sequence::{NewActionSequence, NewMode, Sequence},
-    spawn::player::Player,
+    spawn::{player::Player, spawn_commands::OxygenRecyler},
 };
 
 #[derive(Component)]
@@ -21,7 +21,10 @@ pub(crate) fn plugin(app: &mut App) {
 
 const PC_WORK_GROUP: &str = "pc_work";
 
-fn auto_add_complex_moving(mut commands: Commands, q_new: Query<Entity, Added<Pc>>) {
+fn auto_add_complex_moving(
+    mut commands: Commands,
+    q_new: Query<Entity, Or<(Added<Pc>, Added<OxygenRecyler>)>>,
+) {
     for entity in q_new.iter() {
         commands.entity(entity).insert(IgnorJustMoving);
     }

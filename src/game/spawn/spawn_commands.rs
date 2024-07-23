@@ -10,6 +10,9 @@ pub struct SpawnOxygenGenerator {
     pub pos: Vec3,
 }
 
+#[derive(Component)]
+pub struct OxygenRecyler;
+
 impl Command for SpawnOxygenGenerator {
     fn apply(self, world: &mut World) {
         let scene =
@@ -21,7 +24,7 @@ impl Command for SpawnOxygenGenerator {
             ..default()
         };
 
-        world.spawn(bundle).insert(Selectable);
+        world.spawn(bundle).insert(Selectable).insert(OxygenRecyler);
     }
 }
 

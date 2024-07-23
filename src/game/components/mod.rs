@@ -1,7 +1,13 @@
 pub mod earth;
 pub mod fire;
+pub mod oxygen_recycler;
 pub mod pc;
 
 pub(crate) fn plugin(app: &mut bevy::prelude::App) {
-    app.add_plugins((earth::plugin, fire::plugin, pc::plugin));
+    app.add_plugins((
+        earth::plugin,
+        fire::plugin,
+        pc::plugin,
+        oxygen_recycler::plugin,
+    ));
 }
