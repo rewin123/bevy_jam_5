@@ -1,7 +1,14 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    bilboard_state::BillboardContent, character::{CharState, CharacterStates, GoToAction}, daycycle::GameTime, device_state::{DevceStatePlugin, DeviceState}, resources::OxygenRecycling, selectable::OnMouseClick, sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence}, spawn::{player::Player, spawn_commands::OxygenRecyler}
+    bilboard_state::BillboardContent,
+    character::{CharState, CharacterStates, GoToAction},
+    daycycle::GameTime,
+    device_state::{DevceStatePlugin, DeviceState},
+    resources::OxygenRecycling,
+    selectable::OnMouseClick,
+    sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
+    spawn::{player::Player, spawn_commands::OxygenRecyler},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -22,7 +29,13 @@ impl DeviceState for OxygenRegenratorState {
     fn content(&self) -> BillboardContent {
         match self {
             OxygenRegenratorState::Idle => BillboardContent::None,
-            OxygenRegenratorState::Work => BillboardContent::Text(Text::from_section("Oxigen++", TextStyle {color: Color::linear_rgb(0.1, 0.1, 1.0), ..default()})),
+            OxygenRegenratorState::Work => BillboardContent::Text(Text::from_section(
+                "Oxigen++",
+                TextStyle {
+                    color: Color::linear_rgb(0.1, 0.1, 1.0),
+                    ..default()
+                },
+            )),
         }
     }
 }
@@ -121,13 +134,9 @@ fn update_oxigen_recycler_state(
 ) {
     for entity in q_oxygen_recyclers.iter() {
         if recycling.working {
-            commands
-                .entity(entity)
-                .insert(OxygenRegenratorState::Work);
+            commands.entity(entity).insert(OxygenRegenratorState::Work);
         } else {
-            commands
-                .entity(entity)
-                .insert(OxygenRegenratorState::Idle);
+            commands.entity(entity).insert(OxygenRegenratorState::Idle);
         }
     }
 }

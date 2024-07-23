@@ -162,10 +162,7 @@ pub struct Temperature {
     pub amount: f32,
 }
 
-fn store_oxygen_step(
-    oxygen: Res<Oxygen>,
-    mut old_oxygen: ResMut<OldOxygen>,
-) {
+fn store_oxygen_step(oxygen: Res<Oxygen>, mut old_oxygen: ResMut<OldOxygen>) {
     old_oxygen.0 = oxygen.amount;
 }
 

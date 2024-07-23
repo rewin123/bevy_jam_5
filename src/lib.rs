@@ -6,7 +6,10 @@ mod screen;
 mod ui;
 
 use bevy::{
-    asset::AssetMetaCheck, audio::{AudioPlugin, Volume}, core_pipeline::Skybox, prelude::*
+    asset::AssetMetaCheck,
+    audio::{AudioPlugin, Volume},
+    core_pipeline::Skybox,
+    prelude::*,
 };
 // Related to an issue with WGPU AMD card on windows
 // See https://github.com/gfx-rs/wgpu/issues/4247

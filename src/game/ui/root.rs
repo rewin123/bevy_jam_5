@@ -3,8 +3,8 @@ use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderBackground, StyleBuilderLa
 use bevy_quill::*;
 
 use crate::game::{
-    daycycle::PlayerState,
-    resources::{CarbonDioxide, Food, Oxygen, OxygenRecycling, Water},
+    daycycle::{GameTime, PlayerState},
+    resources::{CarbonDioxide, Food, OldOxygen, Oxygen, OxygenRecycling, Water},
 };
 
 use super::{
@@ -46,7 +46,7 @@ impl ViewTemplate for RootUi {
 
         let oxygen_status = (oxygen.amount - old_oxugen.0) / gametime.delta_seconds();
         let oxygen_status = oxygen_status.round();
-         
+
         let co2_status = if oxygen_recycling.working {
             -(oxygen_recycling.co2_consumption_rate - co2.generation_rate)
         } else {
