@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::daycycle::GameTime;
+use super::daycycle::{GameTime, PlayerState};
 
 #[allow(dead_code)]
 pub struct DebtPlugin;
@@ -8,6 +8,7 @@ pub struct DebtPlugin;
 pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<Debt>();
     app.add_systems(PostUpdate, increase_debt);
+    app.add_systems(PreUpdate, win_on_zero_debt);
 
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
@@ -49,6 +50,15 @@ fn increase_debt(time: Res<GameTime>, mut debt: ResMut<Debt>) {
     if time.elapsed_seconds() - debt.last_updated as f32 > 1.0 {
         debt.increase();
         debt.last_updated = time.elapsed_seconds() as i32;
+    }
+}
+
+fn win_on_zero_debt(
+    debt: Res<Debt>,
+    mut player_state: ResMut<NextState<PlayerState>>
+) {
+    if debt.amount <= 0.0 {
+        player_state.set(PlayerState::Won);
     }
 }
 

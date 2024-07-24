@@ -18,10 +18,8 @@ pub struct TroublePlanner {
     pub peace_time: f32,
     pub distribution: f32,
 }
-pub const MIN_DISTRIBUTION: f32 = 5.0;
-pub const DEFAULT_PEACE_TIME: f32 = 10.0;
+pub const DEFAULT_PEACE_TIME: f32 = 5.0;
 pub const DEFAULT_DISTRIBUTION: f32 = 10.0;
-pub const DIFFICULTY_PROGRESSION: f32 = 0.5;
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(TroublePlanner {
@@ -51,20 +49,21 @@ fn plan_trouble(
 
     if trouble_planner.peace_time <= 0.0 {
         let items = q_selectable.iter().collect::<Vec<_>>();
-        let mut rng = rand::thread_rng();
-        let index = rng.gen_range(0..items.len());
-
-        commands.entity(items[index]).insert(InFire {
-            fire_created: false,
-            started_at: time.elapsed_seconds(),
-        });
+        if !items.is_empty() {
+            let mut rng = rand::thread_rng();
+            let index = rng.gen_range(0..items.len());
+    
+            commands.entity(items[index]).insert(InFire {
+                fire_created: false,
+                started_at: time.elapsed_seconds(),
+            });
+        }
+       
 
         let poi = Poisson::new(trouble_planner.distribution).unwrap();
         let v = poi.sample(&mut rand::thread_rng());
         trouble_planner.peace_time = v;
-        if trouble_planner.distribution < MIN_DISTRIBUTION {
-            trouble_planner.distribution -= DIFFICULTY_PROGRESSION;
-        }
+        trouble_planner.distribution *= 0.99;
     }
 }
 

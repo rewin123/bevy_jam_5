@@ -26,7 +26,7 @@ pub(crate) fn plugin(app: &mut App) {
 
     app.add_systems(
         PreUpdate,
-        stop_game_on_death.run_if(in_state(PlayerState::Alive)),
+        stop_game_on_death,
     );
     app.add_systems(PreUpdate, (time_speed, update_time).chain());
     app.add_systems(PreUpdate, day_events);
