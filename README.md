@@ -2,7 +2,7 @@
 
 ## Description 
 
-Mortgage is really skyrocketing now a days in Canada, so we found you this amazing apartment at the top of the world with an insanely good mortgage deal. The problem is, you might need to be extra careful managing your sewer.
+Mortgage is really skyrocketing nowadays in Canada, so we found you this amazing apartment at the top of the world with an insanely good mortgage deal. The problem is, you might need to be extra careful managing your sewer and your oxygen levels.
 
 In this amazing game by ________, you will have to pay your mortgage installs, while you manage your resources to reduce costs. Just beware that every now and then, stuff breaks and blowup. The cycle of life we can say
 
