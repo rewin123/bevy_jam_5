@@ -1,77 +1,38 @@
+use std::ops::RangeInclusive;
+
 use bevy::prelude::*;
+use bevy_quill::Cx;
+
+use super::{daycycle::GameTime, ui::components::resource_slider::ResourceSlider};
 
 pub(crate) fn plugin(app: &mut App) {
-    app.init_resource::<Water>();
-    app.init_resource::<BadWater>();
-    app.init_resource::<Oxygen>();
-    app.init_resource::<OldOxygen>();
-    app.init_resource::<OxygenRecycling>();
-    app.init_resource::<Pee>();
-    app.init_resource::<Food>();
-    app.init_resource::<Hydrogen>();
-    app.init_resource::<Electricity>();
-    app.init_resource::<CarbonDioxide>();
-    app.init_resource::<MetalTrash>();
-    app.init_resource::<Metal>();
-    app.init_resource::<Temperature>();
-    app.init_resource::<FoodGeneration>();
 
-    app.add_systems(PreUpdate, store_oxygen_step);
+    app.init_resource::<AllResourcesGetter>();
+    app.init_resource::<OxygenRecycling>();
+    app.init_resource::<FoodGeneration>();
+    app.init_resource::<Electricity>();
+    app.init_resource::<Temperature>();
+
+    app.add_plugins((
+        GameResourcePlugin::<Oxygen>::default(),
+        GameResourcePlugin::<CarbonDioxide>::default(),
+        GameResourcePlugin::<Water>::default(),
+        GameResourcePlugin::<BadWater>::default(),
+        GameResourcePlugin::<Pee>::default(),
+        GameResourcePlugin::<Food>::default(),
+        GameResourcePlugin::<Hydrogen>::default(),
+        GameResourcePlugin::<Metal>::default(),
+        GameResourcePlugin::<MetalTrash>::default(),
+    ));
 
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
 }
 
-#[derive(Resource, Default)]
-pub struct Metal {
-    pub amount: f32,
-}
 
 #[derive(Resource, Default)]
-pub struct MetalTrash {
-    pub amount: f32,
-}
-
-#[derive(Resource)]
-pub struct Water {
-    pub amount: f32,
-    pub limit: f32,
-}
-
-impl Default for Water {
-    fn default() -> Self {
-        Self {
-            amount: 50.0,
-            limit: 100.0,
-        }
-    }
-}
-
-#[derive(Resource, Default)]
-pub struct BadWater {
-    pub amount: f32,
-    pub limit: f32,
-}
-
-/// Oxygen in ship
-#[derive(Resource)]
-pub struct Oxygen {
-    pub amount: f32,
-    pub limit: f32,
-    pub consumption_rate: f32,
-}
-
-#[derive(Resource, Default)]
-pub struct OldOxygen(pub f32);
-
-impl Default for Oxygen {
-    fn default() -> Self {
-        Self {
-            amount: 50.0,
-            limit: 100.0,
-            consumption_rate: 1.0,
-        }
-    }
+pub struct AllResourcesGetter {
+    pub res_plugin: Vec<Box<dyn Fn(&Cx) -> ResourceSlider + Send + Sync>>,
 }
 
 /// Resource for OxygenRecycling configuration
@@ -93,45 +54,6 @@ impl Default for OxygenRecycling {
     }
 }
 
-/// How many carbon is in the air. If its too many, then you will die
-#[derive(Resource)]
-pub struct CarbonDioxide {
-    pub amount: f32,
-    pub limit: f32,
-    pub generation_rate: f32,
-}
-
-impl Default for CarbonDioxide {
-    fn default() -> Self {
-        Self {
-            amount: 0.0,
-            limit: 100.0,
-            generation_rate: 1.0,
-        }
-    }
-}
-
-#[derive(Resource, Default)]
-pub struct Pee {
-    pub amount: f32,
-    pub limit: f32,
-}
-
-#[derive(Resource)]
-pub struct Food {
-    pub amount: f32,
-    pub limit: f32,
-}
-
-impl Default for Food {
-    fn default() -> Self {
-        Self {
-            amount: 10.0,
-            limit: 100.0,
-        }
-    }
-}
-
 #[derive(Resource)]
 pub struct FoodGeneration {
     pub generation_rate: f32,
@@ -146,12 +68,6 @@ impl Default for FoodGeneration {
 }
 
 #[derive(Resource, Default)]
-pub struct Hydrogen {
-    pub amount: f32,
-    pub limit: f32,
-}
-
-#[derive(Resource, Default)]
 pub struct Electricity {
     pub total: f32, //how many electricity can be used. If used > total, then all electricity generators will be shut off
     pub used: f32,  //how many electricity was used in last tick
@@ -160,10 +76,6 @@ pub struct Electricity {
 #[derive(Resource, Default)]
 pub struct Temperature {
     pub amount: f32,
-}
-
-fn store_oxygen_step(oxygen: Res<Oxygen>, mut old_oxygen: ResMut<OldOxygen>) {
-    old_oxygen.0 = oxygen.amount;
 }
 
 #[cfg(feature = "dev")]
@@ -239,3 +151,192 @@ mod dev {
         );
     }
 }
+
+
+
+pub struct GameResourcePlugin<T: GameResource> {
+    _type: std::marker::PhantomData<T>,
+}
+
+impl<T: GameResource> Default for GameResourcePlugin<T> {
+    fn default() -> Self {
+        Self {
+            _type: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<T: GameResource + Default> Plugin for GameResourcePlugin<T> {
+    fn build(&self, app: &mut App) {
+        app.insert_resource(GameResInfo::<T>::new());
+        app.init_resource::<T>();
+        app.add_event::<Generate<T>>();
+        app.add_systems(PostUpdate, collect_generations::<T>);
+
+        app.world_mut().resource_mut::<AllResourcesGetter>()
+            .res_plugin.push(Box::new(|cx| {
+                let val = cx.use_resource::<T>();
+                let info = cx.use_resource::<GameResInfo<T>>();
+                ResourceSlider { 
+                    limit: val.limit().unwrap_or(100.0), 
+                    amount: val.amount(), 
+                    label: format!("{} {:+.0}", val.label(), info.generation_rate), 
+                    style: bevy_mod_stylebuilder::StyleHandle::default()
+                }
+            }));
+    }
+}
+
+pub trait GameResource: Resource {
+    fn amount(&self) -> f32;
+    fn set_amount(&mut self, amount: f32);
+    fn limit(&self) -> Option<f32>;
+    fn healthly_range(&self) -> Option<RangeInclusive<f32>>;
+    fn label(&self) -> String;
+}
+/// Generation for resource in dval/sec manner
+/// Example
+/// For increasing water to 1 per second:
+/// Generate::<Water>::new(1.0)
+#[derive(Event)]
+pub struct Generate<T: Resource> {
+    pub amount: f32,
+    _type: std::marker::PhantomData<T>,
+}
+
+impl <T: Resource> Generate<T> {
+    pub fn new(amount: f32) -> Self {
+        Self {
+            amount,
+            _type: std::marker::PhantomData,
+        }
+    }
+}
+
+
+#[derive(Resource)]
+pub struct GameResInfo<T: GameResource> {
+    pub generation_rate: f32,
+    phantom: std::marker::PhantomData<T>,
+}
+
+
+
+impl<T: GameResource> GameResInfo<T> {
+    pub fn new() -> Self {
+        Self {
+            generation_rate: 0.0,
+            phantom: std::marker::PhantomData,
+        }
+    }
+}
+
+fn collect_generations<T: GameResource>(
+    mut ev_gens: EventReader<Generate<T>>,
+    mut info: ResMut<GameResInfo<T>>,
+    mut resource: ResMut<T>,
+    time: Res<GameTime>,
+) {
+    info.generation_rate = 0.0;
+    for gen in ev_gens.read() {
+        info.generation_rate += gen.amount;
+    }
+    ev_gens.clear();
+    let amount = resource.amount() + info.generation_rate * time.delta_seconds();
+    resource.set_amount(amount);
+}
+
+
+macro_rules! impl_limitless_resource {
+    ($name:ident) => {
+        #[derive(Resource, Default)]
+        pub struct $name {
+            pub amount: f32,
+        }
+
+        impl $name {
+            pub fn new(amount: f32) -> Self {
+                Self {
+                    amount
+                }
+            }
+        }
+
+        impl GameResource for $name {
+            fn amount(&self) -> f32 {
+                self.amount
+            }
+
+            fn set_amount(&mut self, amount: f32) {
+                self.amount = amount;
+            }
+
+            fn limit(&self) -> Option<f32> {
+                None
+            }
+
+            fn healthly_range(&self) -> Option<RangeInclusive<f32>> {
+                None
+            }
+
+            fn label(&self) -> String {
+                stringify!($name).to_string()
+            }
+        }
+    
+    };
+}
+
+impl_limitless_resource!(MetalTrash);
+impl_limitless_resource!(Metal);
+
+
+macro_rules! simple_game_resource {
+    ($name:ident, $limit:literal, $helthly_min:literal, $helthly_max:literal) => {
+        #[derive(Resource, Default)]
+        pub struct $name {
+            amount: f32,
+            limit: f32,
+        }
+
+        impl $name {
+            pub fn new(amount: f32, limit: f32) -> Self {
+                Self {
+                    amount,
+                    limit
+                }
+            }
+        }
+
+        impl GameResource for $name {
+            fn amount(&self) -> f32 {
+                self.amount
+            }
+
+            fn set_amount(&mut self, amount: f32) {
+                self.amount = amount;
+            }
+
+            fn limit(&self) -> Option<f32> {
+                Some(self.limit)
+            }
+
+            fn healthly_range(&self) -> Option<RangeInclusive<f32>> {
+                Some($helthly_min..=$helthly_max)
+            }
+
+            fn label(&self) -> String {
+                stringify!($name).to_string()
+            }
+        }
+    };
+}
+
+
+simple_game_resource!(Water, 100.0, 10.0, 90.0);
+simple_game_resource!(Food, 100.0, 10.0, 90.0);
+simple_game_resource!(Pee, 100.0, 10.0, 90.0);
+simple_game_resource!(BadWater, 100.0, 10.0, 90.0);
+simple_game_resource!(Hydrogen, 100.0, 10.0, 90.0);
+simple_game_resource!(CarbonDioxide, 100.0, 10.0, 90.0);
+simple_game_resource!(Oxygen, 100.0, 10.0, 90.0);

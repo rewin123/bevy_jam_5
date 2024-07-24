@@ -5,7 +5,7 @@ use bevy::{prelude::*, utils::HashSet};
 use super::{
     bilboard_state::{BillboardContent, BillboardSpawner},
     daycycle::GameTime,
-    resources::{Oxygen, OxygenRecycling},
+    resources::{GameResource, Oxygen, OxygenRecycling},
     selectable::OnMouseClick,
     sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
     spawn::player::Player,
@@ -218,9 +218,9 @@ fn check_oxigen(
     oxigen_regeneration: Res<OxygenRecycling>,
 ) {
     for mut states in q_char.iter_mut() {
-        if oxigen.amount <= 10.0 {
+        if oxigen.amount() <= 10.0 {
             states.add(CharState::WantOxigen);
-        } else if oxigen.amount > oxigen.limit * 0.9 && oxigen_regeneration.working {
+        } else if oxigen.amount() > oxigen.limit().unwrap() * 0.9 && oxigen_regeneration.working {
             states.add(CharState::TooManyOxigen);
         }
     }
