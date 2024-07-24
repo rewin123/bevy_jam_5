@@ -7,6 +7,7 @@ pub mod metal_trash_pile;
 pub mod oxygen_recycler;
 pub mod pc;
 pub mod toilet;
+pub mod water_dispenser;
 
 pub(crate) fn plugin(app: &mut bevy::prelude::App) {
     app.add_plugins((
@@ -17,8 +18,8 @@ pub(crate) fn plugin(app: &mut bevy::prelude::App) {
         oxygen_recycler::plugin,
         metal_trash_pile::plugin,
         toilet::plugin,
+        water_dispenser::plugin,
     ));
 
-    app
-        .add_plugins(WorldInspectorPlugin::new());
+    app.add_plugins(WorldInspectorPlugin::new());
 }

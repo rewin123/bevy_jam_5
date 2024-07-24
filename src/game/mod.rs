@@ -18,6 +18,7 @@ mod map;
 mod metal_trash;
 mod movement;
 mod pc_work;
+pub mod render;
 mod resource_flow;
 pub mod resources;
 mod selectable;
@@ -26,14 +27,11 @@ pub mod spawn;
 pub mod sprite_material;
 mod trouble_planner;
 pub mod ui;
-pub mod render;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
 
-    app.add_plugins(
-        ExportRegistryPlugin::default()
-    );
+    app.add_plugins(ExportRegistryPlugin::default());
 
     app.add_plugins((
         animation::plugin,
@@ -62,7 +60,5 @@ pub(super) fn plugin(app: &mut App) {
         bilboard_state::plugin,
     ));
 
-    app.add_plugins((
-        render::plugin,
-    ));
+    app.add_plugins((render::plugin,));
 }

@@ -101,6 +101,7 @@ pub struct Toilet;
 
 pub struct SpawnToilet {
     pub pos: Vec3,
+    pub rot: Option<Quat>,
 }
 
 impl Command for SpawnToilet {
@@ -108,12 +109,38 @@ impl Command for SpawnToilet {
         let scene = world.resource::<HandleMap<SceneKey>>()[&SceneKey::Toilet].clone_weak();
         let bundle = SceneBundle {
             scene,
-            transform: Transform::from_translation(self.pos).with_scale(Vec3::splat(0.35)),
+            transform: Transform::from_translation(self.pos)
+                .with_rotation(self.rot.unwrap_or_default())
+                .with_scale(Vec3::splat(0.35)),
             ..default()
         };
 
         world
             .spawn(bundle)
             .insert((Selectable, Toilet, IgnoreJustMoving));
+    }
+}
+#[derive(Component)]
+pub struct WaterDispenser;
+
+pub struct SpawnWaterDispenser {
+    pub pos: Vec3,
+    pub rot: Option<Quat>,
+}
+
+impl Command for SpawnWaterDispenser {
+    fn apply(self, world: &mut World) {
+        let scene = world.resource::<HandleMap<SceneKey>>()[&SceneKey::WaterDispenser].clone_weak();
+        let bundle = SceneBundle {
+            scene,
+            transform: Transform::from_translation(self.pos)
+                .with_rotation(self.rot.unwrap_or_default())
+                .with_scale(Vec3::splat(0.35)),
+            ..default()
+        };
+
+        world
+            .spawn(bundle)
+            .insert((Selectable, WaterDispenser, IgnoreJustMoving));
     }
 }

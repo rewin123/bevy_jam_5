@@ -65,11 +65,12 @@ fn update_map(
 
         let floor = meshes.add(Cuboid::new(1.0, 0.1, 1.0));
         let floor_material = materials.add(StandardMaterial {
-            base_color_texture: Some(asset_server.load("images/metalgrid2-bl/metalgrid2-bl/metalgrid2_basecolor.png")),
+            base_color_texture: Some(
+                asset_server.load("images/metalgrid2-bl/metalgrid2-bl/metalgrid2_basecolor.png"),
+            ),
             metallic: 1.0,
             ..default()
         });
-
 
         let wall_pbr = PbrBundle {
             mesh: cube.clone(),

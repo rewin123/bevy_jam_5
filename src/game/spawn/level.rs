@@ -13,6 +13,7 @@ use super::{
     player::{Player, SpawnPlayer},
     spawn_commands::{
         SpawnEarth, SpawnHydroponic, SpawnMetalTrashPile, SpawnOxygenGenerator, SpawnToilet,
+        SpawnWaterDispenser,
     },
 };
 
@@ -118,7 +119,13 @@ fn spawn_level(
     });
 
     commands.add(SpawnToilet {
-        pos: Vec3::new(7.5, 0.1, 7.5),
+        pos: Vec3::new(8.0, 0.1, 7.5),
+        rot: Some(Quat::from_rotation_y((90.0_f32).to_radians())),
+    });
+
+    commands.add(SpawnWaterDispenser {
+        pos: Vec3::new(8.0, 0.1, 6.0),
+        rot: Some(Quat::from_rotation_y((-90.0_f32).to_radians())),
     });
 
     commands.add(SpawnEarth);

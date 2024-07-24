@@ -22,6 +22,7 @@ pub(crate) fn plugin(app: &mut App) {
         GameResourcePlugin::<Hydrogen>::default(),
         GameResourcePlugin::<Metal>::default(),
         GameResourcePlugin::<MetalTrash>::default(),
+        GameResourcePlugin::<Thirst>::default(),
     ));
 
     #[cfg(feature = "dev")]
@@ -294,10 +295,19 @@ impl_limitless_resource!(Metal);
 
 macro_rules! simple_game_resource {
     ($name:ident, $limit:literal, $helthly_min:literal, $helthly_max:literal) => {
-        #[derive(Resource, Default)]
+        #[derive(Resource)]
         pub struct $name {
             amount: f32,
             limit: f32,
+        }
+
+        impl Default for $name {
+            fn default() -> Self {
+                Self {
+                    amount: 0.0,
+                    limit: $limit,
+                }
+            }
         }
 
         impl $name {
@@ -343,6 +353,7 @@ macro_rules! simple_game_resource {
 simple_game_resource!(Water, 100.0, 10.0, 90.0);
 simple_game_resource!(Food, 100.0, 10.0, 90.0);
 simple_game_resource!(Pee, 100.0, 10.0, 90.0);
+simple_game_resource!(Thirst, 100.0, 10.0, 90.0);
 simple_game_resource!(BadWater, 100.0, 10.0, 90.0);
 simple_game_resource!(Hydrogen, 100.0, 10.0, 90.0);
 simple_game_resource!(CarbonDioxide, 100.0, 10.0, 90.0);

@@ -6,12 +6,21 @@ use super::{
     components::fire::InFire,
     daycycle::{DeathCause, GameTime, PlayerDied, TimeSpeed},
     resources::{
-        CarbonDioxide, Food, FoodGeneration, GameResource, Generate, Oxygen, OxygenRecycling,
+        CarbonDioxide, Food, FoodGeneration, GameResource, Generate, Oxygen, OxygenRecycling, Pee,
+        Thirst, Water,
     },
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(Update, (update_oxygen_and_co2, update_food, fire_oxigen));
+    app.add_systems(
+        Update,
+        (
+            update_oxygen_and_co2,
+            update_food,
+            fire_oxigen,
+            update_thirst,
+        ),
+    );
     app.add_systems(PostUpdate, (bad_air_death, too_many_oxigen_death));
 }
 
@@ -95,4 +104,8 @@ fn fire_oxigen(
         oxigen.send(Generate::new(-consuming));
         co2.send(Generate::new(consuming));
     }
+}
+
+fn update_thirst(mut thirst: EventWriter<Generate<Thirst>>) {
+    thirst.send(Generate::new(2.0));
 }

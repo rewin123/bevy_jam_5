@@ -1,4 +1,29 @@
-use bevy::{core_pipeline::{core_3d::graph::{Core3d, Node3d}, fullscreen_vertex_shader::fullscreen_shader_vertex_state}, prelude::*, render::{extract_component::{ComponentUniforms, DynamicUniformIndex, ExtractComponent, ExtractComponentPlugin, UniformComponentPlugin}, render_graph::{RenderGraphApp, RenderLabel, ViewNode, ViewNodeRunner}, render_resource::{binding_types::{sampler, texture_2d, uniform_buffer}, BindGroupEntries, BindGroupLayout, BindGroupLayoutEntries, CachedRenderPipelineId, ColorTargetState, ColorWrites, FragmentState, MultisampleState, Operations, PipelineCache, PrimitiveState, RenderPassColorAttachment, RenderPassDescriptor, RenderPipelineDescriptor, Sampler, SamplerBindingType, SamplerDescriptor, ShaderStages, ShaderType, TextureFormat, TextureSampleType}, renderer::RenderDevice, texture::BevyDefault, view::ViewTarget, RenderApp}};
+use bevy::{
+    core_pipeline::{
+        core_3d::graph::{Core3d, Node3d},
+        fullscreen_vertex_shader::fullscreen_shader_vertex_state,
+    },
+    prelude::*,
+    render::{
+        extract_component::{
+            ComponentUniforms, DynamicUniformIndex, ExtractComponent, ExtractComponentPlugin,
+            UniformComponentPlugin,
+        },
+        render_graph::{RenderGraphApp, RenderLabel, ViewNode, ViewNodeRunner},
+        render_resource::{
+            binding_types::{sampler, texture_2d, uniform_buffer},
+            BindGroupEntries, BindGroupLayout, BindGroupLayoutEntries, CachedRenderPipelineId,
+            ColorTargetState, ColorWrites, FragmentState, MultisampleState, Operations,
+            PipelineCache, PrimitiveState, RenderPassColorAttachment, RenderPassDescriptor,
+            RenderPipelineDescriptor, Sampler, SamplerBindingType, SamplerDescriptor, ShaderStages,
+            ShaderType, TextureFormat, TextureSampleType,
+        },
+        renderer::RenderDevice,
+        texture::BevyDefault,
+        view::ViewTarget,
+        RenderApp,
+    },
+};
 use bevy_mod_outline::NodeOutline;
 
 const SHADER_ASSET_PATH: &str = "shaders/cartoon.wgsl";
@@ -7,8 +32,10 @@ pub struct CartoonPlugin;
 
 impl Plugin for CartoonPlugin {
     fn build(&self, app: &mut App) {
-
-        app.add_plugins((ExtractComponentPlugin::<CartoonSettings>::default(), UniformComponentPlugin::<CartoonSettings>::default()));
+        app.add_plugins((
+            ExtractComponentPlugin::<CartoonSettings>::default(),
+            UniformComponentPlugin::<CartoonSettings>::default(),
+        ));
 
         app.add_systems(PreUpdate, setup_settings);
 
@@ -18,32 +45,41 @@ impl Plugin for CartoonPlugin {
 
         render_app
             .add_render_graph_node::<ViewNodeRunner<CartoonProcessing>>(Core3d, CartoonLabel)
-            .add_render_graph_edges(Core3d, (NodeOutline::OutlinePass, CartoonLabel, Node3d::EndMainPassPostProcessing))
-            .add_render_graph_edges(Core3d, (Node3d::Tonemapping, CartoonLabel, Node3d::EndMainPassPostProcessing));
+            .add_render_graph_edges(
+                Core3d,
+                (
+                    NodeOutline::OutlinePass,
+                    CartoonLabel,
+                    Node3d::EndMainPassPostProcessing,
+                ),
+            )
+            .add_render_graph_edges(
+                Core3d,
+                (
+                    Node3d::Tonemapping,
+                    CartoonLabel,
+                    Node3d::EndMainPassPostProcessing,
+                ),
+            );
     }
-
-    
 
     fn finish(&self, app: &mut App) {
         let Some(render_app) = app.get_sub_app_mut(RenderApp) else {
             return;
         };
 
-        render_app
-            .init_resource::<CartoonPipeline>();
+        render_app.init_resource::<CartoonPipeline>();
     }
 }
 
-fn setup_settings(
-    mut q_cameras: Query<&mut CartoonSettings>,
-    window: Query<&Window>
-) {
-    let Ok(window) = window.get_single() else { return; };
+fn setup_settings(mut q_cameras: Query<&mut CartoonSettings>, window: Query<&Window>) {
+    let Ok(window) = window.get_single() else {
+        return;
+    };
     for mut settings in q_cameras.iter_mut() {
-        settings.size = Vec2::new(window.resolution.width() as f32, window.resolution.height() as f32);
+        settings.size = Vec2::new(window.resolution.width(), window.resolution.height());
     }
 }
-
 
 // This is the component that will get passed to the shader
 #[derive(Component, Default, Clone, Copy, ExtractComponent, ShaderType)]
@@ -58,20 +94,24 @@ struct CartoonLabel;
 struct CartoonProcessing;
 
 impl ViewNode for CartoonProcessing {
-    type ViewQuery = (&'static ViewTarget, &'static DynamicUniformIndex<CartoonSettings>);
+    type ViewQuery = (
+        &'static ViewTarget,
+        &'static DynamicUniformIndex<CartoonSettings>,
+    );
 
     fn run<'w>(
-            &self,
-            _: &mut bevy::render::render_graph::RenderGraphContext,
-            render_context: &mut bevy::render::renderer::RenderContext<'w>,
-            (view_target, settings_index): bevy::ecs::query::QueryItem<'w, Self::ViewQuery>,
-            world: &'w World,
-        ) -> Result<(), bevy::render::render_graph::NodeRunError> {
+        &self,
+        _: &mut bevy::render::render_graph::RenderGraphContext,
+        render_context: &mut bevy::render::renderer::RenderContext<'w>,
+        (view_target, settings_index): bevy::ecs::query::QueryItem<'w, Self::ViewQuery>,
+        world: &'w World,
+    ) -> Result<(), bevy::render::render_graph::NodeRunError> {
         let cartoon_pipeline = world.resource::<CartoonPipeline>();
 
         let pipeline_cache = world.resource::<PipelineCache>();
 
-        let Some(pipeline) = pipeline_cache.get_render_pipeline(cartoon_pipeline.pipeline_id) else {
+        let Some(pipeline) = pipeline_cache.get_render_pipeline(cartoon_pipeline.pipeline_id)
+        else {
             return Ok(());
         };
 
@@ -92,26 +132,24 @@ impl ViewNode for CartoonProcessing {
             )),
         );
 
-        let mut render_pass = render_context
-            .begin_tracked_render_pass(RenderPassDescriptor {
-                label: Some("cartoon_pass"),
-                color_attachments: &[Some(RenderPassColorAttachment {
-                    view: post_process.destination,
-                    resolve_target: None,
-                    ops: Operations::default()
-                })],
-                depth_stencil_attachment: None,
-                timestamp_writes: None,
-                occlusion_query_set: None,
+        let mut render_pass = render_context.begin_tracked_render_pass(RenderPassDescriptor {
+            label: Some("cartoon_pass"),
+            color_attachments: &[Some(RenderPassColorAttachment {
+                view: post_process.destination,
+                resolve_target: None,
+                ops: Operations::default(),
+            })],
+            depth_stencil_attachment: None,
+            timestamp_writes: None,
+            occlusion_query_set: None,
         });
-        
+
         render_pass.set_render_pipeline(pipeline);
         render_pass.set_bind_group(0, &bind_group, &[settings_index.index()]);
         render_pass.draw(0..3, 0..1);
         Ok(())
     }
 }
-
 
 #[derive(Resource)]
 struct CartoonPipeline {
@@ -140,32 +178,33 @@ impl FromWorld for CartoonPipeline {
 
         let shader = world.load_asset(SHADER_ASSET_PATH);
 
-        let pipeline_id = world
-            .resource_mut::<PipelineCache>()
-            .queue_render_pipeline(RenderPipelineDescriptor {
-                label: Some("cartoon_pipeline".into()),
-                layout: vec![layout.clone()],
-                vertex: fullscreen_shader_vertex_state(),
-                fragment: Some(FragmentState {
-                    shader,
-                    shader_defs: vec![],
-                    entry_point: "fragment".into(),
-                    targets: vec![Some(ColorTargetState {
-                        format: TextureFormat::bevy_default(),
-                        blend: None,
-                        write_mask: ColorWrites::ALL
-                    })],
-                }),
-                primitive: PrimitiveState::default(),
-                depth_stencil: None,
-                multisample: MultisampleState::default(),
-                push_constant_ranges: vec![],
-            });
+        let pipeline_id =
+            world
+                .resource_mut::<PipelineCache>()
+                .queue_render_pipeline(RenderPipelineDescriptor {
+                    label: Some("cartoon_pipeline".into()),
+                    layout: vec![layout.clone()],
+                    vertex: fullscreen_shader_vertex_state(),
+                    fragment: Some(FragmentState {
+                        shader,
+                        shader_defs: vec![],
+                        entry_point: "fragment".into(),
+                        targets: vec![Some(ColorTargetState {
+                            format: TextureFormat::bevy_default(),
+                            blend: None,
+                            write_mask: ColorWrites::ALL,
+                        })],
+                    }),
+                    primitive: PrimitiveState::default(),
+                    depth_stencil: None,
+                    multisample: MultisampleState::default(),
+                    push_constant_ranges: vec![],
+                });
 
-            Self {
-                layout,
-                sampler,
-                pipeline_id,
-            }
+        Self {
+            layout,
+            sampler,
+            pipeline_id,
+        }
     }
 }
