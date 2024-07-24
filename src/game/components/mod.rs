@@ -1,6 +1,7 @@
 pub mod earth;
 pub mod fire;
 pub mod flowup_text;
+pub mod metal_trash;
 pub mod oxygen_recycler;
 pub mod pc;
 

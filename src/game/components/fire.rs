@@ -10,7 +10,23 @@ pub(crate) fn plugin(app: &mut App) {
 
 #[derive(Default, Component)]
 pub struct InFire {
+    /// If the fire mesh has been spawned
     pub fire_created: bool,
+    /// The seconds when the fire started
+    /// Based on the [`GameTime`]
+    pub started_at: f32,
+}
+
+const FIRE_TIMER: f32 = 10.0;
+
+impl InFire {
+    pub fn time_remaining(&self, gametime: f32) -> f32 {
+        self.started_at + FIRE_TIMER - gametime
+    }
+
+    pub fn time_ended(&self, gametime: f32) -> bool {
+        return self.time_remaining(gametime) < 0.0;
+    }
 }
 
 #[derive(Component)]

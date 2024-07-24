@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::game::{
     assets::{HandleMap, SceneKey},
-    components::{fire::InFire, pc::Pc},
+    components::pc::Pc,
     daycycle::TimeSpeed,
     selectable::Selectable,
 };
@@ -106,9 +106,7 @@ fn spawn_level(
                 .with_scale(Vec3::splat(0.5)),
             ..default()
         })
-        .insert(Selectable)
-        //add fire
-        .insert(InFire::default());
+        .insert(Selectable);
 
     commands.add(SpawnOxygenGenerator {
         pos: Vec3::new(3.0, 0.1, 7.0),
