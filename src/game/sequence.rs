@@ -3,6 +3,7 @@
 use std::sync::Arc;
 
 use bevy::prelude::*;
+use rand::seq;
 
 pub(crate) fn plugin(app: &mut App) {
     app.observe(on_next_action);
@@ -15,12 +16,13 @@ pub struct NextAction;
 
 #[derive(Event)]
 pub struct NewActionSequence {
-    pub actions: Sequence,
+    pub actions: ActionGroup,
     pub mode: NewMode,
 }
 
 pub enum NewMode {
     Replace,
+    SoftReplace, //replace only if work group is not same
     Append,
 }
 
@@ -47,30 +49,16 @@ impl ActionHolder {
 // Action sequence for character
 #[derive(Component, Default, Clone)]
 pub struct Sequence {
-    pub actions: Vec<ActionHolder>,
+    pub actions: Vec<ActionGroup>,
     pub active: bool,
 }
 
 impl Sequence {
-    pub fn push<T: CharacterAction + Send + Sync + 'static>(&mut self, action: T) {
-        self.actions.push(ActionHolder {
-            action: Arc::new(action),
-            group_name: "".to_string(),
-        });
+    pub fn push<T: IntoActionGroup + Send + Sync + 'static>(&mut self, action: T) {
+        self.actions.push(action.into_action_group());
         if self.actions.len() == 1 {
             self.active = false;
         }
-    }
-
-    pub fn push_with_group<T: CharacterAction + Send + Sync + 'static>(
-        &mut self,
-        action: T,
-        group_name: String,
-    ) {
-        self.actions.push(ActionHolder {
-            action: Arc::new(action),
-            group_name,
-        });
     }
 }
 
@@ -83,13 +71,16 @@ fn on_next_action(
     info!("OnNextAction {}", target);
     if let Ok(mut sequence) = q_players.get_mut(target) {
         if !sequence.actions.is_empty() && sequence.active {
-            sequence.actions[0].action.terminate(&mut commands, target);
+            sequence.actions[0].terminate(&mut commands, target);
             sequence.active = false;
-            sequence.actions.remove(0);
+            sequence.actions[0].remove_first_action();
+            if sequence.actions[0].is_empty() {
+                sequence.actions.remove(0);
+            }
         }
 
         if !sequence.actions.is_empty() {
-            sequence.actions[0].trigger_start(&mut commands, target);
+            sequence.actions[0].start_action(&mut commands, target);
             sequence.active = true;
         }
     }
@@ -112,29 +103,103 @@ fn new_sequence(
                     sequence.active = false;
                 }
                 sequence.actions.clear();
+
+                sequence.actions.push(trigger.event().actions.clone());
+                commands.trigger_targets(NextAction, target);
             }
 
-            commands
-                .entity(target)
-                .insert(trigger.event().actions.clone());
-            commands.trigger_targets(NextAction, target);
+            
         }
         NewMode::Append => {
             if let Ok(mut sequence) = q_players.get_mut(target) {
-                if !sequence.actions.is_empty() && sequence.active {
-                    sequence.actions[0].terminate(&mut commands, target);
-                    sequence.active = false;
+
+                let need_new_action = !sequence.active;
+
+                sequence.actions.push(trigger.event().actions.clone());
+                if need_new_action {
+                    commands.trigger_targets(NextAction, target);
                 }
-                sequence
-                    .actions
-                    .extend(trigger.event().actions.actions.iter().cloned());
-                commands.trigger_targets(NextAction, target);
-            } else {
-                commands
-                    .entity(target)
-                    .insert(trigger.event().actions.clone());
-                commands.trigger_targets(NextAction, target);
             }
         }
+        NewMode::SoftReplace => {
+            if let Ok(mut sequence) = q_players.get_mut(target) {
+                if !sequence.actions.is_empty() {
+                    if sequence.actions[0].name != trigger.event().actions.name {
+                        sequence.actions[0].terminate(&mut commands, target);
+                        sequence.actions.clear();
+                        sequence.actions.push(trigger.event().actions.clone());
+                        sequence.active = false;
+                        commands.trigger_targets(NextAction, target);
+                    }
+                } else {
+                    sequence.actions.push(trigger.event().actions.clone());
+                    sequence.active = false;
+                    commands.trigger_targets(NextAction, target);
+                }
+            }
+        },
+    }
+}
+
+
+#[derive(Clone)]
+pub struct ActionGroup {
+    pub name: String,
+    pub actions: Vec<Arc<dyn CharacterAction + Send + Sync>>,
+}
+
+impl ActionGroup {
+    pub fn new(name: String) -> Self {
+        Self {
+            name,
+            actions: vec![],
+        }
+    }
+
+    pub fn add<T: CharacterAction + Send + Sync + 'static>(&mut self, action: T) {
+        self.actions.push(Arc::new(action));
+    }
+
+    pub fn with_action<T: CharacterAction + Send + Sync + 'static>(mut self, action: T) -> Self {
+        self.actions.push(Arc::new(action));
+        self
+    }
+
+    pub fn start_action(&self, commands: &mut Commands, target: Entity) {
+        if !self.actions.is_empty() {
+            self.actions[0].trigger_start(commands, target);
+        }
+    }
+
+    pub fn terminate(&self, commands: &mut Commands, target: Entity) {
+        if !self.actions.is_empty() {
+            self.actions[0].terminate(commands, target);
+        }
+    }
+
+    pub fn remove_first_action(&mut self) {
+        if !self.actions.is_empty() {
+            self.actions.remove(0);
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.actions.is_empty()
+    }
+}
+
+pub trait IntoActionGroup {
+    fn into_action_group(self) -> ActionGroup;
+}
+
+impl<T: CharacterAction + Send + Sync + 'static> IntoActionGroup for T {
+    fn into_action_group(self) -> ActionGroup {
+        ActionGroup::new("".to_string()).with_action(self)
+    }
+}
+
+impl IntoActionGroup for ActionGroup {
+    fn into_action_group(self) -> ActionGroup {
+        self
     }
 }

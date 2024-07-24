@@ -7,7 +7,7 @@ use crate::game::{
     device_state::{DeviceState, DeviceStatePlugin},
     resources::OxygenRecycling,
     selectable::OnMouseClick,
-    sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
+    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
     spawn::{player::Player, spawn_commands::OxygenRecyler},
 };
 
@@ -60,35 +60,25 @@ fn on_selected(
     }
 
     if let Ok(or_transform) = q_oxygen_recyclers.get_mut(target) {
-        let mut sequence = Sequence::default();
-        sequence.push_with_group(
+        let mut actions = ActionGroup::new(OXYGEN_RECYCLER_WORK_GROUP.to_string());
+        actions.add(
             GoToAction {
                 target,
                 target_pos: or_transform.translation(),
-            },
-            OXYGEN_RECYCLER_WORK_GROUP.to_string(),
+            }
         );
-        sequence.push_with_group(OxygenRecyclerAction, OXYGEN_RECYCLER_WORK_GROUP.to_string());
-        let targets = q_players
-            .iter()
-            .filter_map(|(entity, seq)| {
-                if seq.actions.is_empty() || seq.actions[0].group_name != OXYGEN_RECYCLER_WORK_GROUP
-                {
-                    Some(entity)
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<_>>();
-        if !targets.is_empty() {
-            commands.trigger_targets(
-                NewActionSequence {
-                    actions: sequence,
-                    mode: NewMode::Append,
-                },
-                targets,
-            );
-        }
+        actions.add(OxygenRecyclerAction);
+        
+        commands
+            .trigger_targets(NewActionSequence {
+                actions: actions,
+                mode: NewMode::Replace,
+            }, 
+            q_players
+                .iter()
+                .map(|(entity, sequence)| entity)
+                .collect::<Vec<_>>()
+        );
 
         info!("Oxygen Recycling!");
     }

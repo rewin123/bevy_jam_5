@@ -4,7 +4,7 @@ use crate::game::{
     character::GoToAction,
     metal_trash::GatherMetalWorkAction,
     selectable::OnMouseClick,
-    sequence::{NewActionSequence, NewMode, Sequence},
+    sequence::{ActionGroup, NewActionSequence, NewMode, Sequence},
     spawn::{player::Player, spawn_commands::MetalTrashPile},
 };
 
@@ -27,37 +27,20 @@ fn on_selected(
     }
 
     if let Ok(metal_trash_pile_transform) = q_metal_trash_piles.get_mut(target) {
-        let mut sequence = Sequence::default();
+        let mut actions = ActionGroup::new(METAL_TRASH_WORK_GROUP.to_string());
 
-        sequence.push_with_group(
+        actions.add(
             GoToAction {
                 target,
                 target_pos: metal_trash_pile_transform.translation(),
-            },
-            METAL_TRASH_WORK_GROUP.to_string(),
+            }
         );
-        sequence.push_with_group(GatherMetalWorkAction, METAL_TRASH_WORK_GROUP.to_string());
+        actions.add(GatherMetalWorkAction);
 
-        let targets = q_players
-            .iter()
-            .filter_map(|(entity, seq)| {
-                if seq.actions.is_empty() || seq.actions[0].group_name != METAL_TRASH_WORK_GROUP {
-                    Some(entity)
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<_>>();
-
-        if !targets.is_empty() {
-            commands.trigger_targets(
-                NewActionSequence {
-                    actions: sequence,
-                    mode: NewMode::Append,
-                },
-                targets,
-            );
-        }
+        commands.trigger_targets(
+            NewActionSequence { actions, mode: NewMode::SoftReplace}, 
+            q_players.iter().map(|(entity, _)| entity).collect::<Vec<_>>()
+        );
 
         info!("Gathering Metal Trash!");
     }

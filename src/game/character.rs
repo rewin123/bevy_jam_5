@@ -7,7 +7,7 @@ use super::{
     daycycle::GameTime,
     resources::{GameResource, Oxygen, OxygenRecycling},
     selectable::OnMouseClick,
-    sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
+    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
     spawn::player::Player,
 };
 
@@ -68,8 +68,9 @@ fn add_target(
         return;
     };
 
-    let mut sequence = Sequence::default();
-    sequence.push(GoToAction {
+    let mut actions = ActionGroup::new("GoTo".to_string());
+
+    actions.add(GoToAction {
         target: clicked_entity,
         target_pos: target_component.translation(),
     });
@@ -77,7 +78,7 @@ fn add_target(
     if !q_player.is_empty() {
         commands.trigger_targets(
             NewActionSequence {
-                actions: sequence,
+                actions: actions,
                 mode: NewMode::Replace,
             },
             q_player.iter().next().unwrap(),

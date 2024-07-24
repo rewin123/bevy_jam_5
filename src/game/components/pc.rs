@@ -6,7 +6,7 @@ use crate::game::{
     character::{GoToAction, IgnoreJustMoving},
     pc_work::PcWorkAction,
     selectable::OnMouseClick,
-    sequence::{NewActionSequence, NewMode, Sequence},
+    sequence::{ActionGroup, NewActionSequence, NewMode, Sequence},
     spawn::{
         player::Player,
         spawn_commands::{MetalTrashPile, OxygenRecyler},
@@ -36,7 +36,7 @@ fn auto_add_complex_moving(
 fn on_selected(
     trigger: Trigger<OnMouseClick>,
     mut commands: Commands,
-    q_players: Query<(Entity, &Sequence), With<Player>>,
+    q_players: Query<Entity, With<Player>>,
     mut q_pcs: Query<&GlobalTransform, With<Pc>>,
 ) {
     let target = trigger.entity();
@@ -46,37 +46,24 @@ fn on_selected(
     }
 
     if let Ok(pc_transform) = q_pcs.get_mut(target) {
-        let mut sequence = Sequence::default();
+        let mut actions = ActionGroup::new(PC_WORK_GROUP.to_string());
 
-        sequence.push_with_group(
+        actions.add(
             GoToAction {
                 target,
                 target_pos: pc_transform.translation(),
-            },
-            PC_WORK_GROUP.to_string(),
+            }
         );
-        sequence.push_with_group(PcWorkAction, PC_WORK_GROUP.to_string());
+        actions.add(PcWorkAction);
 
-        let targets = q_players
-            .iter()
-            .filter_map(|(entity, seq)| {
-                if seq.actions.is_empty() || seq.actions[0].group_name != PC_WORK_GROUP {
-                    Some(entity)
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<_>>();
 
-        if !targets.is_empty() {
-            commands.trigger_targets(
-                NewActionSequence {
-                    actions: sequence,
-                    mode: NewMode::Append,
-                },
-                targets,
-            );
-        }
+        commands.trigger_targets(
+            NewActionSequence {
+                actions: actions,
+                mode: NewMode::SoftReplace
+            },
+            q_players.iter().collect::<Vec<_>>()
+        );
 
         info!("PC working!");
     }
