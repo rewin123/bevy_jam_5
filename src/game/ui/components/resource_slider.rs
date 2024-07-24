@@ -1,5 +1,5 @@
 use bevy::{
-    color::palettes,
+    color::palettes::{self, css::GREY},
     prelude::{Children, NodeBundle},
     ui::{Display, FlexDirection},
 };
@@ -79,6 +79,8 @@ impl ViewTemplate for ResourceSlider {
                         ss.border(3).border_color(Y_GREEN).border_radius(8.0);
                     } else if ct > 80.0 {
                         ss.border(3).border_color(X_RED).border_radius(8.0);
+                    } else {
+                        ss.border(3).border_color(GREY).border_radius(8.0);
                     }
                 },
                 self.amount,
