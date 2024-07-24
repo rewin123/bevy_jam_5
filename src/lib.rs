@@ -19,6 +19,7 @@ use bevy::render::{
 use bevy_mod_picking::DefaultPickingPlugins;
 use bevy_quill::QuillPlugin;
 use bevy_quill_obsidian::ObsidianUiPlugin;
+use game::render::cartoon_style::CartoonSettings;
 
 pub struct AppPlugin;
 
@@ -110,6 +111,7 @@ fn spawn_camera(mut commands: Commands) {
             },
             ..default()
         },
+        CartoonSettings::default(),
         // Render all UI to this camera.
         // Not strictly necessary since we only use one camera,
         // but if we don't use this component, our UI will disappear as soon
