@@ -1,22 +1,15 @@
-use bevy::{
-    color::palettes::{self, css::GREY},
-    prelude::{Children, NodeBundle},
-    ui::{Display, FlexDirection},
-};
+use bevy::{color::palettes::css::GREY, prelude::NodeBundle};
 use bevy_mod_stylebuilder::{
-    StyleBuilder, StyleBuilderBackground, StyleBuilderBorderColor, StyleBuilderBorderRadius,
-    StyleBuilderLayout, StyleHandle,
+    StyleBuilder, StyleBuilderBorderColor, StyleBuilderBorderRadius, StyleBuilderLayout,
+    StyleHandle,
 };
 use bevy_quill::{Cx, Element, View, ViewTemplate};
 use bevy_quill_obsidian::{
-    colors::{self, X_RED, Y_GREEN},
+    colors::{X_RED, Y_GREEN},
     controls::Slider,
 };
 
-use crate::game::ui::{
-    self,
-    constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH},
-};
+use crate::game::ui::constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH};
 
 #[derive(Clone, PartialEq)]
 pub(crate) struct ResourceSlider {
@@ -76,7 +69,7 @@ impl ResourceSlider {
 impl ViewTemplate for ResourceSlider {
     type View = impl View;
 
-    fn create(&self, cx: &mut Cx) -> Self::View {
+    fn create(&self, _cx: &mut Cx) -> Self::View {
         Element::<NodeBundle>::new()
             .style_dyn(
                 |(amount, lower_threshold, upper_threshold, inverse_warning), ss| {

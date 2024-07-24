@@ -180,6 +180,9 @@ impl<T: GameResource + Default> Plugin for GameResourcePlugin<T> {
                     amount: val.amount(),
                     label: format!("{} {:+.0}", val.label(), info.generation_rate),
                     style: bevy_mod_stylebuilder::StyleHandle::default(),
+                    upper_threshold_warning: 80.0,
+                    lower_threshold_warning: 20.0,
+                    inverse_warning: false, // increase means green. If not, inverse.
                 }
             }));
     }
