@@ -68,23 +68,6 @@ impl ResourceSlider {
     }
 }
 
-// impl ViewTemplate for ResourceSlider {
-//     type View = impl View;
-
-//     fn create(&self, cx: &mut Cx) -> Self::View {
-//         Slider::new()
-//             .range(0. ..=self.limit)
-//             .disabled(true)
-//             .label(self.label.clone())
-//             .style((o_slider_style, self.style.clone()))
-//             .value(self.amount)
-//     }
-// }
-
-fn ressource_border_style(ss: &mut StyleBuilder) {
-    //ss.border(3).border_color(X_RED);
-}
-
 impl ViewTemplate for ResourceSlider {
     type View = impl View;
 
@@ -98,7 +81,6 @@ impl ViewTemplate for ResourceSlider {
                 },
                 self.amount < 40.0,
             )
-            //.style(ressource_border_style)
             .children((Slider::new()
                 .range(0. ..=self.limit)
                 .disabled(true)
