@@ -1,6 +1,4 @@
-use crate::game::{
-    components::metal_trash::MetalTrashInFloor, daycycle::GameTime, resources::MetalTrash,
-};
+use crate::game::daycycle::GameTime;
 use bevy::prelude::*;
 use rand::prelude::*;
 use rand_distr::{Distribution, Poisson};
@@ -10,7 +8,7 @@ use super::{
     character::DestinationTarget,
     components::fire::InFire,
     selectable::Selectable,
-    spawn::player::Player,
+    spawn::{player::Player, spawn_commands::MetalTrashPile},
 };
 
 #[derive(Resource, Debug)]
@@ -36,14 +34,7 @@ fn plan_trouble(
     mut commands: Commands,
     mut trouble_planner: ResMut<TroublePlanner>,
     time: Res<GameTime>,
-    q_selectable: Query<
-        Entity,
-        (
-            With<Selectable>,
-            Without<InFire>,
-            Without<MetalTrashInFloor>,
-        ),
-    >,
+    q_selectable: Query<Entity, (With<Selectable>, Without<InFire>, Without<MetalTrashPile>)>,
 ) {
     trouble_planner.peace_time -= time.delta_seconds();
 
@@ -104,7 +95,7 @@ fn tick_fire(
                     ..default()
                 })
                 .insert(Selectable)
-                .insert(MetalTrashInFloor);
+                .insert(MetalTrashPile);
             commands.entity(entity).despawn_recursive();
         }
     }

@@ -129,7 +129,7 @@ pub enum CharState {
 }
 
 impl CharState {
-    fn weight(&self) -> i32 {
+    const fn weight(&self) -> i32 {
         match self {
             CharState::Idle => 0,
             CharState::Working => 1,
