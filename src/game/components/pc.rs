@@ -6,7 +6,7 @@ use crate::game::{
     character::{GoToAction, IgnoreJustMoving},
     pc_work::PcWorkAction,
     selectable::OnMouseClick,
-    sequence::{ActionGroup, NewActionSequence, NewMode, Sequence},
+    sequence::{ActionGroup, NewActionSequence, NewMode},
     spawn::{
         player::Player,
         spawn_commands::{MetalTrashPile, OxygenRecyler},

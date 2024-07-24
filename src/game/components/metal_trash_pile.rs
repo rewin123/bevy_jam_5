@@ -4,7 +4,7 @@ use crate::game::{
     character::GoToAction,
     metal_trash::GatherMetalWorkAction,
     selectable::OnMouseClick,
-    sequence::{ActionGroup, NewActionSequence, NewMode, Sequence},
+    sequence::{ActionGroup, NewActionSequence, NewMode},
     spawn::{player::Player, spawn_commands::MetalTrashPile},
 };
 
@@ -17,7 +17,7 @@ const METAL_TRASH_WORK_GROUP: &str = "gathering_metal_trash_work";
 fn on_selected(
     trigger: Trigger<OnMouseClick>,
     mut commands: Commands,
-    q_players: Query<(Entity, &Sequence), With<Player>>,
+    q_players: Query<Entity, With<Player>>,
     mut q_metal_trash_piles: Query<&GlobalTransform, With<MetalTrashPile>>,
 ) {
     let target = trigger.entity();
@@ -39,7 +39,7 @@ fn on_selected(
 
         commands.trigger_targets(
             NewActionSequence { actions, mode: NewMode::SoftReplace}, 
-            q_players.iter().map(|(entity, _)| entity).collect::<Vec<_>>()
+            q_players.iter().collect::<Vec<_>>()
         );
 
         info!("Gathering Metal Trash!");

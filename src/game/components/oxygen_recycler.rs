@@ -7,7 +7,7 @@ use crate::game::{
     device_state::{DeviceState, DeviceStatePlugin},
     resources::OxygenRecycling,
     selectable::OnMouseClick,
-    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
+    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
     spawn::{player::Player, spawn_commands::OxygenRecyler},
 };
 
@@ -50,7 +50,7 @@ const OXYGEN_RECYCLER_WORK_GROUP: &str = "oxygen_recycler";
 fn on_selected(
     trigger: Trigger<OnMouseClick>,
     mut commands: Commands,
-    q_players: Query<(Entity, &Sequence), With<Player>>,
+    q_players: Query<Entity, With<Player>>,
     mut q_oxygen_recyclers: Query<&GlobalTransform, With<OxygenRecyler>>,
 ) {
     let target = trigger.entity();
@@ -76,7 +76,6 @@ fn on_selected(
             }, 
             q_players
                 .iter()
-                .map(|(entity, sequence)| entity)
                 .collect::<Vec<_>>()
         );
 
