@@ -10,7 +10,7 @@ use crate::game::{
 };
 
 use super::{
-    player::SpawnPlayer,
+    player::{Player, SpawnPlayer},
     spawn_commands::{SpawnEarth, SpawnHydroponic, SpawnOxygenGenerator},
 };
 
@@ -26,7 +26,11 @@ fn spawn_level(
     _trigger: Trigger<SpawnLevel>,
     mut commands: Commands,
     scene_handler: Res<HandleMap<SceneKey>>,
+    player: Query<Entity, With<Player>>,
 ) {
+    if let Ok(player) = player.get_single() {
+        commands.entity(player).despawn_recursive();
+    }
     // The only thing we have in our level is a player,
     // but add things like walls etc. here.
     commands.trigger(SpawnPlayer);
