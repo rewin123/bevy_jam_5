@@ -11,7 +11,9 @@ use crate::game::{
 
 use super::{
     player::{Player, SpawnPlayer},
-    spawn_commands::{SpawnEarth, SpawnHydroponic, SpawnMetalTrashPile, SpawnOxygenGenerator},
+    spawn_commands::{
+        SpawnEarth, SpawnHydroponic, SpawnMetalTrashPile, SpawnOxygenGenerator, SpawnToilet,
+    },
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -113,6 +115,10 @@ fn spawn_level(
 
     commands.add(SpawnMetalTrashPile {
         pos: Vec3::new(6.0, 0.1, 6.0),
+    });
+
+    commands.add(SpawnToilet {
+        pos: Vec3::new(7.5, 0.1, 7.5),
     });
 
     commands.add(SpawnEarth);

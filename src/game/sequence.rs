@@ -107,12 +107,9 @@ fn new_sequence(
                 sequence.actions.push(trigger.event().actions.clone());
                 commands.trigger_targets(NextAction, target);
             }
-
-            
         }
         NewMode::Append => {
             if let Ok(mut sequence) = q_players.get_mut(target) {
-
                 let need_new_action = !sequence.active;
 
                 sequence.actions.push(trigger.event().actions.clone());
@@ -137,10 +134,9 @@ fn new_sequence(
                     commands.trigger_targets(NextAction, target);
                 }
             }
-        },
+        }
     }
 }
-
 
 #[derive(Clone)]
 pub struct ActionGroup {

@@ -29,17 +29,18 @@ fn on_selected(
     if let Ok(metal_trash_pile_transform) = q_metal_trash_piles.get_mut(target) {
         let mut actions = ActionGroup::new(METAL_TRASH_WORK_GROUP.to_string());
 
-        actions.add(
-            GoToAction {
-                target,
-                target_pos: metal_trash_pile_transform.translation(),
-            }
-        );
+        actions.add(GoToAction {
+            target,
+            target_pos: metal_trash_pile_transform.translation(),
+        });
         actions.add(GatherMetalWorkAction);
 
         commands.trigger_targets(
-            NewActionSequence { actions, mode: NewMode::SoftReplace}, 
-            q_players.iter().collect::<Vec<_>>()
+            NewActionSequence {
+                actions,
+                mode: NewMode::SoftReplace,
+            },
+            q_players.iter().collect::<Vec<_>>(),
         );
 
         info!("Gathering Metal Trash!");

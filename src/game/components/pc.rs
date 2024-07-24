@@ -48,21 +48,18 @@ fn on_selected(
     if let Ok(pc_transform) = q_pcs.get_mut(target) {
         let mut actions = ActionGroup::new(PC_WORK_GROUP.to_string());
 
-        actions.add(
-            GoToAction {
-                target,
-                target_pos: pc_transform.translation(),
-            }
-        );
+        actions.add(GoToAction {
+            target,
+            target_pos: pc_transform.translation(),
+        });
         actions.add(PcWorkAction);
-
 
         commands.trigger_targets(
             NewActionSequence {
-                actions: actions,
-                mode: NewMode::SoftReplace
+                actions,
+                mode: NewMode::SoftReplace,
             },
-            q_players.iter().collect::<Vec<_>>()
+            q_players.iter().collect::<Vec<_>>(),
         );
 
         info!("PC working!");

@@ -61,22 +61,18 @@ fn on_selected(
 
     if let Ok(or_transform) = q_oxygen_recyclers.get_mut(target) {
         let mut actions = ActionGroup::new(OXYGEN_RECYCLER_WORK_GROUP.to_string());
-        actions.add(
-            GoToAction {
-                target,
-                target_pos: or_transform.translation(),
-            }
-        );
+        actions.add(GoToAction {
+            target,
+            target_pos: or_transform.translation(),
+        });
         actions.add(OxygenRecyclerAction);
-        
-        commands
-            .trigger_targets(NewActionSequence {
-                actions: actions,
+
+        commands.trigger_targets(
+            NewActionSequence {
+                actions,
                 mode: NewMode::Replace,
-            }, 
-            q_players
-                .iter()
-                .collect::<Vec<_>>()
+            },
+            q_players.iter().collect::<Vec<_>>(),
         );
 
         info!("Oxygen Recycling!");

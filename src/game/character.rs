@@ -78,7 +78,7 @@ fn add_target(
     if !q_player.is_empty() {
         commands.trigger_targets(
             NewActionSequence {
-                actions: actions,
+                actions,
                 mode: NewMode::Replace,
             },
             q_player.iter().next().unwrap(),

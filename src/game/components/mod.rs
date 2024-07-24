@@ -4,6 +4,7 @@ pub mod flowup_text;
 pub mod metal_trash_pile;
 pub mod oxygen_recycler;
 pub mod pc;
+pub mod toilet;
 
 pub(crate) fn plugin(app: &mut bevy::prelude::App) {
     app.add_plugins((
@@ -13,5 +14,6 @@ pub(crate) fn plugin(app: &mut bevy::prelude::App) {
         flowup_text::plugin,
         oxygen_recycler::plugin,
         metal_trash_pile::plugin,
+        toilet::plugin,
     ));
 }

@@ -192,6 +192,8 @@ pub trait GameResource: Resource {
     #[allow(dead_code)]
     fn healthly_range(&self) -> Option<RangeInclusive<f32>>;
     fn label(&self) -> String;
+    /// Decreases the amount, and clamps it to 0 and the limit
+    fn decrease(&mut self, decreate_amount: f32);
 }
 /// Generation for resource in dval/sec manner
 /// Example
@@ -275,6 +277,9 @@ macro_rules! impl_limitless_resource {
             fn label(&self) -> String {
                 stringify!($name).to_string()
             }
+            fn decrease(&mut self, decrease_amount: f32) {
+                self.set_amount((self.amount - decrease_amount).max(0.0))
+            }
         }
     };
 }
@@ -315,6 +320,10 @@ macro_rules! simple_game_resource {
 
             fn label(&self) -> String {
                 stringify!($name).to_string()
+            }
+
+            fn decrease(&mut self, decrease_amount: f32) {
+                self.set_amount((self.amount - decrease_amount).clamp(0.0, self.limit))
             }
         }
     };
