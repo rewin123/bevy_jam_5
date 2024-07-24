@@ -64,25 +64,11 @@ impl ViewTemplate for ResourceSlider {
     type View = impl View;
 
     fn create(&self, _: &mut bevy_quill::Cx) -> Self::View {
-        let a = false;
-        Element::<NodeBundle>::new()
-            .style_dyn(
-                |ct, ss| {
-                    if ct {
-                        ss.border_color(palettes::css::RED).border(3);
-                    } else {
-                        ss.border_color(palettes::css::LIME).border(3);
-                    }
-                },
-                a,
-            )
-            .children("Style")
-
-        // Slider::new()
-        //     .range(0. ..=self.limit)
-        //     .disabled(true)
-        //     .label(self.label.clone())
-        //     .style((o_slider_style, self.style.clone()))
-        //     .value(self.amount)
+        Slider::new()
+            .range(0. ..=self.limit)
+            .disabled(true)
+            .label(self.label.clone())
+            .style((o_slider_style, self.style.clone()))
+            .value(self.amount)
     }
 }
