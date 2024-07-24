@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use super::{
     components::fire::InFire,
     daycycle::{DeathCause, GameTime, PlayerDied, TimeSpeed},
-    resources::{CarbonDioxide, Food, FoodGeneration, GameResource, Generate, Oxygen, OxygenRecycling},
+    resources::{CarbonDioxyde, Food, FoodGeneration, GameResource, Generate, Oxygen, OxygenRecycling},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -16,7 +16,7 @@ pub(super) fn plugin(app: &mut App) {
 fn update_oxygen_and_co2(
     oxygen_recycling: ResMut<OxygenRecycling>,
     mut oxygen: EventWriter<Generate<Oxygen>>,
-    mut co2: EventWriter<Generate<CarbonDioxide>>,
+    mut co2: EventWriter<Generate<CarbonDioxyde>>,
     gametime: Res<GameTime>,
 ) {
     let recycling = oxygen_recycling.working;
@@ -38,7 +38,7 @@ fn update_oxygen_and_co2(
 
 fn bad_air_death(
     oxygen: Res<Oxygen>,
-    co2: Res<CarbonDioxide>,
+    co2: Res<CarbonDioxyde>,
     mut death: EventWriter<PlayerDied>,
     time_speed: Res<TimeSpeed>,
 ) {
@@ -80,7 +80,7 @@ fn calculate_new_amount(
 
 fn fire_oxigen(
     mut oxigen: EventWriter<Generate<Oxygen>>,
-    mut co2: EventWriter<Generate<CarbonDioxide>>,
+    mut co2: EventWriter<Generate<CarbonDioxyde>>,
     gametime: Res<GameTime>,
     q_in_fire: Query<Entity, With<InFire>>,
 ) {

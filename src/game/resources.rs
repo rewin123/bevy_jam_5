@@ -15,7 +15,7 @@ pub(crate) fn plugin(app: &mut App) {
 
     app.add_plugins((
         GameResourcePlugin::<Oxygen>::default(),
-        GameResourcePlugin::<CarbonDioxide>::default(),
+        GameResourcePlugin::<CarbonDioxyde>::default(),
         GameResourcePlugin::<Water>::default(),
         GameResourcePlugin::<BadWater>::default(),
         GameResourcePlugin::<Pee>::default(),
@@ -101,7 +101,7 @@ mod dev {
         food: Res<Food>,
         hydrogen: Res<Hydrogen>,
         electricity: Res<Electricity>,
-        carbon_in_air: Res<CarbonDioxide>,
+        carbon_in_air: Res<CarbonDioxyde>,
         temperature: Res<Temperature>,
     ) {
         debug_panel.add("Metal", format!("Metal: {}", metal.amount));
@@ -338,5 +338,5 @@ simple_game_resource!(Food, 100.0, 10.0, 90.0);
 simple_game_resource!(Pee, 100.0, 10.0, 90.0);
 simple_game_resource!(BadWater, 100.0, 10.0, 90.0);
 simple_game_resource!(Hydrogen, 100.0, 10.0, 90.0);
-simple_game_resource!(CarbonDioxide, 100.0, 10.0, 90.0);
+simple_game_resource!(CarbonDioxyde, 100.0, 10.0, 90.0);
 simple_game_resource!(Oxygen, 100.0, 10.0, 90.0);
