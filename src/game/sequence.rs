@@ -3,36 +3,35 @@ use std::sync::Arc;
 use bevy::prelude::*;
 
 pub(crate) fn plugin(app: &mut App) {
-    
     app.observe(on_next_action);
     app.observe(new_sequence);
 }
-
 
 /// Must do next action (and if we have current active action)
 #[derive(Event)]
 pub struct NextAction;
 
 /// Must do next action (and if we haven't current active action)
+#[allow(dead_code)]
 #[derive(Event)]
 pub struct NextActionIfNone;
 
 #[derive(Event)]
 pub struct NewActionSequence {
     pub actions: Sequence,
-    pub mode: NewMode
+    pub mode: NewMode,
 }
 
+#[allow(dead_code)]
 pub enum NewMode {
     Replace,
-    Append
+    Append,
 }
 
 pub trait CharacterAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity); // Start the action with trigger
     fn terminate(&self, commands: &mut Commands, target: Entity);
 }
-
 
 // Action sequence for character
 #[derive(Component, Default)]
@@ -44,12 +43,11 @@ impl Sequence {
     }
 }
 
-
 fn on_next_action(
     trigger: Trigger<NextAction>,
     mut commands: Commands,
-    mut q_players: Query<&mut Sequence>) 
-{
+    mut q_players: Query<&mut Sequence>,
+) {
     let target = trigger.entity();
     info!("OnNextAction {}", target);
     if let Ok(mut sequence) = q_players.get_mut(target) {
@@ -67,8 +65,8 @@ fn on_next_action(
 fn new_sequence(
     trigger: Trigger<NewActionSequence>,
     mut commands: Commands,
-    mut q_players: Query<&mut Sequence>) {
-
+    mut q_players: Query<&mut Sequence>,
+) {
     let target = trigger.entity();
 
     info!("NewSequence {}", target);
@@ -82,22 +80,27 @@ fn new_sequence(
                 sequence.0.clear();
             }
 
-            commands.entity(target).insert(Sequence(trigger.event().actions.0.clone()));
+            commands
+                .entity(target)
+                .insert(Sequence(trigger.event().actions.0.clone()));
             commands.trigger_targets(NextAction, target);
-        },
+        }
         NewMode::Append => {
             if let Ok(mut sequence) = q_players.get_mut(target) {
                 if !sequence.0.is_empty() {
-                   sequence.0.append(&mut trigger.event().actions.0.clone());
+                    sequence.0.append(&mut trigger.event().actions.0.clone());
                 } else {
-                    commands.entity(target).insert(Sequence(trigger.event().actions.0.clone()));
+                    commands
+                        .entity(target)
+                        .insert(Sequence(trigger.event().actions.0.clone()));
                     commands.trigger_targets(NextAction, target);
                 }
             } else {
-                commands.entity(target).insert(Sequence(trigger.event().actions.0.clone()));
+                commands
+                    .entity(target)
+                    .insert(Sequence(trigger.event().actions.0.clone()));
                 commands.trigger_targets(NextAction, target);
             }
-        },
+        }
     }
-    
 }

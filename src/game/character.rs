@@ -1,19 +1,16 @@
 use bevy::prelude::*;
-use std::sync::Arc;
 
 use super::{
-    daycycle::GameTime, selectable::{OnSelect, Selected}, sequence::{CharacterAction, NextAction}, spawn::player::Player
+    daycycle::GameTime,
+    selectable::{OnSelect, Selected},
+    sequence::{CharacterAction, NextAction},
+    spawn::player::Player,
 };
-
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, move_player_to_target);
     app.observe(add_target);
 }
-
-
-
-
 
 pub const PLAYER_SPEED: f32 = 5.0;
 

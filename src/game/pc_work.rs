@@ -1,7 +1,7 @@
-use bevy::prelude::*;
 use super::daycycle::GameTime;
 use super::debt::Debt;
 use super::sequence::{CharacterAction, NextAction};
+use bevy::prelude::*;
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(PcWorkConfig {
@@ -23,7 +23,6 @@ pub struct PcWork {
     pub work_time: f32,
 }
 
-
 pub struct PcWorkAction;
 
 impl CharacterAction for PcWorkAction {
@@ -41,7 +40,7 @@ fn update_pc_work(
     time: Res<GameTime>,
     mut q_pc_work: Query<(Entity, &mut PcWork)>,
     work_config: Res<PcWorkConfig>,
-    mut debt : ResMut<Debt>,
+    mut debt: ResMut<Debt>,
 ) {
     for (entity, mut pc_work) in q_pc_work.iter_mut() {
         pc_work.work_time += time.delta_seconds();

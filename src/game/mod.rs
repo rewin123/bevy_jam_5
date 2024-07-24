@@ -13,14 +13,14 @@ mod debt;
 mod highlight;
 mod map;
 mod movement;
+mod pc_work;
 pub mod resources;
 mod selectable;
+mod sequence;
 pub mod spawn;
 pub mod sprite_material;
 mod trouble_planner;
 pub mod ui;
-mod pc_work;
-mod sequence;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
