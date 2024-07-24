@@ -4,7 +4,8 @@ use bevy::{
     ui::{Display, FlexDirection},
 };
 use bevy_mod_stylebuilder::{
-    StyleBuilder, StyleBuilderBackground, StyleBuilderBorderColor, StyleBuilderLayout, StyleHandle,
+    StyleBuilder, StyleBuilderBackground, StyleBuilderBorderColor, StyleBuilderBorderRadius,
+    StyleBuilderLayout, StyleHandle,
 };
 use bevy_quill::{Cx, Element, View, ViewTemplate};
 use bevy_quill_obsidian::{
@@ -80,8 +81,8 @@ impl ResourceSlider {
 //     }
 // }
 
-fn style_test(ss: &mut StyleBuilder) {
-    ss.border(3).border_color(X_RED);
+fn ressource_border_style(ss: &mut StyleBuilder) {
+    //ss.border(3).border_color(X_RED);
 }
 
 impl ViewTemplate for ResourceSlider {
@@ -89,8 +90,15 @@ impl ViewTemplate for ResourceSlider {
 
     fn create(&self, cx: &mut Cx) -> Self::View {
         Element::<NodeBundle>::new()
-            //.insert_dyn(TargetCamera, self.camera)
-            .style(style_test)
+            .style_dyn(
+                |ct, ss| {
+                    if ct {
+                        ss.border(3).border_color(X_RED).border_radius(8.0);
+                    }
+                },
+                self.amount < 40.0,
+            )
+            //.style(ressource_border_style)
             .children((Slider::new()
                 .range(0. ..=self.limit)
                 .disabled(true)
