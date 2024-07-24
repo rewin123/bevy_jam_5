@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::game::{
     assets::{HandleMap, SceneKey},
-    components::{fire::InFire, pc::Pc},
+    components::pc::Pc,
     daycycle::TimeSpeed,
     selectable::Selectable,
 };
@@ -32,10 +32,11 @@ fn spawn_level(
     commands.trigger(SpawnPlayer);
 
     commands.spawn(DirectionalLightBundle {
-        transform: Transform::from_translation(Vec3::new(2.0, 5.0, 2.0))
+        transform: Transform::from_translation(Vec3::new(2.0, 5.0, 0.0))
             .looking_at(Vec3::ZERO, Vec3::Y),
         directional_light: DirectionalLight {
             shadows_enabled: true,
+            illuminance: 2000.0,
             ..default()
         },
         ..default()

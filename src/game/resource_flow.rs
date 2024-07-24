@@ -3,16 +3,14 @@
 use bevy::prelude::*;
 
 use super::{
+    components::fire::InFire,
     daycycle::{DeathCause, GameTime, PlayerDied, TimeSpeed},
     resources::{CarbonDioxide, Food, FoodGeneration, Oxygen, OxygenRecycling},
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(Update, (update_oxygen_and_co2, update_food));
-    app.add_systems(PostUpdate, (
-        bad_air_death,
-        too_many_oxigen_death,
-    ));
+    app.add_systems(Update, (update_oxygen_and_co2, update_food, fire_oxigen));
+    app.add_systems(PostUpdate, (bad_air_death, too_many_oxigen_death));
 }
 
 fn update_oxygen_and_co2(
@@ -98,4 +96,32 @@ fn calculate_new_amount(
     let delta = generation - consumption;
     let timed_delta = delta * time_delta;
     (amount + timed_delta).clamp(0.0, limit)
+}
+
+fn fire_oxigen(
+    mut oxygen: ResMut<Oxygen>,
+    mut co2: ResMut<CarbonDioxide>,
+    gametime: Res<GameTime>,
+    q_in_fire: Query<Entity, With<InFire>>,
+) {
+    let count = q_in_fire.iter().count();
+    if count > 0 {
+        let consuming = count as f32 * 3.0;
+
+        oxygen.amount = calculate_new_amount(
+            oxygen.amount,
+            0.0,
+            consuming,
+            gametime.delta_seconds(),
+            oxygen.limit,
+        );
+
+        co2.amount = calculate_new_amount(
+            co2.amount,
+            consuming,
+            0.0,
+            gametime.delta_seconds(),
+            co2.limit,
+        );
+    }
 }

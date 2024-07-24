@@ -176,8 +176,6 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
     for (mut state, mut spawner) in q_char.iter_mut() {
         let state = state.get_importantest_state();
 
-        info!("State: {:?}", state);
-
         let usual_text = TextStyle::default();
         let warning_text = TextStyle {
             color: Color::linear_rgb(1.0, 0.0, 0.0),
@@ -214,7 +212,11 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
     }
 }
 
-fn check_oxigen(mut q_char: Query<&mut CharacterStates>, oxigen: Res<Oxygen>, oxigen_regeneration: Res<OxygenRecycling>) {
+fn check_oxigen(
+    mut q_char: Query<&mut CharacterStates>,
+    oxigen: Res<Oxygen>,
+    oxigen_regeneration: Res<OxygenRecycling>,
+) {
     for mut states in q_char.iter_mut() {
         if oxigen.amount <= 10.0 {
             states.add(CharState::WantOxigen);

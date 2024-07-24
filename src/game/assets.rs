@@ -35,9 +35,7 @@ impl FromWorld for HandleMap<FontKey> {
         let asset_server = world.resource::<AssetServer>();
         [(
             FontKey::Pixel,
-            asset_server.load(
-                "fonts/upheaval-tt-brk/upheavtt.ttf",
-            ),
+            asset_server.load("fonts/upheaval-tt-brk/upheavtt.ttf"),
         )]
         .into()
     }

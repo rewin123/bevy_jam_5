@@ -11,10 +11,13 @@ use crate::game::{
     spawn::{player::Player, spawn_commands::OxygenRecyler},
 };
 
+use super::fire::InFire;
+
 pub(super) fn plugin(app: &mut App) {
     app.observe(on_selected);
     app.add_systems(Update, update_oxygen_recycler_work);
     app.add_systems(Update, update_oxygen_recycler_state);
+    app.add_systems(PostUpdate, disable_oxygen_if_no_recycler);
 
     app.add_plugins(DeviceStatePlugin::<OxygenRegenratorState>::default());
 }
@@ -23,6 +26,7 @@ pub(super) fn plugin(app: &mut App) {
 pub enum OxygenRegenratorState {
     Idle,
     Work,
+    InFire(f32),
 }
 
 impl DeviceState for OxygenRegenratorState {
@@ -36,6 +40,7 @@ impl DeviceState for OxygenRegenratorState {
                     ..default()
                 },
             )),
+            OxygenRegenratorState::InFire(time) => BillboardContent::time_remaining(*time),
         }
     }
 }
@@ -130,13 +135,32 @@ fn update_oxygen_recycler_work(
 fn update_oxygen_recycler_state(
     mut commands: Commands,
     q_oxygen_recyclers: Query<Entity, With<OxygenRecyler>>,
+    on_fire: Query<(Entity, &InFire)>,
     recycling: Res<OxygenRecycling>,
+    time: Res<GameTime>,
 ) {
     for entity in q_oxygen_recyclers.iter() {
-        if recycling.working {
+        if let Ok((_, fire)) = on_fire.get(entity) {
+            // The entity may be despawned
+            let Some(mut entity_cms) = commands.get_entity(entity) else {
+                continue;
+            };
+            entity_cms.insert(OxygenRegenratorState::InFire(
+                fire.time_remaining(time.elapsed_seconds()),
+            ));
+        } else if recycling.working {
             commands.entity(entity).insert(OxygenRegenratorState::Work);
         } else {
             commands.entity(entity).insert(OxygenRegenratorState::Idle);
         }
+    }
+}
+
+fn disable_oxygen_if_no_recycler(
+    q_oxygen_recyclers: Query<Entity, With<OxygenRecyler>>,
+    mut recycling: ResMut<OxygenRecycling>,
+) {
+    if q_oxygen_recyclers.is_empty() {
+        recycling.working = false;
     }
 }

@@ -21,7 +21,6 @@ pub struct BillboardSpawner {
     pub size: Vec2,
 }
 
-
 // Floating billboards by sinus equation
 #[derive(Component)]
 pub struct BillboardSinPos;
@@ -35,6 +34,18 @@ pub enum BillboardContent {
     Text(Text),
     Image(Handle<Image>),
     None,
+}
+
+impl BillboardContent {
+    pub fn time_remaining(seconds_remaining: f32) -> Self {
+        BillboardContent::Text(Text::from_section(
+            format!("Destroyed in {}", seconds_remaining as i32),
+            TextStyle {
+                color: Color::linear_rgb(1.0, 0.1, 0.1),
+                ..default()
+            },
+        ))
+    }
 }
 
 fn sync_inner(
@@ -62,7 +73,7 @@ fn manage_billboard(
     mut commands: Commands,
     mut q_billboards: Query<(&BillboardSpawner, &mut BillboardInner), Changed<BillboardSpawner>>,
     mut meshes: ResMut<Assets<Mesh>>,
-    fonts: Res<HandleMap<FontKey>>
+    fonts: Res<HandleMap<FontKey>>,
 ) {
     for (billboard, mut inner) in q_billboards.iter_mut() {
         let target = inner.billboard;
@@ -82,7 +93,7 @@ fn manage_billboard(
                     transform: Transform::from_scale(
                         Vec3::new(billboard.size.x, billboard.size.y, 1.0) / 48.0,
                     ),
-                    
+
                     ..default()
                 });
 
@@ -106,7 +117,10 @@ fn manage_billboard(
 
 fn sync_billboard_position(
     mut q_billboards: Query<(&mut Transform), With<Billboard>>,
-    mut q_src: Query<(&GlobalTransform, &BillboardInner, Option<&BillboardSinPos>), Without<Billboard>>,
+    mut q_src: Query<
+        (&GlobalTransform, &BillboardInner, Option<&BillboardSinPos>),
+        Without<Billboard>,
+    >,
     time: Res<Time>,
 ) {
     for (transform, billboard, sin_pos) in q_src.iter_mut() {
@@ -117,9 +131,9 @@ fn sync_billboard_position(
             continue;
         };
 
-
         if sin_pos.is_some() {
-            bill_transform.translation = transform.translation() + Vec3::new(0.0, 2.0 + 0.2 * (time.elapsed_seconds() * 2.0).sin(), 0.0);
+            bill_transform.translation = transform.translation()
+                + Vec3::new(0.0, 2.0 + 0.2 * (time.elapsed_seconds() * 2.0).sin(), 0.0);
         } else {
             bill_transform.translation = transform.translation() + Vec3::new(0.0, 2.0, 0.0);
         }
