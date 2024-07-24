@@ -25,7 +25,7 @@ impl InFire {
     }
 
     pub fn time_ended(&self, gametime: f32) -> bool {
-        return self.time_remaining(gametime) < 0.0;
+        self.time_remaining(gametime) < 0.0
     }
 }
 

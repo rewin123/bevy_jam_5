@@ -6,7 +6,6 @@ use bevy_quill::Cx;
 use super::{daycycle::GameTime, ui::components::resource_slider::ResourceSlider};
 
 pub(crate) fn plugin(app: &mut App) {
-
     app.init_resource::<AllResourcesGetter>();
     app.init_resource::<OxygenRecycling>();
     app.init_resource::<FoodGeneration>();
@@ -28,7 +27,6 @@ pub(crate) fn plugin(app: &mut App) {
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
 }
-
 
 #[derive(Resource, Default)]
 pub struct AllResourcesGetter {
@@ -152,8 +150,6 @@ mod dev {
     }
 }
 
-
-
 pub struct GameResourcePlugin<T: GameResource> {
     _type: std::marker::PhantomData<T>,
 }
@@ -173,15 +169,17 @@ impl<T: GameResource + Default> Plugin for GameResourcePlugin<T> {
         app.add_event::<Generate<T>>();
         app.add_systems(PostUpdate, collect_generations::<T>);
 
-        app.world_mut().resource_mut::<AllResourcesGetter>()
-            .res_plugin.push(Box::new(|cx| {
+        app.world_mut()
+            .resource_mut::<AllResourcesGetter>()
+            .res_plugin
+            .push(Box::new(|cx| {
                 let val = cx.use_resource::<T>();
                 let info = cx.use_resource::<GameResInfo<T>>();
-                ResourceSlider { 
-                    limit: val.limit().unwrap_or(100.0), 
-                    amount: val.amount(), 
-                    label: format!("{} {:+.0}", val.label(), info.generation_rate), 
-                    style: bevy_mod_stylebuilder::StyleHandle::default()
+                ResourceSlider {
+                    limit: val.limit().unwrap_or(100.0),
+                    amount: val.amount(),
+                    label: format!("{} {:+.0}", val.label(), info.generation_rate),
+                    style: bevy_mod_stylebuilder::StyleHandle::default(),
                 }
             }));
     }
@@ -191,6 +189,7 @@ pub trait GameResource: Resource {
     fn amount(&self) -> f32;
     fn set_amount(&mut self, amount: f32);
     fn limit(&self) -> Option<f32>;
+    #[allow(dead_code)]
     fn healthly_range(&self) -> Option<RangeInclusive<f32>>;
     fn label(&self) -> String;
 }
@@ -204,8 +203,8 @@ pub struct Generate<T: Resource> {
     _type: std::marker::PhantomData<T>,
 }
 
-impl <T: Resource> Generate<T> {
-    pub fn new(amount: f32) -> Self {
+impl<T: Resource> Generate<T> {
+    pub const fn new(amount: f32) -> Self {
         Self {
             amount,
             _type: std::marker::PhantomData,
@@ -213,17 +212,14 @@ impl <T: Resource> Generate<T> {
     }
 }
 
-
 #[derive(Resource)]
 pub struct GameResInfo<T: GameResource> {
     pub generation_rate: f32,
     phantom: std::marker::PhantomData<T>,
 }
 
-
-
 impl<T: GameResource> GameResInfo<T> {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             generation_rate: 0.0,
             phantom: std::marker::PhantomData,
@@ -246,7 +242,6 @@ fn collect_generations<T: GameResource>(
     resource.set_amount(amount);
 }
 
-
 macro_rules! impl_limitless_resource {
     ($name:ident) => {
         #[derive(Resource, Default)]
@@ -255,10 +250,8 @@ macro_rules! impl_limitless_resource {
         }
 
         impl $name {
-            pub fn new(amount: f32) -> Self {
-                Self {
-                    amount
-                }
+            pub const fn new(amount: f32) -> Self {
+                Self { amount }
             }
         }
 
@@ -283,13 +276,11 @@ macro_rules! impl_limitless_resource {
                 stringify!($name).to_string()
             }
         }
-    
     };
 }
 
 impl_limitless_resource!(MetalTrash);
 impl_limitless_resource!(Metal);
-
 
 macro_rules! simple_game_resource {
     ($name:ident, $limit:literal, $helthly_min:literal, $helthly_max:literal) => {
@@ -300,11 +291,8 @@ macro_rules! simple_game_resource {
         }
 
         impl $name {
-            pub fn new(amount: f32, limit: f32) -> Self {
-                Self {
-                    amount,
-                    limit
-                }
+            pub const fn new(amount: f32, limit: f32) -> Self {
+                Self { amount, limit }
             }
         }
 
@@ -331,7 +319,6 @@ macro_rules! simple_game_resource {
         }
     };
 }
-
 
 simple_game_resource!(Water, 100.0, 10.0, 90.0);
 simple_game_resource!(Food, 100.0, 10.0, 90.0);

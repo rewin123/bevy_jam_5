@@ -30,21 +30,21 @@ fn o_slider_style(sb: &mut StyleBuilder) {
 }
 
 impl ResourceSlider {
-    pub fn new() -> Self {
-        Self::default()
-    }
-    pub const fn limit(mut self, l: f32) -> Self {
-        self.limit = l;
-        self
-    }
-    pub const fn amount(mut self, a: f32) -> Self {
-        self.amount = a;
-        self
-    }
-    pub fn label(mut self, l: impl Into<String>) -> Self {
-        self.label = l.into();
-        self
-    }
+    // pub fn new() -> Self {
+    //     Self::default()
+    // }
+    // pub const fn limit(mut self, l: f32) -> Self {
+    //     self.limit = l;
+    //     self
+    // }
+    // pub const fn amount(mut self, a: f32) -> Self {
+    //     self.amount = a;
+    //     self
+    // }
+    // pub fn label(mut self, l: impl Into<String>) -> Self {
+    //     self.label = l.into();
+    //     self
+    // }
 
     // Left for future use
     #[allow(dead_code)]

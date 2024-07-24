@@ -2,16 +2,10 @@ use bevy::prelude::*;
 use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderBackground, StyleBuilderLayout};
 use bevy_quill::*;
 
-use crate::game::{
-    daycycle::{GameTime, PlayerState},
-    resources::{AllResourcesGetter, CarbonDioxide, Food, Oxygen, OxygenRecycling, Water},
-};
+use crate::game::{daycycle::PlayerState, resources::AllResourcesGetter};
 
 use super::{
-    components::{
-        end_screen::{EndScreen, EndType},
-        resource_slider::ResourceSlider,
-    },
+    components::end_screen::{EndScreen, EndType},
     constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH},
     context_menu, SelectedItem,
 };
@@ -30,7 +24,6 @@ fn root_style(sb: &mut StyleBuilder) {
         .height(Val::Percent(100.0));
 }
 
-
 impl ViewTemplate for RootUi {
     type View = impl View;
     fn create(&self, cx: &mut Cx) -> Self::View {
@@ -39,10 +32,8 @@ impl ViewTemplate for RootUi {
 
         let position = selected_item.item;
 
-
         let game_ended = *player_state != PlayerState::Alive;
 
-        
         let getters = cx.use_resource::<AllResourcesGetter>();
         let mut sliders = vec![];
         for i in 0..getters.res_plugin.len() {
@@ -88,9 +79,12 @@ impl ViewTemplate for RootUi {
                                 .width(RESOURCE_MENU_WIDTH)
                                 .background_color(Srgba::new(1.0, 1.0, 1.0, 0.3));
                         })
-                        .children(sliders.into_iter().map(|slider| {
-                            slider.into_view_child()
-                        }).collect::<Vec<_>>()),
+                        .children(
+                            sliders
+                                .into_iter()
+                                .map(|slider| slider.into_view_child())
+                                .collect::<Vec<_>>(),
+                        ),
                     // If the position of the menu is `Some` we show the Context Menu
                     // Other wise we show nothing
                     Cond::new(position.is_some(), context_menu::ContextMenu, ()),

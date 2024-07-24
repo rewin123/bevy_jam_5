@@ -53,10 +53,7 @@ fn increase_debt(time: Res<GameTime>, mut debt: ResMut<Debt>) {
     }
 }
 
-fn win_on_zero_debt(
-    debt: Res<Debt>,
-    mut player_state: ResMut<NextState<PlayerState>>
-) {
+fn win_on_zero_debt(debt: Res<Debt>, mut player_state: ResMut<NextState<PlayerState>>) {
     if debt.amount <= 0.0 {
         player_state.set(PlayerState::Won);
     }

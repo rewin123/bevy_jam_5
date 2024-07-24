@@ -43,13 +43,12 @@ fn plan_trouble(
         if !items.is_empty() {
             let mut rng = rand::thread_rng();
             let index = rng.gen_range(0..items.len());
-    
+
             commands.entity(items[index]).insert(InFire {
                 fire_created: false,
                 started_at: time.elapsed_seconds(),
             });
         }
-       
 
         let poi = Poisson::new(trouble_planner.distribution).unwrap();
         let v = poi.sample(&mut rand::thread_rng());
@@ -91,7 +90,7 @@ fn tick_fire(
             commands
                 .spawn(SceneBundle {
                     scene: scene_handler[&SceneKey::MetalTrash].clone_weak(),
-                    transform: transform.clone(),
+                    transform: *transform,
                     ..default()
                 })
                 .insert(Selectable)

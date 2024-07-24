@@ -5,7 +5,9 @@ use bevy::prelude::*;
 use super::{
     components::fire::InFire,
     daycycle::{DeathCause, GameTime, PlayerDied, TimeSpeed},
-    resources::{CarbonDioxide, Food, FoodGeneration, GameResource, Generate, Oxygen, OxygenRecycling},
+    resources::{
+        CarbonDioxide, Food, FoodGeneration, GameResource, Generate, Oxygen, OxygenRecycling,
+    },
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -27,7 +29,7 @@ fn update_oxygen_and_co2(
     } else {
         0.0
     };
-    
+
     oxygen.send(Generate::new(oxygen_generation));
     co2.send(Generate::new(-oxygen_generation));
 
@@ -42,7 +44,9 @@ fn bad_air_death(
     mut death: EventWriter<PlayerDied>,
     time_speed: Res<TimeSpeed>,
 ) {
-    if *time_speed != TimeSpeed::Pause && (oxygen.amount() <= 0.0 || co2.amount() >= co2.limit().unwrap_or_default()) {
+    if *time_speed != TimeSpeed::Pause
+        && (oxygen.amount() <= 0.0 || co2.amount() >= co2.limit().unwrap_or_default())
+    {
         death.send(PlayerDied(DeathCause::Suffocated));
         info!("No more air, o2: {}, co2 {}", oxygen.amount(), co2.amount());
     }

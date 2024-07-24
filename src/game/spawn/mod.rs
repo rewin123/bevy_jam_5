@@ -17,12 +17,7 @@ pub(super) fn plugin(app: &mut App) {
     app.observe(setup_resource);
 }
 
-
-
-fn setup_resource(
-    _: Trigger<SpawnLevel>,
-    mut commands: Commands,
-) {
+fn setup_resource(_: Trigger<SpawnLevel>, mut commands: Commands) {
     commands.insert_resource(Oxygen::new(50.0, 100.0));
     commands.insert_resource(CarbonDioxide::new(50.0, 100.0));
 }
