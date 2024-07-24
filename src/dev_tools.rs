@@ -1,3 +1,7 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+
 //! Development tools for the game. This plugin is only enabled in dev builds.
 
 use bevy::{dev_tools::states::log_transitions, prelude::*};
@@ -48,7 +52,7 @@ fn add_fps(mut debug_panel: ResMut<DebugPanel>, time: Res<Time>) {
 }
 
 fn apply_debug_panel(
-    mut commands: Commands,
+    commands: Commands,
     mut debug_panel: ResMut<DebugPanel>,
     mut debug_panel_query: Query<Entity, With<DebugPanelMarker>>,
 ) {
@@ -81,9 +85,9 @@ fn apply_debug_panel(
     }
 
     if let Some(entity) = debug_panel_query.iter_mut().next() {
-        commands.add(InsertNodumEntity {
-            entity,
-            nodum: top_node,
-        })
+        // commands.add(InsertNodumEntity {
+        //     entity,
+        //     nodum: top_node,
+        // })
     }
 }

@@ -1,4 +1,4 @@
-use bevy::{core_pipeline::{core_3d::graph::{Core3d, Node3d}, fullscreen_vertex_shader::fullscreen_shader_vertex_state}, prelude::*, render::{extract_component::{ComponentUniforms, DynamicUniformIndex, ExtractComponent, ExtractComponentPlugin, UniformComponentPlugin}, render_graph::{RenderGraphApp, RenderLabel, ViewNode, ViewNodeRunner}, render_resource::{binding_types::{sampler, texture_2d, uniform_buffer}, BindGroupEntries, BindGroupLayout, BindGroupLayoutEntries, CachedComputePipelineId, CachedRenderPipelineId, ColorTargetState, ColorWrites, FragmentState, MultisampleState, Operations, PipelineCache, PrimitiveState, RenderPassColorAttachment, RenderPassDescriptor, RenderPipelineDescriptor, Sampler, SamplerBindingType, SamplerDescriptor, ShaderStages, ShaderType, TextureFormat, TextureSampleType}, renderer::RenderDevice, texture::BevyDefault, view::ViewTarget, RenderApp}};
+use bevy::{core_pipeline::{core_3d::graph::{Core3d, Node3d}, fullscreen_vertex_shader::fullscreen_shader_vertex_state}, prelude::*, render::{extract_component::{ComponentUniforms, DynamicUniformIndex, ExtractComponent, ExtractComponentPlugin, UniformComponentPlugin}, render_graph::{RenderGraphApp, RenderLabel, ViewNode, ViewNodeRunner}, render_resource::{binding_types::{sampler, texture_2d, uniform_buffer}, BindGroupEntries, BindGroupLayout, BindGroupLayoutEntries, CachedRenderPipelineId, ColorTargetState, ColorWrites, FragmentState, MultisampleState, Operations, PipelineCache, PrimitiveState, RenderPassColorAttachment, RenderPassDescriptor, RenderPipelineDescriptor, Sampler, SamplerBindingType, SamplerDescriptor, ShaderStages, ShaderType, TextureFormat, TextureSampleType}, renderer::RenderDevice, texture::BevyDefault, view::ViewTarget, RenderApp}};
 use bevy_mod_outline::NodeOutline;
 
 const SHADER_ASSET_PATH: &str = "shaders/cartoon.wgsl";
@@ -35,7 +35,7 @@ impl Plugin for CartoonPlugin {
 }
 
 fn setup_settings(
-    mut q_cameras: Query<(&mut CartoonSettings)>,
+    mut q_cameras: Query<&mut CartoonSettings>,
     window: Query<&Window>
 ) {
     let Ok(window) = window.get_single() else { return; };
@@ -62,7 +62,7 @@ impl ViewNode for CartoonProcessing {
 
     fn run<'w>(
             &self,
-            graph: &mut bevy::render::render_graph::RenderGraphContext,
+            _: &mut bevy::render::render_graph::RenderGraphContext,
             render_context: &mut bevy::render::renderer::RenderContext<'w>,
             (view_target, settings_index): bevy::ecs::query::QueryItem<'w, Self::ViewQuery>,
             world: &'w World,

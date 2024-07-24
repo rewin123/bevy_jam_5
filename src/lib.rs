@@ -6,9 +6,7 @@ mod screen;
 mod ui;
 
 use bevy::{
-    asset::AssetMetaCheck,
-    audio::{AudioPlugin, Volume},
-    prelude::*,
+    asset::AssetMetaCheck, audio::{AudioPlugin, Volume}, pbr::{ScreenSpaceAmbientOcclusionBundle, ScreenSpaceAmbientOcclusionSettings}, prelude::*
 };
 // Related to an issue with WGPU AMD card on windows
 // See https://github.com/gfx-rs/wgpu/issues/4247
@@ -120,4 +118,6 @@ fn spawn_camera(mut commands: Commands) {
         // for debugging. So it's good to have this here for future-proofing.
         IsDefaultUiCamera,
     ));
+
+    commands.insert_resource(Msaa::Off);
 }
