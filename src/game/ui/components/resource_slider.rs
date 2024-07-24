@@ -1,5 +1,11 @@
-use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderLayout, StyleHandle};
-use bevy_quill::{View, ViewTemplate};
+use bevy::{
+    color::palettes,
+    prelude::{Children, NodeBundle},
+};
+use bevy_mod_stylebuilder::{
+    StyleBuilder, StyleBuilderBorderColor, StyleBuilderLayout, StyleHandle,
+};
+use bevy_quill::{Element, View, ViewTemplate};
 use bevy_quill_obsidian::controls::Slider;
 
 use crate::game::ui::constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH};
@@ -58,11 +64,25 @@ impl ViewTemplate for ResourceSlider {
     type View = impl View;
 
     fn create(&self, _: &mut bevy_quill::Cx) -> Self::View {
-        Slider::new()
-            .range(0. ..=self.limit)
-            .disabled(true)
-            .label(self.label.clone())
-            .style((o_slider_style, self.style.clone()))
-            .value(self.amount)
+        let a = false;
+        Element::<NodeBundle>::new()
+            .style_dyn(
+                |ct, ss| {
+                    if ct {
+                        ss.border_color(palettes::css::RED).border(3);
+                    } else {
+                        ss.border_color(palettes::css::LIME).border(3);
+                    }
+                },
+                a,
+            )
+            .children("Style")
+
+        // Slider::new()
+        //     .range(0. ..=self.limit)
+        //     .disabled(true)
+        //     .label(self.label.clone())
+        //     .style((o_slider_style, self.style.clone()))
+        //     .value(self.amount)
     }
 }
