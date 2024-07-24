@@ -28,8 +28,8 @@ fn spawn_level(
     scene_handler: Res<HandleMap<SceneKey>>,
     player: Query<Entity, With<Player>>,
 ) {
-    if let Ok(player) = player.get_single() {
-        commands.entity(player).despawn_recursive();
+    if let Ok(_player) = player.get_single() {
+        return;
     }
     // The only thing we have in our level is a player,
     // but add things like walls etc. here.
