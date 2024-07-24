@@ -25,6 +25,7 @@ pub mod spawn;
 pub mod sprite_material;
 mod trouble_planner;
 pub mod ui;
+pub mod render;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
@@ -54,5 +55,9 @@ pub(super) fn plugin(app: &mut App) {
         sequence::plugin,
         resource_flow::plugin,
         bilboard_state::plugin,
+    ));
+
+    app.add_plugins((
+        render::plugin,
     ));
 }
