@@ -24,16 +24,21 @@ pub(crate) struct ResourceSlider {
     pub amount: f32,
     pub label: String,
     pub style: StyleHandle,
+    pub upper_threshold_warning: f32,
+    pub lower_threshold_warning: f32,
+    pub inverse_warning: bool,
 }
 
 impl Default for ResourceSlider {
     fn default() -> Self {
         Self {
-            // Copied from Obsidian slider
             limit: 1.0,
             amount: 0.0,
             label: "Resource".to_string(),
             style: StyleHandle::default(),
+            upper_threshold_warning: 80.0,
+            lower_threshold_warning: 20.0,
+            inverse_warning: false,
         }
     }
 }
@@ -74,16 +79,27 @@ impl ViewTemplate for ResourceSlider {
     fn create(&self, cx: &mut Cx) -> Self::View {
         Element::<NodeBundle>::new()
             .style_dyn(
-                |ct, ss| {
-                    if ct < 20.0 {
+                |(amount, lower_threshold, upper_threshold, inverse_warning), ss| {
+                    let (upper_limit, lower_limit) = if inverse_warning {
+                        (lower_threshold, upper_threshold)
+                    } else {
+                        (upper_threshold, lower_threshold)
+                    };
+
+                    if amount > upper_limit {
                         ss.border(3).border_color(Y_GREEN).border_radius(8.0);
-                    } else if ct > 80.0 {
+                    } else if amount < lower_limit {
                         ss.border(3).border_color(X_RED).border_radius(8.0);
                     } else {
                         ss.border(3).border_color(GREY).border_radius(8.0);
                     }
                 },
-                self.amount,
+                (
+                    self.amount,
+                    self.lower_threshold_warning,
+                    self.upper_threshold_warning,
+                    self.inverse_warning,
+                ),
             )
             .children((Slider::new()
                 .range(0. ..=self.limit)
