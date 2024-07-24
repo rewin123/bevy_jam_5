@@ -5,7 +5,7 @@ use crate::game::{
     character::{CharState, CharacterStates, GoToAction},
     components::flowup_text::FlowUpText,
     daycycle::GameTime,
-    resources::{GameResource, Pee},
+    resources::{BadWater, GameResource, Pee},
     selectable::OnMouseClick,
     sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
     spawn::{player::Player, spawn_commands::Toilet},
@@ -64,7 +64,10 @@ pub struct ToiletWork {
 pub struct ToiletWorkConfig {
     /// Times it takes for a [`ToiletWorkAction`] takes
     pub work_time: f32,
-    /// Amount a completed [`ToiletWorkAction`] decreases from Pee
+    /**  
+     * Amount a completed [`ToiletWorkAction`] decreases from [`Pee`]
+     * and increases from [`BadWater`]
+     */
     pub work_decrease: f32,
 }
 
@@ -93,6 +96,7 @@ fn update_pee_work(
     mut q_toilet_work: Query<(Entity, &mut ToiletWork, &mut CharacterStates)>,
     toilet_work_config: Res<ToiletWorkConfig>,
     mut pee: ResMut<Pee>,
+    mut bad_water: ResMut<BadWater>,
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
 ) {
     for (entity, mut toilet_work, mut states) in q_toilet_work.iter_mut() {
@@ -100,8 +104,13 @@ fn update_pee_work(
 
         toilet_work.work_time += time.delta_seconds();
         if toilet_work.work_time > toilet_work_config.work_time {
-            pee.decrease(toilet_work_config.work_time);
-            info!("Peeing decreased {}", pee.amount());
+            pee.decrease(toilet_work_config.work_decrease);
+            bad_water.increase(toilet_work_config.work_decrease);
+            info!(
+                "Peeing decreased : pee {}, bad water {}",
+                pee.amount(),
+                bad_water.amount()
+            );
             commands.entity(entity).remove::<ToiletWork>();
             commands.trigger_targets(NextAction, entity);
 

@@ -79,12 +79,7 @@ impl ViewTemplate for RootUi {
                                 .width(RESOURCE_MENU_WIDTH)
                                 .background_color(Srgba::new(1.0, 1.0, 1.0, 0.3));
                         })
-                        .children(
-                            sliders
-                                .into_iter()
-                                .map(|slider| slider.into_view_child())
-                                .collect::<Vec<_>>(),
-                        ),
+                        .children(For::index(&sliders, |slider, _| slider.clone())),
                     // If the position of the menu is `Some` we show the Context Menu
                     // Other wise we show nothing
                     Cond::new(position.is_some(), context_menu::ContextMenu, ()),
