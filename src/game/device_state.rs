@@ -2,11 +2,11 @@ use bevy::prelude::*;
 
 use super::bilboard_state::{BillboardContent, BillboardSinPos, BillboardSpawner};
 
-pub struct DevceStatePlugin<T: DeviceState> {
+pub struct DeviceStatePlugin<T: DeviceState> {
     _phantom: std::marker::PhantomData<T>,
 }
 
-impl<T: DeviceState> Default for DevceStatePlugin<T> {
+impl<T: DeviceState> Default for DeviceStatePlugin<T> {
     fn default() -> Self {
         Self {
             _phantom: std::marker::PhantomData,
@@ -14,7 +14,7 @@ impl<T: DeviceState> Default for DevceStatePlugin<T> {
     }
 }
 
-impl<T: DeviceState> Plugin for DevceStatePlugin<T> {
+impl<T: DeviceState> Plugin for DeviceStatePlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_systems(PreUpdate, render_state::<T>);
     }

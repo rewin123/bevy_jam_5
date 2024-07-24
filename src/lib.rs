@@ -8,7 +8,6 @@ mod ui;
 use bevy::{
     asset::AssetMetaCheck,
     audio::{AudioPlugin, Volume},
-    core_pipeline::Skybox,
     prelude::*,
 };
 // Related to an issue with WGPU AMD card on windows
@@ -101,7 +100,7 @@ enum AppSet {
     Update,
 }
 
-fn spawn_camera(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera"),
         Camera3dBundle {

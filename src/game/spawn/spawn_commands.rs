@@ -46,6 +46,30 @@ impl Command for SpawnHydroponic {
     }
 }
 
+#[derive(Component)]
+pub struct MetalTrashPile;
+
+pub struct SpawnMetalTrashPile {
+    pub pos: Vec3,
+}
+
+impl Command for SpawnMetalTrashPile {
+    fn apply(self, world: &mut World) {
+        let scene = world.resource::<HandleMap<SceneKey>>()[&SceneKey::MetalTrash].clone_weak();
+
+        let bundle = SceneBundle {
+            scene,
+            transform: Transform::from_translation(self.pos).with_scale(Vec3::splat(0.5)),
+            ..default()
+        };
+
+        world
+            .spawn(bundle)
+            .insert(Selectable)
+            .insert(MetalTrashPile);
+    }
+}
+
 pub struct SpawnEarth;
 
 impl Command for SpawnEarth {
@@ -70,3 +94,16 @@ impl Command for SpawnEarth {
         world.spawn(bundle).insert(Earth);
     }
 }
+
+/*
+    commands
+        .spawn(SceneBundle {
+            scene: scene_handler[&SceneKey::MetalTrash].clone_weak(),
+            transform: Transform::from_translation(Vec3::new(6.0, 0.1, 6.0))
+                .with_scale(Vec3::splat(0.5)),
+            ..default()
+        })
+        .insert(Selectable)
+        //add fire
+        .insert(InFire::default());
+*/

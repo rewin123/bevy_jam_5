@@ -4,7 +4,7 @@ use crate::game::{
     bilboard_state::BillboardContent,
     character::{CharState, CharacterStates, GoToAction},
     daycycle::GameTime,
-    device_state::{DevceStatePlugin, DeviceState},
+    device_state::{DeviceState, DeviceStatePlugin},
     resources::OxygenRecycling,
     selectable::OnMouseClick,
     sequence::{CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
@@ -16,10 +16,10 @@ use super::fire::InFire;
 pub(super) fn plugin(app: &mut App) {
     app.observe(on_selected);
     app.add_systems(Update, update_oxygen_recycler_work);
-    app.add_systems(Update, update_oxigen_recycler_state);
+    app.add_systems(Update, update_oxygen_recycler_state);
     app.add_systems(PostUpdate, disable_oxygen_if_no_recycler);
 
-    app.add_plugins(DevceStatePlugin::<OxygenRegenratorState>::default());
+    app.add_plugins(DeviceStatePlugin::<OxygenRegenratorState>::default());
 }
 
 #[derive(Component, PartialEq, Clone)]
@@ -132,7 +132,7 @@ fn update_oxygen_recycler_work(
     }
 }
 
-fn update_oxigen_recycler_state(
+fn update_oxygen_recycler_state(
     mut commands: Commands,
     q_oxygen_recyclers: Query<Entity, With<OxygenRecyler>>,
     on_fire: Query<(Entity, &InFire)>,

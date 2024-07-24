@@ -11,7 +11,7 @@ use crate::game::{
 
 use super::{
     player::SpawnPlayer,
-    spawn_commands::{SpawnEarth, SpawnHydroponic, SpawnOxygenGenerator},
+    spawn_commands::{SpawnEarth, SpawnHydroponic, SpawnMetalTrashPile, SpawnOxygenGenerator},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -99,21 +99,16 @@ fn spawn_level(
         })
         .insert(Selectable);
 
-    commands
-        .spawn(SceneBundle {
-            scene: scene_handler[&SceneKey::MetalTrash].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(6.0, 0.1, 6.0))
-                .with_scale(Vec3::splat(0.5)),
-            ..default()
-        })
-        .insert(Selectable);
-
     commands.add(SpawnOxygenGenerator {
         pos: Vec3::new(3.0, 0.1, 7.0),
     });
 
     commands.add(SpawnHydroponic {
         pos: Vec3::new(1.0, 0.1, 7.0),
+    });
+
+    commands.add(SpawnMetalTrashPile {
+        pos: Vec3::new(6.0, 0.1, 6.0),
     });
 
     commands.add(SpawnEarth);
