@@ -1,6 +1,7 @@
 //! Game mechanics and content.
 
 use bevy::prelude::*;
+use bevy_registry_export::ExportRegistryPlugin;
 
 mod animation;
 pub mod assets;
@@ -29,6 +30,10 @@ pub mod render;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);
+
+    app.add_plugins(
+        ExportRegistryPlugin::default()
+    );
 
     app.add_plugins((
         animation::plugin,

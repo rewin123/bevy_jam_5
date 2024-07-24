@@ -52,6 +52,7 @@ fn update_map(
     mut q_maps: Query<(Entity, &ShipMap, Option<&Children>), Changed<ShipMap>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    asset_server: Res<AssetServer>,
 ) {
     for (entity, map, children) in &mut q_maps {
         info!("Updating map {}", entity);
@@ -63,6 +64,12 @@ fn update_map(
         });
 
         let floor = meshes.add(Cuboid::new(1.0, 0.1, 1.0));
+        let floor_material = materials.add(StandardMaterial {
+            base_color_texture: Some(asset_server.load("images/metalgrid2-bl/metalgrid2-bl/metalgrid2_basecolor.png")),
+            metallic: 1.0,
+            ..default()
+        });
+
 
         let wall_pbr = PbrBundle {
             mesh: cube.clone(),
@@ -72,7 +79,7 @@ fn update_map(
 
         let floor_pbr = PbrBundle {
             mesh: floor.clone(),
-            material: material.clone(),
+            material: floor_material,
             ..default()
         };
 
