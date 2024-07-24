@@ -1,4 +1,4 @@
-use crate::game::{daycycle::GameTime, resources::MetalTrash};
+use crate::game::daycycle::GameTime;
 use bevy::prelude::*;
 use rand::prelude::*;
 use rand_distr::{Distribution, Poisson};
