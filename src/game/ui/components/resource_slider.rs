@@ -9,7 +9,7 @@ use bevy_mod_stylebuilder::{
 };
 use bevy_quill::{Cx, Element, View, ViewTemplate};
 use bevy_quill_obsidian::{
-    colors::{self, X_RED},
+    colors::{self, X_RED, Y_GREEN},
     controls::Slider,
 };
 
@@ -75,11 +75,13 @@ impl ViewTemplate for ResourceSlider {
         Element::<NodeBundle>::new()
             .style_dyn(
                 |ct, ss| {
-                    if ct {
+                    if ct < 20.0 {
+                        ss.border(3).border_color(Y_GREEN).border_radius(8.0);
+                    } else if ct > 80.0 {
                         ss.border(3).border_color(X_RED).border_radius(8.0);
                     }
                 },
-                self.amount < 40.0,
+                self.amount,
             )
             .children((Slider::new()
                 .range(0. ..=self.limit)
