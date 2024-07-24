@@ -5,7 +5,7 @@ use bevy::{
 use bevy_mod_stylebuilder::{
     StyleBuilder, StyleBuilderBorderColor, StyleBuilderLayout, StyleHandle,
 };
-use bevy_quill::{Element, View, ViewTemplate};
+use bevy_quill::{Cx, Element, View, ViewTemplate};
 use bevy_quill_obsidian::controls::Slider;
 
 use crate::game::ui::constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH};
@@ -60,15 +60,33 @@ impl ResourceSlider {
     }
 }
 
+// impl ViewTemplate for ResourceSlider {
+//     type View = impl View;
+
+//     fn create(&self, cx: &mut Cx) -> Self::View {
+//         Slider::new()
+//             .range(0. ..=self.limit)
+//             .disabled(true)
+//             .label(self.label.clone())
+//             .style((o_slider_style, self.style.clone()))
+//             .value(self.amount)
+//     }
+// }
+
 impl ViewTemplate for ResourceSlider {
     type View = impl View;
 
-    fn create(&self, _: &mut bevy_quill::Cx) -> Self::View {
-        Slider::new()
-            .range(0. ..=self.limit)
-            .disabled(true)
-            .label(self.label.clone())
-            .style((o_slider_style, self.style.clone()))
-            .value(self.amount)
+    fn create(&self, cx: &mut Cx) -> Self::View {
+        Element::<NodeBundle>::new()
+            //.insert_dyn(TargetCamera, self.camera)
+            //.style(style_test)
+            .children((Element::<NodeBundle>::new()
+                //.style(style_row)
+                .children((Slider::new()
+                    .range(0. ..=self.limit)
+                    .disabled(true)
+                    .label(self.label.clone())
+                    .style((o_slider_style, self.style.clone()))
+                    .value(self.amount),)),))
     }
 }
