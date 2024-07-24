@@ -1,14 +1,21 @@
 use bevy::{
     color::palettes,
     prelude::{Children, NodeBundle},
+    ui::{Display, FlexDirection},
 };
 use bevy_mod_stylebuilder::{
-    StyleBuilder, StyleBuilderBorderColor, StyleBuilderLayout, StyleHandle,
+    StyleBuilder, StyleBuilderBackground, StyleBuilderBorderColor, StyleBuilderLayout, StyleHandle,
 };
 use bevy_quill::{Cx, Element, View, ViewTemplate};
-use bevy_quill_obsidian::controls::Slider;
+use bevy_quill_obsidian::{
+    colors::{self, X_RED},
+    controls::Slider,
+};
 
-use crate::game::ui::constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH};
+use crate::game::ui::{
+    self,
+    constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH},
+};
 
 #[derive(Clone, PartialEq)]
 pub(crate) struct ResourceSlider {
@@ -73,20 +80,22 @@ impl ResourceSlider {
 //     }
 // }
 
+fn style_test(ss: &mut StyleBuilder) {
+    ss.border(3).border_color(X_RED);
+}
+
 impl ViewTemplate for ResourceSlider {
     type View = impl View;
 
     fn create(&self, cx: &mut Cx) -> Self::View {
         Element::<NodeBundle>::new()
             //.insert_dyn(TargetCamera, self.camera)
-            //.style(style_test)
-            .children((Element::<NodeBundle>::new()
-                //.style(style_row)
-                .children((Slider::new()
-                    .range(0. ..=self.limit)
-                    .disabled(true)
-                    .label(self.label.clone())
-                    .style((o_slider_style, self.style.clone()))
-                    .value(self.amount),)),))
+            .style(style_test)
+            .children((Slider::new()
+                .range(0. ..=self.limit)
+                .disabled(true)
+                .label(self.label.clone())
+                .style((o_slider_style, self.style.clone()))
+                .value(self.amount),))
     }
 }
