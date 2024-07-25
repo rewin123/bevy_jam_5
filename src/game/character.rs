@@ -224,11 +224,11 @@ fn check_oxigen(
     oxygen_regeneration: Res<OxygenRecycling>,
 ) {
     for mut states in q_char.iter_mut() {
-        let (min_o, max_o) = oxygen.thresholds();
+        let (min_o, max_o) = oxygen.warning_thresholds();
         let amount = oxygen.amount();
 
         match (
-            oxygen.thresholds(),
+            oxygen.warning_thresholds(),
             oxygen.amount(),
             oxygen_regeneration.working,
         ) {

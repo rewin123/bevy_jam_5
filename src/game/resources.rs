@@ -63,7 +63,7 @@ macro_rules! impl_limitless_resource {
                 ResourceThreshold::Limitless
             }
 
-            fn thresholds(&self) -> (Option<f32>, Option<f32>) {
+            fn warning_thresholds(&self) -> (Option<f32>, Option<f32>) {
                 (None, None)
             }
 
@@ -126,7 +126,7 @@ macro_rules! simple_game_resource {
                 Some(self.limit)
             }
 
-            fn thresholds(&self) -> (Option<f32>, Option<f32>) {
+            fn warning_thresholds(&self) -> (Option<f32>, Option<f32>) {
                 ($min, $max)
             }
 
@@ -421,7 +421,7 @@ impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
             .push(Box::new(|cx| {
                 let val = cx.use_resource::<T>();
                 let info = cx.use_resource::<GameResInfo<T>>();
-                let (min_threshold, max_threshold) = val.thresholds();
+                let (min_threshold, max_threshold) = val.warning_thresholds();
                 ResourceSlider {
                     limit: val.limit().unwrap_or(100.0),
                     amount: val.amount(),
@@ -451,7 +451,7 @@ pub trait GameResource: Resource {
     fn amount(&self) -> f32;
     fn set_amount(&mut self, amount: f32);
     fn limit(&self) -> Option<f32>;
-    fn thresholds(&self) -> (Option<f32>, Option<f32>);
+    fn warning_thresholds(&self) -> (Option<f32>, Option<f32>);
     fn resource_threshold(&self) -> ResourceThreshold;
     fn label(&self) -> String;
     fn decrease(&mut self, decreate_amount: f32);
@@ -513,8 +513,8 @@ fn check_death_conditions<T: GameResource + Clone>(
     let amount = resource.amount();
     let player_died: bool = match (resource.resource_threshold(), resource.limit()) {
         (ResourceThreshold::Necessity, _) => amount <= 0.0,
-        (ResourceThreshold::Waste, Some(limit)) => amount >= limit,
-        (ResourceThreshold::HealthyRange, Some(limit)) => amount <= 0.0 || amount >= limit,
+        (ResourceThreshold::Waste, Some(_)) => amount >= resource.limit().unwrap(),
+        (ResourceThreshold::HealthyRange, Some(_)) => amount <= 0.0 || amount >= resource.limit().unwrap(),
         _ => false,
     };
     if player_died {
