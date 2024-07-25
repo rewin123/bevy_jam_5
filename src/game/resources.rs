@@ -79,13 +79,19 @@ macro_rules! impl_limitless_resource {
             fn increase(&mut self, increase_amount: f32) {
                 self.set_amount((self.amount + increase_amount).max(0.0))
             }
+
+            fn death_reason(&self, _is_deficiency: bool) -> Option<String> {
+                None
+            }
         }
     };
 }
 
-
 macro_rules! simple_game_resource {
-    ($name:ident, $initial_amount:literal, $limit:literal, $min:expr, $max:expr, $resource_type:expr) => {
+    ($name:ident, $initial_amount:literal, $limit:literal, $min:expr, $max:expr, $resource_type:expr, $excess_reason:expr) => {
+        simple_game_resource!($name, $initial_amount, $limit, $min, $max, $resource_type, "", $excess_reason);
+    };
+    ($name:ident, $initial_amount:literal, $limit:literal, $min:expr, $max:expr, $resource_type:expr, $deficiency_reason:expr, $excess_reason:expr) => {
         #[derive(Resource, Clone, Copy)]
         pub struct $name {
             amount: f32,
@@ -132,84 +138,109 @@ macro_rules! simple_game_resource {
                 stringify!($name).to_string()
             }
 
-            #[doc = "Decreases the amount by the given value, until 0"]
             fn decrease(&mut self, decrease_amount: f32) {
                 self.set_amount((self.amount - decrease_amount).clamp(0.0, self.limit))
             }
 
-            #[doc = "Increases the amount by the given value, until the limit"]
             fn increase(&mut self, increase_amount: f32) {
                 self.set_amount((self.amount + increase_amount).clamp(0.0, self.limit))
+            }
+
+            fn death_reason(&self, is_deficiency: bool) -> Option<String> {
+                if is_deficiency {
+                    Some($deficiency_reason.to_string())
+                } else {
+                    Some($excess_reason.to_string())
+                }
             }
         }
     };
 }
 
-
-
+// Now let's redefine our resources with optional deficiency reasons
 simple_game_resource!(
     Water,
     50.0,
     100.0,
     Some(10.0),
     None,
-    ResourceThreshold::Necessity
+    ResourceThreshold::Necessity,
+    "You couldn't pay your water bill and dried up like your dreams of early mortgage repayment.",
+    "You drowned in debt and water simultaneously. At least your mortgage is now waterproof!"
 );
+
 simple_game_resource!(
     Food,
     50.0,
     100.0,
     Some(10.0),
     None,
-    ResourceThreshold::Necessity
+    ResourceThreshold::Necessity,
+    "You ate your last instant noodle. Now you're bankrupt and in heaven, where mortgage is just a myth.",
+    "You burst from overeating. Too bad your mortgage didn't burst with you."
 );
+
 simple_game_resource!(
     Oxygen,
     50.0,
     100.0,
     Some(10.0),
     Some(90.0),
-    ResourceThreshold::HealthyRange
+    ResourceThreshold::HealthyRange,
+    "You suffocated trying to save on oxygen tanks to pay the mortgage. To breathe or to pay - that is the question!",
+    "You exploded from excess oxygen. Your mortgage also bubbled up, but alas, didn't pop."
 );
+
 simple_game_resource!(
     Hydrogen,
     50.0,
     100.0,
     Some(10.0),
     Some(90.0),
-    ResourceThreshold::HealthyRange
+    ResourceThreshold::HealthyRange,
+    "Your hydrogen engine stalled. Now you're drifting in space, like your mortgage in a sea of debt.",
+    "Boom! You turned into a small sun. The mortgage bank is already billing your relatives for light pollution."
 );
+
 simple_game_resource!(
     Pee,
     0.0,
     100.0,
     None,
     Some(90.0),
-    ResourceThreshold::Waste
+    ResourceThreshold::Waste,
+    "You drowned in your own urine, trying to save on sewage to pay the mortgage. The golden shower turned into a golden cage!"
 );
+
 simple_game_resource!(
     Thirst,
     10.0,
     100.0,
     None,
     Some(90.0),
-    ResourceThreshold::Necessity
+    ResourceThreshold::Necessity,
+    "You died of thirst. Your last thought was about the mortgage, not water.",
+    "You died of thirst, refusing to drink anything but elite champagne. Your mortgage remained unpaid, just like your thirst."
 );
+
 simple_game_resource!(
     BadWater,
     0.0,
     100.0,
     None,
     Some(90.0),
-    ResourceThreshold::Waste
+    ResourceThreshold::Waste,
+    "You drowned in an ocean of poor quality water. Your mortgage broker is already selling tickets for tours to the new toxic lake."
 );
+
 simple_game_resource!(
     CarbonDioxide,
     0.0,
     100.0,
     None,
     Some(90.0),
-    ResourceThreshold::Waste
+    ResourceThreshold::Waste,
+    "You suffocated in carbon dioxide. Your last breath was used to inflate a balloon saying 'For Sale: Almost Paid Off Mortgage'."
 );
 
 impl_limitless_resource!(MetalTrash);
@@ -425,6 +456,8 @@ pub trait GameResource: Resource {
     fn label(&self) -> String;
     fn decrease(&mut self, decreate_amount: f32);
     fn increase(&mut self, increase_amount: f32);
+
+    fn death_reason(&self, is_deficiency: bool) -> Option<String>;
 }
 /// Generation for resource in dval/sec manner
 /// Example

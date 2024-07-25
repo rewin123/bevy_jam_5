@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_egui::EguiPlugin;
 use bevy_quill::View;
 
 use super::components::pc::Pc;
@@ -19,6 +20,9 @@ pub(super) fn plugin(app: &mut App) {
     app.observe(open_context);
     app.observe(set_context_menu_position);
     app.observe(clear_context_menu_position);
+
+    app.add_plugins(EguiPlugin);
+    app.add_plugins(components::resource_panel::plugin);
 }
 
 #[derive(Event, Debug)]

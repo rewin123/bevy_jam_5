@@ -66,8 +66,8 @@ impl NodeTree {
         self
     }
 
-    pub fn with_child(mut self, child: NodeTree) -> Self {
-        self.children.push(child);
+    pub fn with_child(mut self, child: impl IntoNodeTree) -> Self {
+        self.children.push(child.into_node_tree());
         self
     }
 
@@ -98,12 +98,33 @@ impl IntoNodeTree for NodeTree {
     }
 }
 
-impl<T: ToString> IntoNodeTree for T {
+impl IntoNodeTree for &str {
     fn into_node_tree(self) -> NodeTree {
         NodeTree::default().with_bundle(TextBundle::from_section(
             self.to_string(),
             TextStyle::default(),
         ))
+    }
+}
+
+impl IntoNodeTree for String {
+    fn into_node_tree(self) -> NodeTree {
+        NodeTree::default().with_bundle(TextBundle::from_section(
+            self,
+            TextStyle::default(),
+        ))
+    }
+}
+
+impl IntoNodeTree for NodeBundle {
+    fn into_node_tree(self) -> NodeTree {
+        NodeTree::default().with_bundle(self)
+    }
+}
+
+impl IntoNodeTree for TextBundle {
+    fn into_node_tree(self) -> NodeTree {
+        NodeTree::default().with_bundle(self)
     }
 }
 
