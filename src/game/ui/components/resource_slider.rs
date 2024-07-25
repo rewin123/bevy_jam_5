@@ -1,6 +1,13 @@
-use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderLayout, StyleHandle};
-use bevy_quill::{View, ViewTemplate};
-use bevy_quill_obsidian::controls::Slider;
+use bevy::{color::palettes::css::GREY, prelude::NodeBundle};
+use bevy_mod_stylebuilder::{
+    StyleBuilder, StyleBuilderBorderColor, StyleBuilderBorderRadius, StyleBuilderLayout,
+    StyleHandle,
+};
+use bevy_quill::{Cx, Element, View, ViewTemplate};
+use bevy_quill_obsidian::{
+    colors::{X_RED, Y_GREEN},
+    controls::Slider,
+};
 
 use crate::game::ui::constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH};
 
@@ -10,16 +17,21 @@ pub(crate) struct ResourceSlider {
     pub amount: f32,
     pub label: String,
     pub style: StyleHandle,
+    pub upper_threshold_warning: f32,
+    pub lower_threshold_warning: f32,
+    pub inverse_warning: bool,
 }
 
 impl Default for ResourceSlider {
     fn default() -> Self {
         Self {
-            // Copied from Obsidian slider
             limit: 1.0,
             amount: 0.0,
             label: "Resource".to_string(),
             style: StyleHandle::default(),
+            upper_threshold_warning: 80.0,
+            lower_threshold_warning: 20.0,
+            inverse_warning: false,
         }
     }
 }
@@ -57,12 +69,36 @@ impl ResourceSlider {
 impl ViewTemplate for ResourceSlider {
     type View = impl View;
 
-    fn create(&self, _: &mut bevy_quill::Cx) -> Self::View {
-        Slider::new()
-            .range(0. ..=self.limit)
-            .disabled(true)
-            .label(self.label.clone())
-            .style((o_slider_style, self.style.clone()))
-            .value(self.amount)
+    fn create(&self, _cx: &mut Cx) -> Self::View {
+        Element::<NodeBundle>::new()
+            .style_dyn(
+                |(amount, lower_threshold, upper_threshold, inverse_warning), ss| {
+                    let (danger_color, good_color) = if inverse_warning {
+                        (Y_GREEN, X_RED)
+                    } else {
+                        (X_RED, Y_GREEN)
+                    };
+
+                    if amount > upper_threshold {
+                        ss.border(3).border_color(good_color).border_radius(8.0);
+                    } else if amount < lower_threshold {
+                        ss.border(3).border_color(danger_color).border_radius(8.0);
+                    } else {
+                        ss.border(3).border_color(GREY).border_radius(8.0);
+                    }
+                },
+                (
+                    self.amount,
+                    self.lower_threshold_warning,
+                    self.upper_threshold_warning,
+                    self.inverse_warning,
+                ),
+            )
+            .children((Slider::new()
+                .range(0. ..=self.limit)
+                .disabled(true)
+                .label(self.label.clone())
+                .style((o_slider_style, self.style.clone()))
+                .value(self.amount),))
     }
 }

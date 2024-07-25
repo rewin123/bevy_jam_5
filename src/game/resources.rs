@@ -181,6 +181,9 @@ impl<T: GameResource + Default> Plugin for GameResourcePlugin<T> {
                     amount: val.amount(),
                     label: format!("{} {:+.0}", val.label(), info.generation_rate),
                     style: bevy_mod_stylebuilder::StyleHandle::default(),
+                    upper_threshold_warning: 80.0,
+                    lower_threshold_warning: 20.0,
+                    inverse_warning: val.inverse_warning(), // increase means green. If not, inverse.
                 }
             }));
     }
@@ -195,6 +198,7 @@ pub trait GameResource: Resource {
     fn label(&self) -> String;
     fn decrease(&mut self, decreate_amount: f32);
     fn increase(&mut self, increase_amount: f32);
+    fn inverse_warning(&self) -> bool;
 }
 /// Generation for resource in dval/sec manner
 /// Example
@@ -278,6 +282,11 @@ macro_rules! impl_limitless_resource {
             fn label(&self) -> String {
                 stringify!($name).to_string()
             }
+
+            fn inverse_warning(&self) -> bool {
+                return false;
+            }
+
             #[doc = "Decreases the amount by the given amount until 0."]
             fn decrease(&mut self, decrease_amount: f32) {
                 self.set_amount((self.amount - decrease_amount).max(0.0))
@@ -335,6 +344,10 @@ macro_rules! simple_game_resource {
 
             fn label(&self) -> String {
                 stringify!($name).to_string()
+            }
+
+            fn inverse_warning(&self) -> bool {
+                return false; // todo rewin: set which resource should display warning for upper_limit
             }
 
             #[doc = "Decreases the amount by the given value, until 0"]
