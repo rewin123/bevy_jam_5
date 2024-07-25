@@ -73,16 +73,16 @@ impl ViewTemplate for ResourceSlider {
         Element::<NodeBundle>::new()
             .style_dyn(
                 |(amount, lower_threshold, upper_threshold, inverse_warning), ss| {
-                    let (upper_limit, lower_limit) = if inverse_warning {
-                        (lower_threshold, upper_threshold)
+                    let (danger_color, good_color) = if inverse_warning {
+                        (Y_GREEN, X_RED)
                     } else {
-                        (upper_threshold, lower_threshold)
+                        (X_RED, Y_GREEN)
                     };
 
-                    if amount > upper_limit {
-                        ss.border(3).border_color(Y_GREEN).border_radius(8.0);
-                    } else if amount < lower_limit {
-                        ss.border(3).border_color(X_RED).border_radius(8.0);
+                    if amount > upper_threshold {
+                        ss.border(3).border_color(good_color).border_radius(8.0);
+                    } else if amount < lower_threshold {
+                        ss.border(3).border_color(danger_color).border_radius(8.0);
                     } else {
                         ss.border(3).border_color(GREY).border_radius(8.0);
                     }
