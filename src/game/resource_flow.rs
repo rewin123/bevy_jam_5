@@ -21,7 +21,7 @@ pub(super) fn plugin(app: &mut App) {
             update_thirst,
         ),
     );
-    app.add_systems(PostUpdate, (bad_air_death, too_many_oxigen_death));
+    // app.add_systems(PostUpdate, (bad_air_death, too_many_oxigen_death));
 }
 
 fn update_oxygen_and_co2(
@@ -47,30 +47,30 @@ fn update_oxygen_and_co2(
     co2.send(Generate::new(1.0));
 }
 
-fn bad_air_death(
-    oxygen: Res<Oxygen>,
-    co2: Res<CarbonDioxide>,
-    mut death: EventWriter<PlayerDied>,
-    time_speed: Res<TimeSpeed>,
-) {
-    if *time_speed != TimeSpeed::Pause
-        && (oxygen.amount() <= 0.0 || co2.amount() >= co2.limit().unwrap_or_default())
-    {
-        death.send(PlayerDied(DeathCause::Suffocated));
-        info!("No more air, o2: {}, co2 {}", oxygen.amount(), co2.amount());
-    }
-}
-
-fn too_many_oxigen_death(
-    oxygen: Res<Oxygen>,
-    mut death: EventWriter<PlayerDied>,
-    time_speed: Res<TimeSpeed>,
-) {
-    if *time_speed != TimeSpeed::Pause && oxygen.amount() >= oxygen.limit().unwrap_or_default() {
-        death.send(PlayerDied(DeathCause::TooManyOxigen));
-    }
-}
-
+// fn bad_air_death(
+//     oxygen: Res<Oxygen>,
+//     co2: Res<CarbonDioxide>,
+//     mut death: EventWriter<PlayerDied>,
+//     time_speed: Res<TimeSpeed>,
+// ) {
+//     if *time_speed != TimeSpeed::Pause
+//         && (oxygen.amount() <= 0.0 || co2.amount() >= co2.limit().unwrap_or_default())
+//     {
+//         death.send(PlayerDied(DeathCause::Suffocated));
+//         info!("No more air, o2: {}, co2 {}", oxygen.amount(), co2.amount());
+//     }
+// }
+//
+// fn too_many_oxigen_death(
+//     oxygen: Res<Oxygen>,
+//     mut death: EventWriter<PlayerDied>,
+//     time_speed: Res<TimeSpeed>,
+// ) {
+//     if *time_speed != TimeSpeed::Pause && oxygen.amount() >= oxygen.limit().unwrap_or_default() {
+//         death.send(PlayerDied(DeathCause::TooManyOxigen));
+//     }
+// }
+//
 fn update_food(
     mut food: EventWriter<Generate<Food>>,
     food_generation: Res<FoodGeneration>,
