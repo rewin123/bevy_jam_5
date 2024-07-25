@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_quill::Cx;
 
+use crate::screen::Screen;
+
 use super::{
     daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed},
     ui::components::resource_slider::ResourceSlider,
@@ -29,6 +31,215 @@ pub(crate) fn plugin(app: &mut App) {
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
 }
+
+
+macro_rules! impl_limitless_resource {
+    ($name:ident) => {
+        #[derive(Resource, Default, Clone, Copy)]
+        pub struct $name {
+            pub amount: f32,
+        }
+
+        impl $name {
+            pub const fn new(amount: f32) -> Self {
+                Self { amount }
+            }
+        }
+
+        impl GameResource for $name {
+            fn amount(&self) -> f32 {
+                self.amount
+            }
+
+            fn set_amount(&mut self, amount: f32) {
+                self.amount = amount;
+            }
+
+            fn limit(&self) -> Option<f32> {
+                None
+            }
+
+            fn resource_threshold(&self) -> ResourceThreshold {
+                ResourceThreshold::Limitless
+            }
+
+            fn thresholds(&self) -> (Option<f32>, Option<f32>) {
+                (None, None)
+            }
+
+            fn label(&self) -> String {
+                stringify!($name).to_string()
+            }
+
+            #[doc = "Decreases the amount by the given amount until 0."]
+            fn decrease(&mut self, decrease_amount: f32) {
+                self.set_amount((self.amount - decrease_amount).max(0.0))
+            }
+            #[doc = "Increases the amount byt the given amount. Doesn't have a max value"]
+            fn increase(&mut self, increase_amount: f32) {
+                self.set_amount((self.amount + increase_amount).max(0.0))
+            }
+        }
+    };
+}
+
+
+macro_rules! simple_game_resource {
+    ($name:ident, $initial_amount:literal, $limit:literal, $min:expr, $max:expr, $resource_type:expr) => {
+        #[derive(Resource, Clone, Copy)]
+        pub struct $name {
+            amount: f32,
+            limit: f32,
+        }
+
+        impl Default for $name {
+            fn default() -> Self {
+                Self {
+                    amount: $initial_amount,
+                    limit: $limit,
+                }
+            }
+        }
+
+        impl $name {
+            pub const fn new(amount: f32, limit: f32) -> Self {
+                Self { amount, limit }
+            }
+        }
+
+        impl GameResource for $name {
+            fn amount(&self) -> f32 {
+                self.amount
+            }
+
+            fn set_amount(&mut self, amount: f32) {
+                self.amount = amount;
+            }
+
+            fn limit(&self) -> Option<f32> {
+                Some(self.limit)
+            }
+
+            fn thresholds(&self) -> (Option<f32>, Option<f32>) {
+                ($min, $max)
+            }
+
+            fn resource_threshold(&self) -> ResourceThreshold {
+                $resource_type
+            }
+
+            fn label(&self) -> String {
+                stringify!($name).to_string()
+            }
+
+            #[doc = "Decreases the amount by the given value, until 0"]
+            fn decrease(&mut self, decrease_amount: f32) {
+                self.set_amount((self.amount - decrease_amount).clamp(0.0, self.limit))
+            }
+
+            #[doc = "Increases the amount by the given value, until the limit"]
+            fn increase(&mut self, increase_amount: f32) {
+                self.set_amount((self.amount + increase_amount).clamp(0.0, self.limit))
+            }
+        }
+    };
+}
+
+
+
+simple_game_resource!(
+    Water,
+    50.0,
+    100.0,
+    Some(10.0),
+    None,
+    ResourceThreshold::Necessity
+);
+simple_game_resource!(
+    Food,
+    50.0,
+    100.0,
+    Some(10.0),
+    None,
+    ResourceThreshold::Necessity
+);
+simple_game_resource!(
+    Oxygen,
+    50.0,
+    100.0,
+    Some(10.0),
+    Some(90.0),
+    ResourceThreshold::HealthyRange
+);
+simple_game_resource!(
+    Hydrogen,
+    50.0,
+    100.0,
+    Some(10.0),
+    Some(90.0),
+    ResourceThreshold::HealthyRange
+);
+simple_game_resource!(
+    Pee,
+    0.0,
+    100.0,
+    None,
+    Some(90.0),
+    ResourceThreshold::Waste
+);
+simple_game_resource!(
+    Thirst,
+    10.0,
+    100.0,
+    None,
+    Some(90.0),
+    ResourceThreshold::Necessity
+);
+simple_game_resource!(
+    BadWater,
+    0.0,
+    100.0,
+    None,
+    Some(90.0),
+    ResourceThreshold::Waste
+);
+simple_game_resource!(
+    CarbonDioxide,
+    0.0,
+    100.0,
+    None,
+    Some(90.0),
+    ResourceThreshold::Waste
+);
+
+impl_limitless_resource!(MetalTrash);
+impl_limitless_resource!(Metal);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #[derive(Resource, Default)]
 pub struct AllResourcesGetter {
@@ -254,10 +465,17 @@ fn check_death_conditions<T: GameResource + Clone>(
     mut time_speed: ResMut<TimeSpeed>,
     mut death: EventWriter<PlayerDied<T>>,
     mut next_state: ResMut<NextState<PlayerState>>,
+    screen: Res<State<Screen>>,
+
 ) {
-    if *time_speed != TimeSpeed::Pause {
+
+    if *time_speed == TimeSpeed::Pause {
         return;
     };
+
+    if *screen != Screen::Playing {
+        return;
+    }
 
     let amount = resource.amount();
     let player_died: bool = match (resource.resource_threshold(), resource.limit()) {
@@ -266,7 +484,8 @@ fn check_death_conditions<T: GameResource + Clone>(
         (ResourceThreshold::HealthyRange, Some(limit)) => amount <= 0.0 || amount >= limit,
         _ => false,
     };
-    if !player_died {
+    if player_died {
+        info!("Die by {}. Amount: {}", resource.label(), amount);
         death.send(PlayerDied(resource.clone()));
         *time_speed = TimeSpeed::Pause;
         next_state.set(PlayerState::Dead);
@@ -286,182 +505,3 @@ fn collect_generations<T: GameResource>(
     ev_gens.clear();
     resource.increase(info.generation_rate * time.delta_seconds());
 }
-
-macro_rules! impl_limitless_resource {
-    ($name:ident) => {
-        #[derive(Resource, Default, Clone, Copy)]
-        pub struct $name {
-            pub amount: f32,
-        }
-
-        impl $name {
-            pub const fn new(amount: f32) -> Self {
-                Self { amount }
-            }
-        }
-
-        impl GameResource for $name {
-            fn amount(&self) -> f32 {
-                self.amount
-            }
-
-            fn set_amount(&mut self, amount: f32) {
-                self.amount = amount;
-            }
-
-            fn limit(&self) -> Option<f32> {
-                None
-            }
-
-            fn resource_threshold(&self) -> ResourceThreshold {
-                ResourceThreshold::Limitless
-            }
-
-            fn thresholds(&self) -> (Option<f32>, Option<f32>) {
-                (None, None)
-            }
-
-            fn label(&self) -> String {
-                stringify!($name).to_string()
-            }
-
-            #[doc = "Decreases the amount by the given amount until 0."]
-            fn decrease(&mut self, decrease_amount: f32) {
-                self.set_amount((self.amount - decrease_amount).max(0.0))
-            }
-            #[doc = "Increases the amount byt the given amount. Doesn't have a max value"]
-            fn increase(&mut self, increase_amount: f32) {
-                self.set_amount((self.amount + increase_amount).max(0.0))
-            }
-        }
-    };
-}
-
-impl_limitless_resource!(MetalTrash);
-impl_limitless_resource!(Metal);
-
-macro_rules! simple_game_resource {
-    ($name:ident, $initial_amount:literal, $limit:literal, $min:expr, $max:expr, $resource_type:expr) => {
-        #[derive(Resource, Clone, Copy)]
-        pub struct $name {
-            amount: f32,
-            limit: f32,
-        }
-
-        impl Default for $name {
-            fn default() -> Self {
-                Self {
-                    amount: $initial_amount,
-                    limit: $limit,
-                }
-            }
-        }
-
-        impl $name {
-            pub const fn new(amount: f32, limit: f32) -> Self {
-                Self { amount, limit }
-            }
-        }
-
-        impl GameResource for $name {
-            fn amount(&self) -> f32 {
-                self.amount
-            }
-
-            fn set_amount(&mut self, amount: f32) {
-                self.amount = amount;
-            }
-
-            fn limit(&self) -> Option<f32> {
-                Some(self.limit)
-            }
-
-            fn thresholds(&self) -> (Option<f32>, Option<f32>) {
-                ($min, $max)
-            }
-
-            fn resource_threshold(&self) -> ResourceThreshold {
-                $resource_type
-            }
-
-            fn label(&self) -> String {
-                stringify!($name).to_string()
-            }
-
-            #[doc = "Decreases the amount by the given value, until 0"]
-            fn decrease(&mut self, decrease_amount: f32) {
-                self.set_amount((self.amount - decrease_amount).clamp(0.0, self.limit))
-            }
-
-            #[doc = "Increases the amount by the given value, until the limit"]
-            fn increase(&mut self, increase_amount: f32) {
-                self.set_amount((self.amount + increase_amount).clamp(0.0, self.limit))
-            }
-        }
-    };
-}
-
-simple_game_resource!(
-    Water,
-    50.0,
-    100.0,
-    Some(10.0),
-    None,
-    ResourceThreshold::Necessity
-);
-simple_game_resource!(
-    Food,
-    50.0,
-    100.0,
-    Some(10.0),
-    None,
-    ResourceThreshold::Necessity
-);
-simple_game_resource!(
-    Oxygen,
-    50.0,
-    100.0,
-    Some(10.0),
-    Some(90.0),
-    ResourceThreshold::HealthyRange
-);
-simple_game_resource!(
-    Hydrogen,
-    50.0,
-    100.0,
-    Some(10.0),
-    Some(90.0),
-    ResourceThreshold::HealthyRange
-);
-simple_game_resource!(
-    Pee,
-    0.0,
-    100.0,
-    None,
-    Some(90.0),
-    ResourceThreshold::Necessity
-);
-simple_game_resource!(
-    Thirst,
-    10.0,
-    100.0,
-    None,
-    Some(90.0),
-    ResourceThreshold::Necessity
-);
-simple_game_resource!(
-    BadWater,
-    0.0,
-    100.0,
-    None,
-    Some(90.0),
-    ResourceThreshold::Waste
-);
-simple_game_resource!(
-    CarbonDioxide,
-    0.0,
-    100.0,
-    None,
-    Some(90.0),
-    ResourceThreshold::Waste
-);
