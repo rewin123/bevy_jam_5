@@ -245,8 +245,7 @@ fn collect_generations<T: GameResource>(
         info.generation_rate += gen.amount;
     }
     ev_gens.clear();
-    let amount = resource.amount() + info.generation_rate * time.delta_seconds();
-    resource.set_amount(amount);
+    resource.increase(info.generation_rate * time.delta_seconds());
 }
 
 macro_rules! impl_limitless_resource {
@@ -303,7 +302,7 @@ impl_limitless_resource!(MetalTrash);
 impl_limitless_resource!(Metal);
 
 macro_rules! simple_game_resource {
-    ($name:ident, $limit:literal, $helthly_min:literal, $helthly_max:literal) => {
+    ($name:ident, $initial_amount:literal, $limit:literal, $helthly_min:literal, $helthly_max:literal) => {
         #[derive(Resource)]
         pub struct $name {
             amount: f32,
@@ -313,7 +312,7 @@ macro_rules! simple_game_resource {
         impl Default for $name {
             fn default() -> Self {
                 Self {
-                    amount: 0.0,
+                    amount: $initial_amount,
                     limit: $limit,
                 }
             }
@@ -363,11 +362,11 @@ macro_rules! simple_game_resource {
     };
 }
 
-simple_game_resource!(Water, 100.0, 10.0, 90.0);
-simple_game_resource!(Food, 100.0, 10.0, 90.0);
-simple_game_resource!(Pee, 100.0, 10.0, 90.0);
-simple_game_resource!(Thirst, 100.0, 10.0, 90.0);
-simple_game_resource!(BadWater, 100.0, 10.0, 90.0);
-simple_game_resource!(Hydrogen, 100.0, 10.0, 90.0);
-simple_game_resource!(CarbonDioxide, 100.0, 10.0, 90.0);
-simple_game_resource!(Oxygen, 100.0, 10.0, 90.0);
+simple_game_resource!(Water, 50.0, 100.0, 10.0, 90.0);
+simple_game_resource!(Food, 10.0, 100.0, 10.0, 90.0);
+simple_game_resource!(Pee, 0.0, 100.0, 10.0, 90.0);
+simple_game_resource!(Thirst, 10.0, 100.0, 10.0, 90.0);
+simple_game_resource!(BadWater, 0.0, 100.0, 10.0, 90.0);
+simple_game_resource!(Hydrogen, 50.0, 100.0, 10.0, 90.0);
+simple_game_resource!(CarbonDioxide, 10.0, 100.0, 10.0, 90.0);
+simple_game_resource!(Oxygen, 50.0, 100.0, 10.0, 90.0);
