@@ -2,7 +2,7 @@ use bevy::{ecs::world::unsafe_world_cell::UnsafeWorldCell, prelude::*};
 use bevy_egui::*;
 use node_tree::{tree::{IntoNodeTree, NodeTree}, InsertNodumEntity};
 
-use crate::game::resources::{CarbonDioxide, GameResInfo, GameResource, Oxygen};
+use crate::game::resources::*;
 
 const BORDER_COLOR: &str = "#8080b3";
 const OXYGEN_COLOR: &str = "#4a4a8c";
@@ -12,6 +12,7 @@ const BAD_WATER_COLOR: &str = "#8c4a4a";
 const METAL_COLOR: &str = "#8c4a8c";
 const METAL_WASTE_COLOR: &str = "#4a8c4a";
 const CO2_COLOR: &str = "#8c4a4a";
+const THIRST_COLOR: &str = "#4a8ccc";
 
 pub(crate) fn plugin(app: &mut App) {
 
@@ -68,7 +69,9 @@ fn draw_resource_panel(
                 border_radius: BorderRadius::all(Val::Px(5.0)),
                 ..default()
             })
-            .with_child(oxygen_cycle(&mut cell, &style));
+            .with_child(oxygen_cycle(&mut cell, &style))
+            .with_child(water_cycle(&mut cell, &style))
+            .with_child(other_resources(&mut cell, &style));
 
 
         let root = cell
@@ -113,17 +116,19 @@ unsafe fn oxygen_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -
                 flex_direction: FlexDirection::Column,
                 width: Val::Percent(100.0),
                 align_items: AlignItems::Center,
+            
                 ..default()
             },
             ..default()
         }.into_node_tree()
-        .with_child(TextBundle::from_section("-- Breath -->", style.text.clone()))
+        .with_child(TextBundle::from_section("Oxygen Cycle", style.text.clone()))
+        .with_child(TextBundle::from_section("--Breath-->", style.text.clone()))
     )
     .with_child( //bars
         NodeBundle {
             style: Style {
                 display: Display::Flex,
-                justify_content: JustifyContent::SpaceBetween,
+                justify_content: JustifyContent::SpaceAround,
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 ..default()
@@ -152,10 +157,138 @@ unsafe fn oxygen_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -
             },
             ..default()
         }.into_node_tree()
-        .with_child(TextBundle::from_section("<-- Recycle --", style.text.clone()))
+        .with_child(TextBundle::from_section("<--Recycle--", style.text.clone()))
     )
 }
 
+
+unsafe fn water_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> NodeTree {
+    NodeBundle {
+        style: Style {
+            display: Display::Flex,
+            flex_direction: FlexDirection::Column,
+            height: Val::Percent(35.0),
+            width: Val::Percent(100.0),
+            margin: UiRect::all(Val::Px(10.0)),
+            ..default()
+        },
+        ..default()
+    }.into_node_tree()
+    .with_child(
+        TextBundle::from_section("Water Cycle", style.text.clone())
+        .with_style(Style {
+            align_self: AlignSelf::Center,
+            ..default()
+    }))
+    .with_child(
+        TextBundle::from_section("--Hydroponic-->", style.text.clone())
+            .with_style(Style {
+                align_self: AlignSelf::Center,
+                ..default()
+            })
+    )
+    .with_child(NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Px(20.0),
+                display: Display::Flex,
+                flex_direction: FlexDirection::Row,
+                justify_content: JustifyContent::SpaceAround,
+                ..default()
+            },
+            ..default()
+        }.into_node_tree()
+        .with_child(TextBundle::from_section("-Drink->", style.text.clone()))
+        .with_child(TextBundle::from_section("-Toilet->", style.text.clone()))
+    )
+    .with_child(NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                display: Display::Flex,
+                flex_direction: FlexDirection::Row,
+                justify_content: JustifyContent::SpaceBetween,
+                ..default()
+            },
+            ..default()
+        }.into_node_tree()
+        .with_child(bar::<Water>(cell, ResourceBar {
+            name: "Water",
+            color: hex2color(WATER_COLOR),
+            text_style: style.text.clone()
+        }))
+        .with_child(bar::<Pee>(cell, ResourceBar {
+            name: "Pee",
+            color: hex2color(PEE_COLOR),
+            text_style: style.text.clone()
+        }))
+        .with_child(bar::<BadWater>(cell, ResourceBar {
+            name: "Bad Water",
+            color: hex2color(BAD_WATER_COLOR),
+            text_style: style.text.clone()
+        }))
+    )
+    .with_child(
+    TextBundle::from_section("<-- Recycle --", style.text.clone())
+        .with_style(Style {
+            align_self: AlignSelf::Center,
+            ..default()
+        })
+    )
+}
+
+
+unsafe fn other_resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> NodeTree {
+    NodeBundle {
+        style: Style {
+            display: Display::Flex,
+            flex_direction: FlexDirection::Column,
+            height: Val::Percent(30.0),
+            width: Val::Percent(100.0),
+            margin: UiRect::all(Val::Px(10.0)),
+            ..default()
+        },
+        ..default()
+    }.into_node_tree()
+    .with_child(
+        TextBundle::from_section("Other Resources", style.text.clone())
+            .with_style(Style {
+                align_self: AlignSelf::Center,
+                margin: UiRect::bottom(Val::Px(10.0)),
+                ..default()
+            })
+    )
+    .with_child(NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                display: Display::Flex,
+                flex_direction: FlexDirection::Row,
+                justify_content: JustifyContent::SpaceBetween,
+                ..default()
+            },
+            ..default()
+        }.into_node_tree()
+        .with_child(bar::<Metal>(cell, ResourceBar {
+            name: "Metal",
+            color: hex2color(METAL_COLOR),
+            text_style: style.text.clone()
+        }))
+        .with_child(bar::<MetalTrash>(cell, ResourceBar {
+            name: "Metal Trash",
+            color: hex2color(METAL_WASTE_COLOR),
+            text_style: style.text.clone()
+        }))
+        .with_child(bar::<Thirst>(cell, ResourceBar {
+            name: "Thirst",
+            color: hex2color(THIRST_COLOR),
+            text_style: style.text.clone()
+        }))
+    )
+}
+
+
+/// Resource bar <-----------------------------------------------------------------------
 struct ResourceBar {
     name: &'static str,
     color: Color,
@@ -179,6 +312,7 @@ unsafe fn bar<T : GameResource>(cell: &UnsafeWorldCell, bar : ResourceBar) -> No
                 height: Val::Percent(100.0),
                 border: UiRect::all(Val::Px(1.0)),
                 position_type: PositionType::Relative,
+                align_self: AlignSelf::Center,
                 ..default()
             },
             border_color: BorderColor(hex2color(BORDER_COLOR)),
@@ -267,7 +401,7 @@ unsafe fn bar<T : GameResource>(cell: &UnsafeWorldCell, bar : ResourceBar) -> No
     NodeBundle {
         style: Style {
             display: Display::Flex,
-            flex_direction: FlexDirection::Row,
+            flex_direction: FlexDirection::Column,
             height: Val::Percent(100.0),
             ..default()
         },
@@ -280,7 +414,7 @@ unsafe fn bar<T : GameResource>(cell: &UnsafeWorldCell, bar : ResourceBar) -> No
             .with_style(Style {
                 height: Val::Px(10.0),
                 align_self: AlignSelf::Center,
-                margin: UiRect::all(Val::Px(10.0)),
+                margin: UiRect::all(Val::Px(2.0)),
                 ..default()
             })
     )
