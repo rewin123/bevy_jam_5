@@ -1,5 +1,3 @@
-use std::ops::RangeInclusive;
-
 use bevy::prelude::*;
 use bevy_quill::Cx;
 
@@ -176,29 +174,41 @@ impl<T: GameResource + Default> Plugin for GameResourcePlugin<T> {
             .push(Box::new(|cx| {
                 let val = cx.use_resource::<T>();
                 let info = cx.use_resource::<GameResInfo<T>>();
+                let (min_threshold, max_threshold) = val.thresholds();
                 ResourceSlider {
                     limit: val.limit().unwrap_or(100.0),
                     amount: val.amount(),
                     label: format!("{} {:+.0}", val.label(), info.generation_rate),
                     style: bevy_mod_stylebuilder::StyleHandle::default(),
-                    upper_threshold_warning: 80.0,
-                    lower_threshold_warning: 20.0,
-                    inverse_warning: val.inverse_warning(), // increase means green. If not, inverse.
+                    min_threshold,
+                    max_threshold,
+                    resource_threshold: val.resource_threshold(),
                 }
             }));
     }
+}
+
+#[derive(Clone, Copy, PartialEq)]
+pub enum ResourceThreshold {
+    /// Is good if the value is between the threshold values
+    HealthyRange,
+    /// Is good if there is at least a min
+    Necessity,
+    /// Is good if there is less than the max
+    Waste,
+    /// No need for thresholds
+    Limitless,
 }
 
 pub trait GameResource: Resource {
     fn amount(&self) -> f32;
     fn set_amount(&mut self, amount: f32);
     fn limit(&self) -> Option<f32>;
-    #[allow(dead_code)]
-    fn healthly_range(&self) -> Option<RangeInclusive<f32>>;
+    fn thresholds(&self) -> (Option<f32>, Option<f32>);
+    fn resource_threshold(&self) -> ResourceThreshold;
     fn label(&self) -> String;
     fn decrease(&mut self, decreate_amount: f32);
     fn increase(&mut self, increase_amount: f32);
-    fn inverse_warning(&self) -> bool;
 }
 /// Generation for resource in dval/sec manner
 /// Example
@@ -274,16 +284,16 @@ macro_rules! impl_limitless_resource {
                 None
             }
 
-            fn healthly_range(&self) -> Option<RangeInclusive<f32>> {
-                None
+            fn resource_threshold(&self) -> ResourceThreshold {
+                ResourceThreshold::Limitless
+            }
+
+            fn thresholds(&self) -> (Option<f32>, Option<f32>) {
+                (None, None)
             }
 
             fn label(&self) -> String {
                 stringify!($name).to_string()
-            }
-
-            fn inverse_warning(&self) -> bool {
-                return false;
             }
 
             #[doc = "Decreases the amount by the given amount until 0."]
@@ -302,7 +312,7 @@ impl_limitless_resource!(MetalTrash);
 impl_limitless_resource!(Metal);
 
 macro_rules! simple_game_resource {
-    ($name:ident, $initial_amount:literal, $limit:literal, $helthly_min:literal, $helthly_max:literal) => {
+    ($name:ident, $initial_amount:literal, $limit:literal, $min:expr, $max:expr, $resource_type:expr) => {
         #[derive(Resource)]
         pub struct $name {
             amount: f32,
@@ -337,16 +347,16 @@ macro_rules! simple_game_resource {
                 Some(self.limit)
             }
 
-            fn healthly_range(&self) -> Option<RangeInclusive<f32>> {
-                Some($helthly_min..=$helthly_max)
+            fn thresholds(&self) -> (Option<f32>, Option<f32>) {
+                ($min, $max)
+            }
+
+            fn resource_threshold(&self) -> ResourceThreshold {
+                $resource_type
             }
 
             fn label(&self) -> String {
                 stringify!($name).to_string()
-            }
-
-            fn inverse_warning(&self) -> bool {
-                return false; // todo rewin: set which resource should display warning for upper_limit
             }
 
             #[doc = "Decreases the amount by the given value, until 0"]
@@ -362,11 +372,67 @@ macro_rules! simple_game_resource {
     };
 }
 
-simple_game_resource!(Water, 50.0, 100.0, 10.0, 90.0);
-simple_game_resource!(Food, 10.0, 100.0, 10.0, 90.0);
-simple_game_resource!(Pee, 0.0, 100.0, 10.0, 90.0);
-simple_game_resource!(Thirst, 10.0, 100.0, 10.0, 90.0);
-simple_game_resource!(BadWater, 0.0, 100.0, 10.0, 90.0);
-simple_game_resource!(Hydrogen, 50.0, 100.0, 10.0, 90.0);
-simple_game_resource!(CarbonDioxide, 10.0, 100.0, 10.0, 90.0);
-simple_game_resource!(Oxygen, 50.0, 100.0, 10.0, 90.0);
+simple_game_resource!(
+    Water,
+    50.0,
+    100.0,
+    Some(10.0),
+    None,
+    ResourceThreshold::Necessity
+);
+simple_game_resource!(
+    Food,
+    50.0,
+    100.0,
+    Some(10.0),
+    None,
+    ResourceThreshold::Necessity
+);
+simple_game_resource!(
+    Oxygen,
+    50.0,
+    100.0,
+    Some(10.0),
+    Some(90.0),
+    ResourceThreshold::HealthyRange
+);
+simple_game_resource!(
+    Hydrogen,
+    50.0,
+    100.0,
+    Some(10.0),
+    Some(90.0),
+    ResourceThreshold::HealthyRange
+);
+simple_game_resource!(
+    Pee,
+    0.0,
+    100.0,
+    None,
+    Some(90.0),
+    ResourceThreshold::Necessity
+);
+simple_game_resource!(
+    Thirst,
+    10.0,
+    100.0,
+    None,
+    Some(90.0),
+    ResourceThreshold::Necessity
+);
+simple_game_resource!(
+    BadWater,
+    0.0,
+    100.0,
+    None,
+    Some(90.0),
+    ResourceThreshold::Waste
+);
+simple_game_resource!(
+    CarbonDioxide,
+    0.0,
+    100.0,
+    None,
+    Some(90.0),
+    ResourceThreshold::Waste
+);

@@ -220,14 +220,25 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
 
 fn check_oxigen(
     mut q_char: Query<&mut CharacterStates>,
-    oxigen: Res<Oxygen>,
-    oxigen_regeneration: Res<OxygenRecycling>,
+    oxygen: Res<Oxygen>,
+    oxygen_regeneration: Res<OxygenRecycling>,
 ) {
     for mut states in q_char.iter_mut() {
-        if oxigen.amount() <= 10.0 {
-            states.add(CharState::WantOxigen);
-        } else if oxigen.amount() > oxigen.limit().unwrap() * 0.9 && oxigen_regeneration.working {
-            states.add(CharState::TooManyOxigen);
-        }
+        let (min_o, max_o) = oxygen.thresholds();
+        let amount = oxygen.amount();
+
+        match (
+            oxygen.thresholds(),
+            oxygen.amount(),
+            oxygen_regeneration.working,
+        ) {
+            ((Some(min), _), amount, _) if min > amount => {
+                states.add(CharState::WantOxigen);
+            }
+            ((_, Some(max)), amount, true) if max < amount => {
+                states.add(CharState::TooManyOxigen);
+            }
+            _ => {}
+        };
     }
 }

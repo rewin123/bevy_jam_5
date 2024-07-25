@@ -1,4 +1,7 @@
-use bevy::{color::palettes::css::GREY, prelude::NodeBundle};
+use bevy::{
+    color::{palettes::css::GREY, Srgba},
+    prelude::NodeBundle,
+};
 use bevy_mod_stylebuilder::{
     StyleBuilder, StyleBuilderBorderColor, StyleBuilderBorderRadius, StyleBuilderLayout,
     StyleHandle,
@@ -9,7 +12,10 @@ use bevy_quill_obsidian::{
     controls::Slider,
 };
 
-use crate::game::ui::constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH};
+use crate::game::{
+    resources::ResourceThreshold,
+    ui::constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH},
+};
 
 #[derive(Clone, PartialEq)]
 pub(crate) struct ResourceSlider {
@@ -17,9 +23,9 @@ pub(crate) struct ResourceSlider {
     pub amount: f32,
     pub label: String,
     pub style: StyleHandle,
-    pub upper_threshold_warning: f32,
-    pub lower_threshold_warning: f32,
-    pub inverse_warning: bool,
+    pub min_threshold: Option<f32>,
+    pub max_threshold: Option<f32>,
+    pub resource_threshold: ResourceThreshold,
 }
 
 impl Default for ResourceSlider {
@@ -29,9 +35,9 @@ impl Default for ResourceSlider {
             amount: 0.0,
             label: "Resource".to_string(),
             style: StyleHandle::default(),
-            upper_threshold_warning: 80.0,
-            lower_threshold_warning: 20.0,
-            inverse_warning: false,
+            min_threshold: None,
+            max_threshold: None,
+            resource_threshold: ResourceThreshold::Limitless,
         }
     }
 }
@@ -72,26 +78,36 @@ impl ViewTemplate for ResourceSlider {
     fn create(&self, _cx: &mut Cx) -> Self::View {
         Element::<NodeBundle>::new()
             .style_dyn(
-                |(amount, lower_threshold, upper_threshold, inverse_warning), ss| {
-                    let (danger_color, good_color) = if inverse_warning {
-                        (Y_GREEN, X_RED)
-                    } else {
-                        (X_RED, Y_GREEN)
-                    };
+                |(amount, lower_threshold, upper_threshold, threshold_type), ss| {
+                    let border_color: Srgba =
+                        match (lower_threshold, upper_threshold, threshold_type) {
+                            (_, _, ResourceThreshold::Limitless) => GREY,
+                            (_, Some(max), ResourceThreshold::HealthyRange) if max > amount => {
+                                X_RED
+                            }
+                            (Some(min), _, ResourceThreshold::HealthyRange) if min < amount => {
+                                X_RED
+                            }
+                            (_, Some(max), ResourceThreshold::HealthyRange) if max < amount => {
+                                Y_GREEN
+                            }
+                            (Some(min), _, ResourceThreshold::HealthyRange) if min > amount => {
+                                Y_GREEN
+                            }
+                            (Some(min), _, ResourceThreshold::Necessity) if min > amount => Y_GREEN,
+                            (Some(min), _, ResourceThreshold::Necessity) if min < amount => X_RED,
+                            (_, Some(max), ResourceThreshold::Waste) if max > amount => Y_GREEN,
+                            (_, Some(max), ResourceThreshold::Waste) if max < amount => X_RED,
+                            _ => GREY,
+                        };
 
-                    if amount > upper_threshold {
-                        ss.border(3).border_color(good_color).border_radius(8.0);
-                    } else if amount < lower_threshold {
-                        ss.border(3).border_color(danger_color).border_radius(8.0);
-                    } else {
-                        ss.border(3).border_color(GREY).border_radius(8.0);
-                    }
+                    ss.border(3).border_color(border_color).border_radius(8.0);
                 },
                 (
                     self.amount,
-                    self.lower_threshold_warning,
-                    self.upper_threshold_warning,
-                    self.inverse_warning,
+                    self.max_threshold,
+                    self.min_threshold,
+                    self.resource_threshold,
                 ),
             )
             .children((Slider::new()
