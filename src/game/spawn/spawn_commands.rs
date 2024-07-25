@@ -144,3 +144,28 @@ impl Command for SpawnWaterDispenser {
             .insert((Selectable, WaterDispenser, IgnoreJustMoving));
     }
 }
+
+#[derive(Component)]
+pub struct WaterCleaner;
+
+pub struct SpawnWaterCleaner {
+    pub pos: Vec3,
+    pub rot: Option<Quat>,
+}
+
+impl Command for SpawnWaterCleaner {
+    fn apply(self, world: &mut World) {
+        let scene = world.resource::<HandleMap<SceneKey>>()[&SceneKey::WaterCleaner].clone_weak();
+        let bundle = SceneBundle {
+            scene,
+            transform: Transform::from_translation(self.pos)
+                .with_rotation(self.rot.unwrap_or_default())
+                .with_scale(Vec3::splat(0.30)),
+            ..default()
+        };
+
+        world
+            .spawn(bundle)
+            .insert((Selectable, WaterCleaner, IgnoreJustMoving));
+    }
+}

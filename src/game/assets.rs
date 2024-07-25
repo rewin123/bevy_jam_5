@@ -143,6 +143,7 @@ pub enum SceneKey {
     Earth,
     Toilet,
     WaterDispenser,
+    WaterCleaner,
 }
 
 impl AssetKey for SceneKey {
@@ -198,6 +199,10 @@ impl FromWorld for HandleMap<SceneKey> {
             (
                 SceneKey::WaterDispenser,
                 asset_server.load("models/water_dispenser.glb#Scene0"),
+            ),
+            (
+                SceneKey::WaterCleaner,
+                asset_server.load("models/water_cleaner.glb#Scene0"),
             ),
         ]
         .into()

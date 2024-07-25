@@ -14975,7 +14975,8 @@
         "OxygenGenerator",
         "Earth",
         "Toilet",
-        "WaterDispenser"
+        "WaterDispenser",
+        "WaterCleaner"
       ],
       "short_name": "SceneKey",
       "title": "hieghest_apartment::game::assets::SceneKey",
