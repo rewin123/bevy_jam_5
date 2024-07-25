@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use bevy_quill::Cx;
 
-use super::{daycycle::GameTime, ui::components::resource_slider::ResourceSlider};
+use super::{
+    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed},
+    ui::components::resource_slider::ResourceSlider,
+};
 
 pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<AllResourcesGetter>();
@@ -161,12 +164,14 @@ impl<T: GameResource> Default for GameResourcePlugin<T> {
     }
 }
 
-impl<T: GameResource + Default> Plugin for GameResourcePlugin<T> {
+impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
     fn build(&self, app: &mut App) {
         app.insert_resource(GameResInfo::<T>::new());
         app.init_resource::<T>();
         app.add_event::<Generate<T>>();
+        app.add_event::<PlayerDied<T>>();
         app.add_systems(PostUpdate, collect_generations::<T>);
+        app.add_systems(PostUpdate, check_death_conditions::<T>);
 
         app.world_mut()
             .resource_mut::<AllResourcesGetter>()
@@ -244,6 +249,30 @@ impl<T: GameResource> GameResInfo<T> {
     }
 }
 
+fn check_death_conditions<T: GameResource + Clone>(
+    resource: ResMut<T>,
+    mut time_speed: ResMut<TimeSpeed>,
+    mut death: EventWriter<PlayerDied<T>>,
+    mut next_state: ResMut<NextState<PlayerState>>,
+) {
+    if *time_speed != TimeSpeed::Pause {
+        return;
+    };
+
+    let amount = resource.amount();
+    let player_died: bool = match (resource.resource_threshold(), resource.limit()) {
+        (ResourceThreshold::Necessity, _) => amount <= 0.0,
+        (ResourceThreshold::Waste, Some(limit)) => amount >= limit,
+        (ResourceThreshold::HealthyRange, Some(limit)) => amount <= 0.0 || amount >= limit,
+        _ => false,
+    };
+    if !player_died {
+        death.send(PlayerDied(resource.clone()));
+        *time_speed = TimeSpeed::Pause;
+        next_state.set(PlayerState::Dead);
+    }
+}
+
 fn collect_generations<T: GameResource>(
     mut ev_gens: EventReader<Generate<T>>,
     mut info: ResMut<GameResInfo<T>>,
@@ -260,7 +289,7 @@ fn collect_generations<T: GameResource>(
 
 macro_rules! impl_limitless_resource {
     ($name:ident) => {
-        #[derive(Resource, Default)]
+        #[derive(Resource, Default, Clone, Copy)]
         pub struct $name {
             pub amount: f32,
         }
@@ -313,7 +342,7 @@ impl_limitless_resource!(Metal);
 
 macro_rules! simple_game_resource {
     ($name:ident, $initial_amount:literal, $limit:literal, $min:expr, $max:expr, $resource_type:expr) => {
-        #[derive(Resource)]
+        #[derive(Resource, Clone, Copy)]
         pub struct $name {
             amount: f32,
             limit: f32,
