@@ -28,6 +28,11 @@ impl NodeTree {
     }
 
     pub fn with_bundle<T: DynamicBundle + Bundle>(mut self, bundle: T) -> Self {
+        self.insert_bundle(bundle);
+        self
+    }
+
+    pub fn insert_bundle<T: DynamicBundle + Bundle>(&mut self, bundle: T) {
         let mut components = Components::default();
         let mut storages = Storages::default();
         let mut local_ids = vec![];
@@ -62,8 +67,6 @@ impl NodeTree {
             self.components
                 .insert(type_id, ComponentHolder::Raw(holder));
         }
-
-        self
     }
 
     pub fn with_child(mut self, child: impl IntoNodeTree) -> Self {

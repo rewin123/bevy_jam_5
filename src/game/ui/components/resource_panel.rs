@@ -5,8 +5,8 @@ use node_tree::{
 };
 
 use crate::game::resources::*;
+use super::*;
 
-const BORDER_COLOR: &str = "#8080b3";
 const OXYGEN_COLOR: &str = "#4a4a8c";
 const WATER_COLOR: &str = "#4a8c4a";
 const PEE_COLOR: &str = "#8c8c4a";
@@ -40,7 +40,7 @@ fn draw_resource_panel(world: &mut World) {
 
         let style = ResourcePanelStyle {
             text: TextStyle {
-                font: asset_server.load("fonts/karma/Karma Suture.otf"),
+                font: asset_server.load(FONT_PATH),
                 font_size: 20.0,
                 ..Default::default()
             },
@@ -60,7 +60,7 @@ fn draw_resource_panel(world: &mut World) {
                     padding: UiRect::all(Val::Px(10.0)),
                     ..default()
                 },
-                background_color: BackgroundColor(hex2color("#2a2a3a")),
+                background_color: BackgroundColor(hex2color(BACKGROUND_COLOR)),
                 border_color: BorderColor(hex2color(BORDER_COLOR)),
                 border_radius: BorderRadius::all(Val::Px(5.0)),
                 ..default()
@@ -83,13 +83,7 @@ fn draw_resource_panel(world: &mut World) {
     }
 }
 
-fn hex2color(hex: &str) -> Color {
-    let hex = hex.strip_prefix('#').unwrap();
-    let r = u8::from_str_radix(&hex[0..2], 16).unwrap();
-    let g = u8::from_str_radix(&hex[2..4], 16).unwrap();
-    let b = u8::from_str_radix(&hex[4..6], 16).unwrap();
-    Color::srgb(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0)
-}
+
 
 unsafe fn oxygen_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> NodeTree {
     NodeBundle {

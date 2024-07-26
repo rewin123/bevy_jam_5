@@ -23,6 +23,7 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_plugins(EguiPlugin);
     app.add_plugins(components::resource_panel::plugin);
+    app.add_plugins(components::debt::plugin);
 }
 
 #[derive(Event, Debug)]

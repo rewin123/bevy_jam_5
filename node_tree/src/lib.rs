@@ -3,6 +3,7 @@ pub mod component_holder;
 pub mod raw_component_holder;
 pub mod tree;
 pub mod typed_component_holder;
+pub mod styling;
 
 use byte_holder::*;
 use component_holder::*;
