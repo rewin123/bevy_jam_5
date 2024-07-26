@@ -330,6 +330,7 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
 
     let limit = val.limit().unwrap_or(100.0);
     let lvl = val.amount() / limit;
+    let lvl = lvl.max(0.0).min(1.0);
 
     let mut bar_tree = NodeTree::default()
         .with_bundle(NodeBundle {
@@ -358,9 +359,9 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
 
     //show rate
     let rate_color = if rate > 0.0 {
-        bar.color.lighter(0.5)
+        bar.color.lighter(0.1)
     } else {
-        bar.color.darker(0.5)
+        bar.color.darker(0.1)
     };
 
     let dp = if rate > 0.0 {
