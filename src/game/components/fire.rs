@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::game::auto_anim::{AnimRange, AnimSet, AutoAnim, AutoAnimPlugin};
+use crate::game::{
+    assets::{HandleMap, SfxKey},
+    auto_anim::{AnimRange, AnimSet, AutoAnim, AutoAnimPlugin},
+};
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_plugins(AutoAnimPlugin::<FireSet>::default());
@@ -36,6 +39,7 @@ fn in_fire(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    sounds: Res<HandleMap<SfxKey>>,
     mut q_in_fire: Query<(Entity, &mut InFire, &Transform)>,
     mut fire: Query<(Entity, &mut FireFor)>,
     q_cameras: Query<&Transform, With<Camera>>,
@@ -66,6 +70,10 @@ fn in_fire(
 
             commands
                 .spawn(SpatialBundle::from_transform(fire_transform))
+                .insert(AudioBundle {
+                    source: sounds[&SfxKey::Fire].clone_weak(),
+                    ..default()
+                })
                 .insert(FireFor(entity))
                 .with_children(|children| {
                     children

@@ -14992,7 +14992,8 @@
         "Step1",
         "Step2",
         "Step3",
-        "Step4"
+        "Step4",
+        "Fire"
       ],
       "short_name": "SfxKey",
       "title": "hieghest_apartment::game::assets::SfxKey",
