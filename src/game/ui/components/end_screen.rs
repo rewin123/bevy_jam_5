@@ -21,7 +21,7 @@ impl Default for EndScreen {
     }
 }
 
-#[derive(Default, PartialEq, Clone, Copy)]
+#[derive(Default, PartialEq, Eq, Clone, Copy)]
 pub enum EndType {
     Win,
     #[default]

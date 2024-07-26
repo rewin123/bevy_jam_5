@@ -417,7 +417,7 @@ impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ResourceThreshold {
     /// Is good if the value is between the threshold values
     HealthyRange,

@@ -7,7 +7,6 @@ use super::{
     character::{CharState, CharacterStates},
     components::kitchen::Kitchen,
     daycycle::GameTime,
-    resources::Food,
     sequence::CharacterAction,
 };
 
@@ -49,9 +48,8 @@ impl CharacterAction for KitchenWorkAction {
 pub fn update_work_in_kitchen(
     mut commands: Commands,
     time: Res<GameTime>,
-    mut kitchen_work_config: ResMut<KitchenWorkConfig>,
+    kitchen_work_config: Res<KitchenWorkConfig>,
     mut q_kitchen_work: Query<(Entity, &mut KitchenWork, &mut CharacterStates)>,
-    mut food: ResMut<Food>,
     q_kitchen: Query<&GlobalTransform, With<Kitchen>>,
 ) {
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
@@ -74,7 +72,7 @@ pub fn update_work_in_kitchen(
                     .spawn(BillboardTextBundle {
                         transform: Transform::from_translation(pc_transform.translation())
                             .with_scale(Vec3::splat(0.01)),
-                        text: Text::from_section(format!("Making Food"), text_style),
+                        text: Text::from_section("Making Food", text_style),
                         ..default()
                     })
                     .insert(FlowUpText { lifetime: 1.0 });

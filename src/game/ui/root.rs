@@ -1,12 +1,11 @@
 use bevy::prelude::*;
-use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderBackground, StyleBuilderLayout};
+use bevy_mod_stylebuilder::{StyleBuilder, StyleBuilderLayout};
 use bevy_quill::*;
 
 use crate::game::{daycycle::PlayerState, resources::AllResourcesGetter};
 
 use super::{
     components::end_screen::{EndScreen, EndType},
-    constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH},
     context_menu, SelectedItem,
 };
 

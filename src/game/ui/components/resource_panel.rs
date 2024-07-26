@@ -1,5 +1,4 @@
 use bevy::{ecs::world::unsafe_world_cell::UnsafeWorldCell, prelude::*};
-use bevy_egui::*;
 use node_tree::{
     tree::{IntoNodeTree, NodeTree},
     InsertNodumEntity,
@@ -47,7 +46,7 @@ fn draw_resource_panel(world: &mut World) {
             },
         };
 
-        let mut tree = NodeTree::default()
+        let tree = NodeTree::default()
             .with_bundle(NodeBundle {
                 style: Style {
                     top: Val::Px(0.0),
@@ -350,7 +349,7 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
             style: Style {
                 width: Val::Px(30.0),
                 height: Val::Percent(lvl * 100.0),
-                top: Val::Percent(100.0 - lvl * 100.0),
+                top: Val::Percent(lvl.mul_add(-100.0, 100.0)),
                 ..default()
             },
             background_color: BackgroundColor(bar.color),
@@ -374,7 +373,7 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
         style: Style {
             width: Val::Px(27.0),
             height: Val::Percent((100.0 * rate / limit).abs()),
-            top: Val::Percent(100.0 - lvl * 100.0 + dp),
+            top: Val::Percent(lvl.mul_add(-100.0, 100.0) + dp),
             left: Val::Px(1.0),
             position_type: PositionType::Absolute,
             ..default()
@@ -391,7 +390,7 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
             style: Style {
                 width: Val::Px(28.0),
                 height: Val::Px(2.0),
-                top: Val::Percent(100.0 - min_warn / limit * 100.0),
+                top: Val::Percent((min_warn / limit).mul_add(-100.0, 100.0)),
                 left: Val::Px(1.0),
                 position_type: PositionType::Absolute,
                 ..default()
@@ -406,7 +405,7 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
             style: Style {
                 width: Val::Px(28.0),
                 height: Val::Px(2.0),
-                top: Val::Percent(100.0 - max_warn / limit * 100.0),
+                top: Val::Percent((max_warn / limit).mul_add(-100.0, 100.0)),
                 left: Val::Px(1.0),
                 position_type: PositionType::Absolute,
                 ..default()

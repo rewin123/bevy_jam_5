@@ -133,7 +133,6 @@ fn move_player_to_target(
 }
 
 /// State logic
-
 #[derive(Default, PartialEq, Clone, Copy, Hash, Eq, Debug)]
 pub enum CharState {
     #[default]
@@ -222,7 +221,6 @@ fn play_alarm(mut commands: Commands, sounds: Res<HandleMap<SfxKey>>) {
                 volume: Volume::new(2.0),
                 ..Default::default()
             },
-            ..default()
         },
         StateScoped(HouseState::Alarm),
     ));
