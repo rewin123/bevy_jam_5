@@ -32,7 +32,6 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_plugins(dev::plugin);
 }
 
-
 macro_rules! impl_limitless_resource {
     ($name:ident) => {
         #[derive(Resource, Default, Clone, Copy)]
@@ -89,7 +88,16 @@ macro_rules! impl_limitless_resource {
 
 macro_rules! simple_game_resource {
     ($name:ident, $initial_amount:literal, $limit:literal, $min:expr, $max:expr, $resource_type:expr, $excess_reason:expr) => {
-        simple_game_resource!($name, $initial_amount, $limit, $min, $max, $resource_type, "", $excess_reason);
+        simple_game_resource!(
+            $name,
+            $initial_amount,
+            $limit,
+            $min,
+            $max,
+            $resource_type,
+            "",
+            $excess_reason
+        );
     };
     ($name:ident, $initial_amount:literal, $limit:literal, $min:expr, $max:expr, $resource_type:expr, $deficiency_reason:expr, $excess_reason:expr) => {
         #[derive(Resource, Clone, Copy)]
@@ -245,32 +253,6 @@ simple_game_resource!(
 
 impl_limitless_resource!(MetalTrash);
 impl_limitless_resource!(Metal);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #[derive(Resource, Default)]
 pub struct AllResourcesGetter {
@@ -435,7 +417,7 @@ impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
     }
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum ResourceThreshold {
     /// Is good if the value is between the threshold values
     HealthyRange,
@@ -499,9 +481,7 @@ fn check_death_conditions<T: GameResource + Clone>(
     mut death: EventWriter<PlayerDied<T>>,
     mut next_state: ResMut<NextState<PlayerState>>,
     screen: Res<State<Screen>>,
-
 ) {
-
     if *time_speed == TimeSpeed::Pause {
         return;
     };
@@ -514,7 +494,9 @@ fn check_death_conditions<T: GameResource + Clone>(
     let player_died: bool = match (resource.resource_threshold(), resource.limit()) {
         (ResourceThreshold::Necessity, _) => amount <= 0.0,
         (ResourceThreshold::Waste, Some(_)) => amount >= resource.limit().unwrap(),
-        (ResourceThreshold::HealthyRange, Some(_)) => amount <= 0.0 || amount >= resource.limit().unwrap(),
+        (ResourceThreshold::HealthyRange, Some(_)) => {
+            amount <= 0.0 || amount >= resource.limit().unwrap()
+        }
         _ => false,
     };
     if player_died {

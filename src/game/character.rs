@@ -1,11 +1,17 @@
 #![allow(unused)]
 
+use std::any::{Any, TypeId};
+
 use bevy::{prelude::*, utils::HashSet};
+
+use crate::screen::Screen;
 
 use super::{
     bilboard_state::{BillboardContent, BillboardSpawner},
-    daycycle::GameTime,
-    resources::{GameResource, Oxygen, OxygenRecycling},
+    daycycle::{GameTime, TimeSpeed},
+    resources::{
+        CarbonDioxide, GameResource, Oxygen, OxygenRecycling, Pee, ResourceThreshold, Thirst,
+    },
     selectable::OnMouseClick,
     sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
     spawn::player::Player,
@@ -16,7 +22,9 @@ pub(crate) fn plugin(app: &mut App) {
     app.observe(add_target);
 
     app.add_systems(PreUpdate, clear_states);
-    app.add_systems(Update, check_oxigen);
+    app.add_systems(Update, set_resource_billboard::<Oxygen>);
+    app.add_systems(Update, set_resource_billboard::<Pee>);
+    app.add_systems(Update, set_resource_billboard::<Thirst>);
     app.add_systems(PostUpdate, (print_state,));
 }
 
@@ -240,5 +248,48 @@ fn check_oxigen(
             }
             _ => {}
         };
+    }
+}
+fn set_resource_billboard<T: GameResource + Clone>(
+    mut q_char: Query<&mut CharacterStates>,
+    resource: ResMut<T>,
+    mut time_speed: ResMut<TimeSpeed>,
+    screen: Res<State<Screen>>,
+) {
+    if *screen != Screen::Playing {
+        return;
+    }
+
+    let amount = resource.amount();
+    let (min_o, max_o) = resource.warning_thresholds();
+    let state: CharState = match (resource.resource_threshold(), min_o, max_o) {
+        (ResourceThreshold::HealthyRange, Some(min), _) if min >= amount => {
+            resource_to_state(resource.clone(), true)
+        }
+        (ResourceThreshold::HealthyRange, _, Some(max)) if max <= amount => {
+            resource_to_state(resource.clone(), false)
+        }
+        (ResourceThreshold::Necessity, Some(min), _) if min >= amount => {
+            resource_to_state(resource.clone(), true)
+        }
+        (ResourceThreshold::Waste, _, Some(max)) if max <= amount => {
+            resource_to_state(resource.clone(), false)
+        }
+        _ => CharState::Idle,
+    };
+
+    for mut states in q_char.iter_mut() {
+        states.add(state);
+    }
+}
+
+fn resource_to_state<T: GameResource + Any>(res: T, is_deficiency: bool) -> CharState {
+    let oxygen_id = TypeId::of::<Oxygen>();
+    info!("a {:#?} {:#?}", oxygen_id, res.type_id());
+
+    match (res.type_id(), is_deficiency) {
+        (oxygen_id, false) => CharState::TooManyOxigen,
+        (oxygen_id, true) => CharState::WantOxigen,
+        _ => CharState::Idle,
     }
 }
