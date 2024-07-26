@@ -95,7 +95,7 @@ fn spawn_debt_ui(
 
     parent = parent
         .with_child(
-            TextBundle::from_section(format!("Debt amount: {:.0}", debt.amount), TextStyle {
+            TextBundle::from_section(format!("Debt: {:.0} (+{:.0}/s)", debt.amount, debt.amount * debt.second_rate), TextStyle {
                 font: asset_server.load(FONT_PATH),
                 font_size: 24.0,
                 color: hex2color("#8c4a4a").lighter(0.4)
