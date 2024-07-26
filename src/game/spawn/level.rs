@@ -61,46 +61,63 @@ fn spawn_level(
         .insert(Selectable)
         .insert(Pc);
 
+    // todo: complete function here
     commands
         .spawn(SceneBundle {
-            scene: scene_handler[&SceneKey::WaterTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(5.0, 0.1, 2.0))
-                .with_scale(Vec3::splat(1.0)),
+            scene: scene_handler[&SceneKey::Kitchen].clone_weak(),
+            transform: Transform::from_translation(Vec3::new(4.0, 0.5, 5.0))
+                .with_scale(Vec3::splat(0.5)),
             ..default()
         })
         .insert(Selectable);
+    // todo add component kitchen
+    //.insert(Kitchen);
 
+    // Light Blue Tank
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::OxygenTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(5.0, 0.1, 1.0))
+            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 1.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
         })
         .insert(Selectable);
 
+    // Dark Blue Tank
     commands
         .spawn(SceneBundle {
-            scene: scene_handler[&SceneKey::BadWaterTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(3.0, 0.1, 1.0))
+            scene: scene_handler[&SceneKey::WaterTank].clone_weak(),
+            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 2.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
         })
         .insert(Selectable);
 
-    commands
-        .spawn(SceneBundle {
-            scene: scene_handler[&SceneKey::HydrogenTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(3.0, 0.1, 2.0))
-                .with_scale(Vec3::splat(1.0)),
-            ..default()
-        })
-        .insert(Selectable);
-
+    // Yellow Tank
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::PeeWaterTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(3.0, 0.1, 3.0))
+            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 3.0))
+                .with_scale(Vec3::splat(1.0)),
+            ..default()
+        })
+        .insert(Selectable);
+
+    // Brown Tank
+    commands
+        .spawn(SceneBundle {
+            scene: scene_handler[&SceneKey::BadWaterTank].clone_weak(),
+            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 4.0))
+                .with_scale(Vec3::splat(1.0)),
+            ..default()
+        })
+        .insert(Selectable);
+
+    // Red Tank
+    commands
+        .spawn(SceneBundle {
+            scene: scene_handler[&SceneKey::HydrogenTank].clone_weak(),
+            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 5.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
         })
