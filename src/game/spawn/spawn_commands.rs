@@ -5,7 +5,7 @@ use bevy::{ecs::world::Command, prelude::*};
 use crate::game::{
     assets::{HandleMap, SceneKey},
     character::IgnoreJustMoving,
-    components::earth::Earth,
+    components::{earth::Earth, kitchen::Kitchen},
     selectable::Selectable,
 };
 
@@ -47,7 +47,7 @@ impl Command for SpawnKitchen {
             ..default()
         };
 
-        world.spawn(bundle).insert(Selectable);
+        world.spawn(bundle).insert(Selectable).insert(Kitchen);
     }
 }
 
