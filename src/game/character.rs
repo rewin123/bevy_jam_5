@@ -258,7 +258,7 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
                 BillboardContent::Text(Text::from_section("Want oxigen", warning_text))
             }
             CharState::TooManyOxigen => {
-                BillboardContent::Text(Text::from_section("Too many oxigen", warning_text))
+                BillboardContent::Text(Text::from_section("Too much oxigen", warning_text))
             }
             CharState::WantPee => {
                 BillboardContent::Text(Text::from_section("Want pee", warning_text))

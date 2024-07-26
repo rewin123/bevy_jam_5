@@ -19,8 +19,6 @@ pub(super) fn plugin(app: &mut App) {
         credits::plugin,
         playing::plugin,
     ));
-
-    
 }
 
 /// The game's main screen states.

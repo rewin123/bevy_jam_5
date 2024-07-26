@@ -5,7 +5,7 @@ use bevy_quill::*;
 use crate::game::{daycycle::PlayerState, resources::AllResourcesGetter};
 
 use super::{
-    components::{end_screen::{EndScreen, EndType}},
+    components::end_screen::{EndScreen, EndType},
     constants::{RESOURCE_MENU_PADDING, RESOURCE_MENU_WIDTH},
     context_menu, SelectedItem,
 };
@@ -67,19 +67,19 @@ impl ViewTemplate for RootUi {
                     }),
                 (
                     // Element::<NodeBundle>::new()
-                        // .style(|sb: &mut StyleBuilder| {
-                        //     sb.display(Display::Flex)
-                        //         .flex_direction(FlexDirection::Column)
-                        //         .top(0)
-                        //         .left(0)
-                        //         .right(0)
-                        //         .padding(RESOURCE_MENU_PADDING)
-                        //         .row_gap(15)
-                        //         .height(Val::Percent(100.0))
-                        //         .width(RESOURCE_MENU_WIDTH)
-                        //         .background_color(Srgba::new(1.0, 1.0, 1.0, 0.3));
-                        // })
-                        // .children(For::index(&sliders, |slider, _| slider.clone())),
+                    // .style(|sb: &mut StyleBuilder| {
+                    //     sb.display(Display::Flex)
+                    //         .flex_direction(FlexDirection::Column)
+                    //         .top(0)
+                    //         .left(0)
+                    //         .right(0)
+                    //         .padding(RESOURCE_MENU_PADDING)
+                    //         .row_gap(15)
+                    //         .height(Val::Percent(100.0))
+                    //         .width(RESOURCE_MENU_WIDTH)
+                    //         .background_color(Srgba::new(1.0, 1.0, 1.0, 0.3));
+                    // })
+                    // .children(For::index(&sliders, |slider, _| slider.clone())),
                     // If the position of the menu is `Some` we show the Context Menu
                     // Other wise we show nothing
                     Cond::new(position.is_some(), context_menu::ContextMenu, ()),
