@@ -12,8 +12,8 @@ use crate::game::{
 use super::{
     player::{Player, SpawnPlayer},
     spawn_commands::{
-        SpawnEarth, SpawnHydroponic, SpawnMetalTrashPile, SpawnOxygenGenerator, SpawnToilet,
-        SpawnWaterCleaner, SpawnWaterDispenser,
+        SpawnEarth, SpawnHydroponic, SpawnKitchen, SpawnMetalTrashPile, SpawnOxygenGenerator,
+        SpawnToilet, SpawnWaterCleaner, SpawnWaterDispenser,
     },
 };
 
@@ -65,7 +65,7 @@ fn spawn_level(
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::Kitchen].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(4.0, 0.5, 5.0))
+            transform: Transform::from_translation(Vec3::new(4.0, 0.9, 1.0))
                 .with_scale(Vec3::splat(0.5)),
             ..default()
         })

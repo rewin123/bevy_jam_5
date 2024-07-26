@@ -157,7 +157,10 @@ impl FromWorld for HandleMap<SceneKey> {
         [
             (SceneKey::Pc, asset_server.load("models/pc.glb#Scene0")),
             // todo : tbeaulieu2: change the asset for something that could represent the kitchen.
-            (SceneKey::Kitchen, asset_server.load("models/pc.glb#Scene0")),
+            (
+                SceneKey::Kitchen,
+                asset_server.load("models/kitchen.glb#Scene0"),
+            ),
             (
                 SceneKey::WaterTank,
                 asset_server.load("models/water_tank.glb#Scene0"),
