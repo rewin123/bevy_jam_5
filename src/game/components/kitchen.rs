@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    character::GoToAction, kitchen_work::CookFoodAction, selectable::OnMouseClick,
+    character::GoToAction, kitchen_work::KitchenWorkAction, selectable::OnMouseClick,
     sequence::ActionGroup, spawn::player::Player,
 };
 
@@ -34,7 +34,7 @@ fn on_selected(
             target_pos: kitchen_transform.translation(),
         });
 
-        actions.add(CookFoodAction);
+        actions.add(KitchenWorkAction);
 
         info!("Cooking Food!");
     }

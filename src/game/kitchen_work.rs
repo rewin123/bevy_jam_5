@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use super::sequence::CharacterAction;
+use super::{
+    character::CharacterStates, components::kitchen::Kitchen, daycycle::GameTime, resources::Food,
+    sequence::CharacterAction,
+};
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(KitchenWorkConfig {
@@ -25,9 +28,9 @@ pub struct KitchenWork {
     pub work_time: f32,
 }
 
-pub struct CookFoodAction;
+pub struct KitchenWorkAction;
 
-impl CharacterAction for CookFoodAction {
+impl CharacterAction for KitchenWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
         commands.entity(target).insert(KitchenWork::default());
     }
@@ -37,6 +40,13 @@ impl CharacterAction for CookFoodAction {
     }
 }
 
-pub fn update_work_in_kitchen() {
+pub fn update_work_in_kitchen(
+    mut commands: Commands,
+    time: Res<GameTime>,
+    mut kitchen_work_config: ResMut<KitchenWorkConfig>,
+    mut q_kitchen_work: Query<(Entity, &mut KitchenWork, &mut CharacterStates)>,
+    mut food: ResMut<Food>,
+    q_kitchen: Query<&GlobalTransform, With<Kitchen>>,
+) {
     // todo : implement the update on the work done in the kitchen
 }
