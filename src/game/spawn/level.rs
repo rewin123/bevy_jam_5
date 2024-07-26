@@ -1,7 +1,5 @@
 //! Spawn the main level by triggering other observers.
 
-use std::f32::consts::PI;
-
 use bevy::prelude::*;
 
 use crate::game::{
@@ -63,16 +61,6 @@ fn spawn_level(
         .insert(Selectable)
         .insert(Pc);
 
-    commands
-        .spawn(SceneBundle {
-            scene: scene_handler[&SceneKey::Kitchen].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(4.5, 0.5, 1.1))
-                .with_scale(Vec3::splat(0.5))
-                .with_rotation(Quat::from_rotation_y(-PI / 2.0)),
-            ..default()
-        })
-        .insert(Selectable);
-
     // Light Blue Tank
     commands
         .spawn(SceneBundle {
@@ -125,6 +113,10 @@ fn spawn_level(
 
     commands.add(SpawnOxygenGenerator {
         pos: Vec3::new(3.0, 0.1, 7.0),
+    });
+
+    commands.add(SpawnKitchen {
+        pos: Vec3::new(4.5, 0.5, 1.1),
     });
 
     commands.add(SpawnHydroponic {

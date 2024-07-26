@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy::{ecs::world::Command, prelude::*};
 
 use crate::game::{
@@ -39,7 +41,9 @@ impl Command for SpawnKitchen {
 
         let bundle = SceneBundle {
             scene,
-            transform: Transform::from_translation(self.pos).with_scale(Vec3::splat(0.5)),
+            transform: Transform::from_translation(Vec3::new(4.5, 0.5, 1.1))
+                .with_scale(Vec3::splat(0.5))
+                .with_rotation(Quat::from_rotation_y(-PI / 2.0)),
             ..default()
         };
 
