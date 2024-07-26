@@ -1,6 +1,9 @@
 use bevy::{ecs::world::unsafe_world_cell::UnsafeWorldCell, prelude::*};
 use bevy_egui::*;
-use node_tree::{tree::{IntoNodeTree, NodeTree}, InsertNodumEntity};
+use node_tree::{
+    tree::{IntoNodeTree, NodeTree},
+    InsertNodumEntity,
+};
 
 use crate::game::resources::*;
 
@@ -15,7 +18,6 @@ const CO2_COLOR: &str = "#8c4a4a";
 const THIRST_COLOR: &str = "#4a8ccc";
 
 pub(crate) fn plugin(app: &mut App) {
-
     app.add_systems(Startup, |mut cmds: Commands| {
         cmds.spawn(ResourcePanel);
     });
@@ -27,29 +29,24 @@ pub(crate) fn plugin(app: &mut App) {
 pub struct ResourcePanel;
 
 struct ResourcePanelStyle {
-    text: TextStyle
+    text: TextStyle,
 }
 
-
-fn draw_resource_panel(
-    world: &mut World 
-) {
-    info!("draw resource panel");
+fn draw_resource_panel(world: &mut World) {
+    // info!("draw resource panel");
     unsafe {
         let mut cell = world.as_unsafe_world_cell();
-        
-        let asset_server = cell
-            .world()
-            .resource::<AssetServer>();
+
+        let asset_server = cell.world().resource::<AssetServer>();
 
         let style = ResourcePanelStyle {
-            text: TextStyle { 
+            text: TextStyle {
                 font: asset_server.load("fonts/karma/Karma Suture.otf"),
                 font_size: 20.0,
                 ..Default::default()
-            }
+            },
         };
-        
+
         let mut tree = NodeTree::default()
             .with_bundle(NodeBundle {
                 style: Style {
@@ -73,7 +70,6 @@ fn draw_resource_panel(
             .with_child(water_cycle(&mut cell, &style))
             .with_child(other_resources(&mut cell, &style));
 
-
         let root = cell
             .world_mut()
             .query_filtered::<Entity, With<ResourcePanel>>()
@@ -81,10 +77,9 @@ fn draw_resource_panel(
             .next()
             .unwrap();
 
-
         cell.world_mut().commands().add(InsertNodumEntity {
             entity: root,
-            nodum: tree
+            nodum: tree,
         });
     }
 }
@@ -108,23 +103,27 @@ unsafe fn oxygen_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -
             ..default()
         },
         ..default()
-    }.into_node_tree()
-    .with_child( // Top text
+    }
+    .into_node_tree()
+    .with_child(
+        // Top text
         NodeBundle {
             style: Style {
                 display: Display::Flex,
                 flex_direction: FlexDirection::Column,
                 width: Val::Percent(100.0),
                 align_items: AlignItems::Center,
-            
+
                 ..default()
             },
             ..default()
-        }.into_node_tree()
+        }
+        .into_node_tree()
         .with_child(TextBundle::from_section("Oxygen Cycle", style.text.clone()))
-        .with_child(TextBundle::from_section("--Breath-->", style.text.clone()))
+        .with_child(TextBundle::from_section("--Breath-->", style.text.clone())),
     )
-    .with_child( //bars
+    .with_child(
+        //bars
         NodeBundle {
             style: Style {
                 display: Display::Flex,
@@ -134,19 +133,27 @@ unsafe fn oxygen_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -
                 ..default()
             },
             ..default()
-        }.into_node_tree()
-        .with_child(bar::<Oxygen>(cell, ResourceBar {
-            name: "Oxygen",
-            color: hex2color(OXYGEN_COLOR),
-            text_style: style.text.clone()
-        }))
-        .with_child(bar::<CarbonDioxide>(cell, ResourceBar {
-            name: "CO2",
-            color: hex2color(CO2_COLOR),
-            text_style: style.text.clone()
-        }))
+        }
+        .into_node_tree()
+        .with_child(bar::<Oxygen>(
+            cell,
+            ResourceBar {
+                name: "Oxygen",
+                color: hex2color(OXYGEN_COLOR),
+                text_style: style.text.clone(),
+            },
+        ))
+        .with_child(bar::<CarbonDioxide>(
+            cell,
+            ResourceBar {
+                name: "CO2",
+                color: hex2color(CO2_COLOR),
+                text_style: style.text.clone(),
+            },
+        )),
     )
-    .with_child( //bottom text
+    .with_child(
+        //bottom text
         NodeBundle {
             style: Style {
                 display: Display::Flex,
@@ -156,11 +163,11 @@ unsafe fn oxygen_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -
                 ..default()
             },
             ..default()
-        }.into_node_tree()
-        .with_child(TextBundle::from_section("<--Recycle--", style.text.clone()))
+        }
+        .into_node_tree()
+        .with_child(TextBundle::from_section("<--Recycle--", style.text.clone())),
     )
 }
-
 
 unsafe fn water_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> NodeTree {
     NodeBundle {
@@ -173,21 +180,22 @@ unsafe fn water_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) ->
             ..default()
         },
         ..default()
-    }.into_node_tree()
+    }
+    .into_node_tree()
     .with_child(
-        TextBundle::from_section("Water Cycle", style.text.clone())
-        .with_style(Style {
+        TextBundle::from_section("Water Cycle", style.text.clone()).with_style(Style {
             align_self: AlignSelf::Center,
             ..default()
-    }))
-    .with_child(
-        TextBundle::from_section("--Hydroponic-->", style.text.clone())
-            .with_style(Style {
-                align_self: AlignSelf::Center,
-                ..default()
-            })
+        }),
     )
-    .with_child(NodeBundle {
+    .with_child(
+        TextBundle::from_section("--Hydroponic-->", style.text.clone()).with_style(Style {
+            align_self: AlignSelf::Center,
+            ..default()
+        }),
+    )
+    .with_child(
+        NodeBundle {
             style: Style {
                 width: Val::Percent(100.0),
                 height: Val::Px(20.0),
@@ -197,11 +205,13 @@ unsafe fn water_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) ->
                 ..default()
             },
             ..default()
-        }.into_node_tree()
+        }
+        .into_node_tree()
         .with_child(TextBundle::from_section("-Drink->", style.text.clone()))
-        .with_child(TextBundle::from_section("-Toilet->", style.text.clone()))
+        .with_child(TextBundle::from_section("-Toilet->", style.text.clone())),
     )
-    .with_child(NodeBundle {
+    .with_child(
+        NodeBundle {
             style: Style {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
@@ -211,32 +221,40 @@ unsafe fn water_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) ->
                 ..default()
             },
             ..default()
-        }.into_node_tree()
-        .with_child(bar::<Water>(cell, ResourceBar {
-            name: "Water",
-            color: hex2color(WATER_COLOR),
-            text_style: style.text.clone()
-        }))
-        .with_child(bar::<Pee>(cell, ResourceBar {
-            name: "Pee",
-            color: hex2color(PEE_COLOR),
-            text_style: style.text.clone()
-        }))
-        .with_child(bar::<BadWater>(cell, ResourceBar {
-            name: "Bad Water",
-            color: hex2color(BAD_WATER_COLOR),
-            text_style: style.text.clone()
-        }))
+        }
+        .into_node_tree()
+        .with_child(bar::<Water>(
+            cell,
+            ResourceBar {
+                name: "Water",
+                color: hex2color(WATER_COLOR),
+                text_style: style.text.clone(),
+            },
+        ))
+        .with_child(bar::<Pee>(
+            cell,
+            ResourceBar {
+                name: "Pee",
+                color: hex2color(PEE_COLOR),
+                text_style: style.text.clone(),
+            },
+        ))
+        .with_child(bar::<BadWater>(
+            cell,
+            ResourceBar {
+                name: "Bad Water",
+                color: hex2color(BAD_WATER_COLOR),
+                text_style: style.text.clone(),
+            },
+        )),
     )
     .with_child(
-    TextBundle::from_section("<-- Recycle --", style.text.clone())
-        .with_style(Style {
+        TextBundle::from_section("<-- Recycle --", style.text.clone()).with_style(Style {
             align_self: AlignSelf::Center,
             ..default()
-        })
+        }),
     )
 }
-
 
 unsafe fn other_resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> NodeTree {
     NodeBundle {
@@ -249,16 +267,17 @@ unsafe fn other_resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle
             ..default()
         },
         ..default()
-    }.into_node_tree()
+    }
+    .into_node_tree()
     .with_child(
-        TextBundle::from_section("Other Resources", style.text.clone())
-            .with_style(Style {
-                align_self: AlignSelf::Center,
-                margin: UiRect::bottom(Val::Px(10.0)),
-                ..default()
-            })
+        TextBundle::from_section("Other Resources", style.text.clone()).with_style(Style {
+            align_self: AlignSelf::Center,
+            margin: UiRect::bottom(Val::Px(10.0)),
+            ..default()
+        }),
     )
-    .with_child(NodeBundle {
+    .with_child(
+        NodeBundle {
             style: Style {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
@@ -268,25 +287,34 @@ unsafe fn other_resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle
                 ..default()
             },
             ..default()
-        }.into_node_tree()
-        .with_child(bar::<Metal>(cell, ResourceBar {
-            name: "Metal",
-            color: hex2color(METAL_COLOR),
-            text_style: style.text.clone()
-        }))
-        .with_child(bar::<MetalTrash>(cell, ResourceBar {
-            name: "Metal Trash",
-            color: hex2color(METAL_WASTE_COLOR),
-            text_style: style.text.clone()
-        }))
-        .with_child(bar::<Thirst>(cell, ResourceBar {
-            name: "Thirst",
-            color: hex2color(THIRST_COLOR),
-            text_style: style.text.clone()
-        }))
+        }
+        .into_node_tree()
+        .with_child(bar::<Metal>(
+            cell,
+            ResourceBar {
+                name: "Metal",
+                color: hex2color(METAL_COLOR),
+                text_style: style.text.clone(),
+            },
+        ))
+        .with_child(bar::<MetalTrash>(
+            cell,
+            ResourceBar {
+                name: "Metal Trash",
+                color: hex2color(METAL_WASTE_COLOR),
+                text_style: style.text.clone(),
+            },
+        ))
+        .with_child(bar::<Thirst>(
+            cell,
+            ResourceBar {
+                name: "Thirst",
+                color: hex2color(THIRST_COLOR),
+                text_style: style.text.clone(),
+            },
+        )),
     )
 }
-
 
 /// Resource bar <-----------------------------------------------------------------------
 struct ResourceBar {
@@ -295,8 +323,7 @@ struct ResourceBar {
     text_style: TextStyle,
 }
 
-unsafe fn bar<T : GameResource>(cell: &UnsafeWorldCell, bar : ResourceBar) -> NodeTree {
-
+unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> NodeTree {
     let val = cell.world().resource::<T>();
     let info = cell.world().resource::<GameResInfo<T>>();
 
@@ -330,73 +357,64 @@ unsafe fn bar<T : GameResource>(cell: &UnsafeWorldCell, bar : ResourceBar) -> No
             ..default()
         });
 
-    
-
     //show rate
-    let rate_color = if rate > 0.0 { 
+    let rate_color = if rate > 0.0 {
         bar.color.lighter(0.5)
     } else {
         bar.color.darker(0.5)
     };
 
-    let dp = if rate > 0.0 { 
+    let dp = if rate > 0.0 {
         -rate / limit * 100.0
     } else {
         rate / limit * 100.0
     };
 
-    bar_tree = bar_tree.with_child(
-        NodeBundle {
-            style: Style {
-                width: Val::Px(27.0),
-                height: Val::Percent((100.0 * rate / limit).abs()),
-                top: Val::Percent(100.0 - lvl * 100.0 + dp),
-                left: Val::Px(1.0),
-                position_type: PositionType::Absolute,
-                ..default()
-            },
-            background_color: BackgroundColor(rate_color),
+    bar_tree = bar_tree.with_child(NodeBundle {
+        style: Style {
+            width: Val::Px(27.0),
+            height: Val::Percent((100.0 * rate / limit).abs()),
+            top: Val::Percent(100.0 - lvl * 100.0 + dp),
+            left: Val::Px(1.0),
+            position_type: PositionType::Absolute,
             ..default()
-        }
-    );
+        },
+        background_color: BackgroundColor(rate_color),
+        ..default()
+    });
 
     // show limits
     let (min_warn, max_warn) = val.warning_thresholds();
 
     if let Some(min_warn) = min_warn {
-        bar_tree = bar_tree.with_child(
-            NodeBundle {
-                style: Style {
-                    width: Val::Px(28.0),
-                    height: Val::Px(2.0),
-                    top: Val::Percent(100.0 - min_warn / limit * 100.0),
-                    left: Val::Px(1.0),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                background_color: BackgroundColor(Color::srgb(0.5, 0.5, 0.0)),
+        bar_tree = bar_tree.with_child(NodeBundle {
+            style: Style {
+                width: Val::Px(28.0),
+                height: Val::Px(2.0),
+                top: Val::Percent(100.0 - min_warn / limit * 100.0),
+                left: Val::Px(1.0),
+                position_type: PositionType::Absolute,
                 ..default()
-            }
-        );
+            },
+            background_color: BackgroundColor(Color::srgb(0.5, 0.5, 0.0)),
+            ..default()
+        });
     }
 
     if let Some(max_warn) = max_warn {
-        bar_tree = bar_tree.with_child(
-            NodeBundle {
-                style: Style {
-                    width: Val::Px(28.0),
-                    height: Val::Px(2.0),
-                    top: Val::Percent(100.0 - max_warn / limit * 100.0),
-                    left: Val::Px(1.0),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                background_color: BackgroundColor(Color::srgb(0.5, 0.5, 0.0)),
+        bar_tree = bar_tree.with_child(NodeBundle {
+            style: Style {
+                width: Val::Px(28.0),
+                height: Val::Px(2.0),
+                top: Val::Percent(100.0 - max_warn / limit * 100.0),
+                left: Val::Px(1.0),
+                position_type: PositionType::Absolute,
                 ..default()
-            }
-        );
+            },
+            background_color: BackgroundColor(Color::srgb(0.5, 0.5, 0.0)),
+            ..default()
+        });
     }
-
 
     NodeBundle {
         style: Style {
@@ -406,16 +424,19 @@ unsafe fn bar<T : GameResource>(cell: &UnsafeWorldCell, bar : ResourceBar) -> No
             ..default()
         },
         ..default()
-    }.into_node_tree() 
-    .with_child( //bar
-        bar_tree
-    ).with_child( // name
-        TextBundle::from_section(bar.name, bar.text_style)
-            .with_style(Style {
-                height: Val::Px(10.0),
-                align_self: AlignSelf::Center,
-                margin: UiRect::all(Val::Px(2.0)),
-                ..default()
-            })
+    }
+    .into_node_tree()
+    .with_child(
+        //bar
+        bar_tree,
+    )
+    .with_child(
+        // name
+        TextBundle::from_section(bar.name, bar.text_style).with_style(Style {
+            height: Val::Px(10.0),
+            align_self: AlignSelf::Center,
+            margin: UiRect::all(Val::Px(2.0)),
+            ..default()
+        }),
     )
 }

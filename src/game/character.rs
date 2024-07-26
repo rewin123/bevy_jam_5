@@ -1,11 +1,22 @@
 #![allow(unused)]
 
-use bevy::{prelude::*, utils::HashSet};
+use std::any::{Any, TypeId};
+
+use bevy::{
+    audio::{PlaybackMode, Volume},
+    prelude::*,
+    utils::HashSet,
+};
+
+use crate::screen::Screen;
 
 use super::{
+    assets::{HandleMap, SfxKey},
     bilboard_state::{BillboardContent, BillboardSpawner},
-    daycycle::GameTime,
-    resources::{GameResource, Oxygen, OxygenRecycling},
+    daycycle::{GameTime, TimeSpeed},
+    resources::{
+        CarbonDioxide, GameResource, Oxygen, OxygenRecycling, Pee, ResourceThreshold, Thirst,
+    },
     selectable::OnMouseClick,
     sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
     spawn::player::Player,
@@ -14,13 +25,24 @@ use super::{
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, move_player_to_target);
     app.observe(add_target);
-
+    app.init_state::<HouseState>();
     app.add_systems(PreUpdate, clear_states);
-    app.add_systems(Update, check_oxigen);
-    app.add_systems(PostUpdate, (print_state,));
+    app.add_systems(Update, set_resource_warnings::<Oxygen>);
+    app.add_systems(Update, set_resource_warnings::<Pee>);
+    app.add_systems(Update, set_resource_warnings::<Thirst>);
+    app.add_systems(PostUpdate, (print_state, set_house_state).chain());
+    app.enable_state_scoped_entities::<HouseState>();
+    app.add_systems(OnEnter(HouseState::Alarm), play_alarm);
 }
 
 pub const PLAYER_SPEED: f32 = 5.0;
+
+#[derive(States, Default, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum HouseState {
+    #[default]
+    Normal,
+    Alarm,
+}
 
 #[derive(Component)]
 pub struct IgnoreJustMoving;
@@ -175,6 +197,37 @@ fn clear_states(mut q: Query<&mut CharacterStates>) {
     }
 }
 
+fn set_house_state(
+    mut q_char: Query<(&CharacterStates)>,
+    mut next_state: ResMut<NextState<HouseState>>,
+) {
+    let has_warning = q_char
+        .iter()
+        .map(|char| char.get_importantest_state())
+        .any(|state| state == CharState::WantOxigen);
+
+    if (has_warning) {
+        next_state.set(HouseState::Alarm);
+    } else {
+        next_state.set(HouseState::Normal);
+    }
+}
+
+fn play_alarm(mut commands: Commands, sounds: Res<HandleMap<SfxKey>>) {
+    commands.spawn((
+        AudioBundle {
+            source: sounds[&SfxKey::Alarm].clone_weak(),
+            settings: PlaybackSettings {
+                mode: PlaybackMode::Loop,
+                volume: Volume::new(2.0),
+                ..Default::default()
+            },
+            ..default()
+        },
+        StateScoped(HouseState::Alarm),
+    ));
+}
+
 fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>) {
     for (mut state, mut spawner) in q_char.iter_mut() {
         let state = state.get_importantest_state();
@@ -240,5 +293,47 @@ fn check_oxigen(
             }
             _ => {}
         };
+    }
+}
+fn set_resource_warnings<T: GameResource + Clone>(
+    mut q_char: Query<&mut CharacterStates>,
+    resource: ResMut<T>,
+    mut time_speed: ResMut<TimeSpeed>,
+    screen: Res<State<Screen>>,
+) {
+    if *screen != Screen::Playing {
+        return;
+    }
+
+    let amount = resource.amount();
+    let (min_o, max_o) = resource.warning_thresholds();
+    let state: CharState = match (resource.resource_threshold(), min_o, max_o) {
+        (ResourceThreshold::HealthyRange, Some(min), _) if min >= amount => {
+            resource_to_state(resource.clone(), true)
+        }
+        (ResourceThreshold::HealthyRange, _, Some(max)) if max <= amount => {
+            resource_to_state(resource.clone(), false)
+        }
+        (ResourceThreshold::Necessity, Some(min), _) if min >= amount => {
+            resource_to_state(resource.clone(), true)
+        }
+        (ResourceThreshold::Waste, _, Some(max)) if max <= amount => {
+            resource_to_state(resource.clone(), false)
+        }
+        _ => CharState::Idle,
+    };
+
+    for mut states in q_char.iter_mut() {
+        states.add(state);
+    }
+}
+
+fn resource_to_state<T: GameResource + Any>(res: T, is_deficiency: bool) -> CharState {
+    let oxygen_id = TypeId::of::<Oxygen>();
+
+    match (res.type_id(), is_deficiency) {
+        (oxygen_id, false) => CharState::TooManyOxigen,
+        (oxygen_id, true) => CharState::WantOxigen,
+        _ => CharState::Idle,
     }
 }
