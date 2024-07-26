@@ -58,7 +58,7 @@ pub fn update_work_in_kitchen(
 ) {
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
         states.add(CharState::Working);
-
+        warn!("Tbeaulieu2 : this is not cooking correctly");
         kitchen_work.work_time += time.delta_seconds();
         if kitchen_work.work_time > kitchen_work_config.work_time {
             // todo : Add poop so that you need to go to the toilet again. Recycle so that you can produce food
