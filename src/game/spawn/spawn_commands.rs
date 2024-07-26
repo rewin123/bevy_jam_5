@@ -1,9 +1,11 @@
+use std::f32::consts::PI;
+
 use bevy::{ecs::world::Command, prelude::*};
 
 use crate::game::{
     assets::{HandleMap, SceneKey},
     character::IgnoreJustMoving,
-    components::earth::Earth,
+    components::{earth::Earth, kitchen::Kitchen},
     selectable::Selectable,
 };
 
@@ -26,6 +28,26 @@ impl Command for SpawnOxygenGenerator {
         };
 
         world.spawn(bundle).insert(Selectable).insert(OxygenRecyler);
+    }
+}
+
+pub struct SpawnKitchen {
+    pub pos: Vec3,
+}
+
+impl Command for SpawnKitchen {
+    fn apply(self, world: &mut World) {
+        let scene = world.resource::<HandleMap<SceneKey>>()[&SceneKey::Kitchen].clone_weak();
+
+        let bundle = SceneBundle {
+            scene,
+            transform: Transform::from_translation(self.pos)
+                .with_scale(Vec3::splat(0.5))
+                .with_rotation(Quat::from_rotation_y(-PI / 2.0)),
+            ..default()
+        };
+
+        world.spawn(bundle).insert(Selectable).insert(Kitchen);
     }
 }
 

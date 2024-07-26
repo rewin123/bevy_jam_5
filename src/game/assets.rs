@@ -135,6 +135,7 @@ impl FromWorld for HandleMap<SoundtrackKey> {
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Reflect)]
 pub enum SceneKey {
     Pc,
+    Kitchen,
     WaterTank,
     OxygenTank,
     BadWaterTank,
@@ -159,6 +160,10 @@ impl FromWorld for HandleMap<SceneKey> {
         let asset_server = world.resource::<AssetServer>();
         [
             (SceneKey::Pc, asset_server.load("models/pc.glb#Scene0")),
+            (
+                SceneKey::Kitchen,
+                asset_server.load("models/kitchen.glb#Scene0"),
+            ),
             (
                 SceneKey::WaterTank,
                 asset_server.load("models/water_tank.glb#Scene0"),

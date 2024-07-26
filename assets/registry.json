@@ -14964,6 +14964,7 @@
       "isResource": false,
       "oneOf": [
         "Pc",
+        "Kitchen",
         "WaterTank",
         "OxygenTank",
         "BadWaterTank",

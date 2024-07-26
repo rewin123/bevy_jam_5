@@ -3,6 +3,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 pub mod earth;
 pub mod fire;
 pub mod flowup_text;
+pub mod kitchen;
 pub mod metal_trash_pile;
 pub mod oxygen_recycler;
 pub mod pc;
@@ -15,6 +16,7 @@ pub(crate) fn plugin(app: &mut bevy::prelude::App) {
         earth::plugin,
         fire::plugin,
         pc::plugin,
+        kitchen::plugin,
         flowup_text::plugin,
         oxygen_recycler::plugin,
         metal_trash_pile::plugin,

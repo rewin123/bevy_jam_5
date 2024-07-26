@@ -14,8 +14,9 @@ mod daycycle;
 mod debt;
 pub mod device_state;
 mod highlight;
+mod kitchen_work;
 mod map;
-mod metal_trash;
+pub mod metal_trash;
 mod movement;
 mod pc_work;
 pub mod render;
@@ -50,15 +51,17 @@ pub(super) fn plugin(app: &mut App) {
         map::plugin,
         selectable::plugin,
         highlight::plugin,
+        metal_trash::plugin,
         components::plugin,
         resources::plugin,
-        sprite_material::SpriteMaterialPlugin,
         pc_work::plugin,
-        metal_trash::plugin,
+        kitchen_work::plugin,
         sequence::plugin,
         resource_flow::plugin,
         bilboard_state::plugin,
     ));
+
+    app.add_plugins(sprite_material::SpriteMaterialPlugin);
 
     app.add_plugins((render::plugin,));
 }
