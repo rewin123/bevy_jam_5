@@ -2,11 +2,16 @@
 
 use std::any::{Any, TypeId};
 
-use bevy::{prelude::*, utils::HashSet};
+use bevy::{
+    audio::{PlaybackMode, Volume},
+    prelude::*,
+    utils::HashSet,
+};
 
 use crate::screen::Screen;
 
 use super::{
+    assets::{HandleMap, SfxKey},
     bilboard_state::{BillboardContent, BillboardSpawner},
     daycycle::{GameTime, TimeSpeed},
     resources::{
@@ -20,15 +25,24 @@ use super::{
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, move_player_to_target);
     app.observe(add_target);
-
+    app.init_state::<HouseState>();
     app.add_systems(PreUpdate, clear_states);
-    app.add_systems(Update, set_resource_billboard::<Oxygen>);
-    app.add_systems(Update, set_resource_billboard::<Pee>);
-    app.add_systems(Update, set_resource_billboard::<Thirst>);
-    app.add_systems(PostUpdate, (print_state,));
+    app.add_systems(Update, set_resource_warnings::<Oxygen>);
+    app.add_systems(Update, set_resource_warnings::<Pee>);
+    app.add_systems(Update, set_resource_warnings::<Thirst>);
+    app.add_systems(PostUpdate, (print_state, set_house_state).chain());
+    app.enable_state_scoped_entities::<HouseState>();
+    app.add_systems(OnEnter(HouseState::Alarm), play_alarm);
 }
 
 pub const PLAYER_SPEED: f32 = 5.0;
+
+#[derive(States, Default, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum HouseState {
+    #[default]
+    Normal,
+    Alarm,
+}
 
 #[derive(Component)]
 pub struct IgnoreJustMoving;
@@ -183,6 +197,37 @@ fn clear_states(mut q: Query<&mut CharacterStates>) {
     }
 }
 
+fn set_house_state(
+    mut q_char: Query<(&CharacterStates)>,
+    mut next_state: ResMut<NextState<HouseState>>,
+) {
+    let has_warning = q_char
+        .iter()
+        .map(|char| char.get_importantest_state())
+        .any(|state| state == CharState::WantOxigen);
+
+    if (has_warning) {
+        next_state.set(HouseState::Alarm);
+    } else {
+        next_state.set(HouseState::Normal);
+    }
+}
+
+fn play_alarm(mut commands: Commands, sounds: Res<HandleMap<SfxKey>>) {
+    commands.spawn((
+        AudioBundle {
+            source: sounds[&SfxKey::Alarm].clone_weak(),
+            settings: PlaybackSettings {
+                mode: PlaybackMode::Loop,
+                volume: Volume::new(2.0),
+                ..Default::default()
+            },
+            ..default()
+        },
+        StateScoped(HouseState::Alarm),
+    ));
+}
+
 fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>) {
     for (mut state, mut spawner) in q_char.iter_mut() {
         let state = state.get_importantest_state();
@@ -250,7 +295,7 @@ fn check_oxigen(
         };
     }
 }
-fn set_resource_billboard<T: GameResource + Clone>(
+fn set_resource_warnings<T: GameResource + Clone>(
     mut q_char: Query<&mut CharacterStates>,
     resource: ResMut<T>,
     mut time_speed: ResMut<TimeSpeed>,
@@ -285,7 +330,6 @@ fn set_resource_billboard<T: GameResource + Clone>(
 
 fn resource_to_state<T: GameResource + Any>(res: T, is_deficiency: bool) -> CharState {
     let oxygen_id = TypeId::of::<Oxygen>();
-    info!("a {:#?} {:#?}", oxygen_id, res.type_id());
 
     match (res.type_id(), is_deficiency) {
         (oxygen_id, false) => CharState::TooManyOxigen,
