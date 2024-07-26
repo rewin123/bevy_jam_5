@@ -63,7 +63,6 @@ fn spawn_level(
         .insert(Selectable)
         .insert(Pc);
 
-    // todo: complete function here
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::Kitchen].clone_weak(),
@@ -73,8 +72,6 @@ fn spawn_level(
             ..default()
         })
         .insert(Selectable);
-    // todo add component kitchen
-    //.insert(Kitchen);
 
     // Light Blue Tank
     commands
