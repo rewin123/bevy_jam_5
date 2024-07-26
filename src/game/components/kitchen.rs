@@ -1,8 +1,11 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    character::GoToAction, kitchen_work::KitchenWorkAction, selectable::OnMouseClick,
-    sequence::ActionGroup, spawn::player::Player,
+    character::GoToAction,
+    kitchen_work::KitchenWorkAction,
+    selectable::OnMouseClick,
+    sequence::{ActionGroup, NewActionSequence, NewMode},
+    spawn::player::Player,
 };
 
 #[derive(Component)]
@@ -35,6 +38,14 @@ fn on_selected(
         });
 
         actions.add(KitchenWorkAction);
+
+        commands.trigger_targets(
+            NewActionSequence {
+                actions,
+                mode: NewMode::SoftReplace,
+            },
+            q_players.iter().collect::<Vec<_>>(),
+        );
 
         info!("Cooking Food!");
     }

@@ -1,9 +1,7 @@
 use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
-use crate::game::{
-    components::flowup_text::FlowUpText, sequence::NextAction, spawn::spawn_commands::SpawnKitchen,
-};
+use crate::game::{components::flowup_text::FlowUpText, sequence::NextAction};
 
 use super::{
     character::{CharState, CharacterStates},
@@ -56,6 +54,7 @@ pub fn update_work_in_kitchen(
     mut food: ResMut<Food>,
     q_kitchen: Query<&GlobalTransform, With<Kitchen>>,
 ) {
+    warn!("{:?}", q_kitchen_work);
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
         states.add(CharState::Working);
         warn!("Tbeaulieu2 : this is not cooking correctly");
