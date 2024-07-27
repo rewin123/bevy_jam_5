@@ -29,7 +29,7 @@ pub struct PlotPoint {
 }
 
 impl PlotPoint {
-    pub fn new(x: f32, y: f32) -> Self {
+    pub const fn new(x: f32, y: f32) -> Self {
         Self { x, y }
     }
 }
@@ -39,8 +39,8 @@ struct DebtMarker;
 
 fn spawn_debt_ui(
     mut commands: Commands,
-    mut plot: ResMut<Plot>,
-    mut debt: Res<Debt>,
+    plot: ResMut<Plot>,
+    debt: Res<Debt>,
     time: Res<GameTime>,
     q_ui: Query<Entity, With<DebtMarker>>,
     asset_server: Res<AssetServer>,
@@ -137,7 +137,7 @@ fn draw_plot_inner(plot: &Plot, width: f32, hieght: f32) -> NodeTree {
     let min_x = plot.points.iter().map(|p| p.x).reduce(f32::min).unwrap();
     let max_x = plot.points.iter().map(|p| p.x).reduce(f32::max).unwrap();
     let min_y = plot.points.iter().map(|p| p.y).reduce(f32::min).unwrap();
-    let mut max_y = plot.points.iter().map(|p| p.y).reduce(f32::max).unwrap() + 0.000001;
+    let max_y = plot.points.iter().map(|p| p.y).reduce(f32::max).unwrap() + 0.000001;
 
     // mid x line
     display = display.with_child(

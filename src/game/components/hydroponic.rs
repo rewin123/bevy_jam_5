@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::inspector_options::Target;
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
@@ -98,7 +97,7 @@ fn update_hydroponic(
             continue;
         }
 
-        if (hydroponic.time_to_food > 0.0) {
+        if hydroponic.time_to_food > 0.0 {
             hydroponic.time_to_food -= dt;
             hydroponic.water -= hydroponic.water_consumption_rate * dt;
             bad_water.send(Generate::new(hydroponic.water_consumption_rate * 0.5));
@@ -176,7 +175,7 @@ pub struct HydroponicWork {
 }
 
 impl HydroponicWork {
-    pub fn new(target: Entity) -> Self {
+    pub const fn new(target: Entity) -> Self {
         Self {
             target,
             work_time: 0.5,
@@ -193,7 +192,7 @@ fn hydroponic_work(
     mut food: ResMut<Food>,
 ) {
     for (player_entity, mut work, mut states) in q_players.iter_mut() {
-        let Ok((mut state, mut hydrponic, hydroponic_transform)) =
+        let Ok((state, mut hydrponic, hydroponic_transform)) =
             q_hydroponics.get_mut(work.target)
         else {
             commands.entity(player_entity).remove::<HydroponicWork>();
@@ -227,7 +226,7 @@ fn hydroponic_work(
                                 hydroponic_transform.translation() + Vec3::Y,
                             )
                             .with_scale(Vec3::splat(size)),
-                            text: Text::from_section(format!("Water refilled"), text_style),
+                            text: Text::from_section("Water refilled".to_string(), text_style),
                             ..default()
                         })
                         .insert(FlowUpText { lifetime: 1.0 });
@@ -257,7 +256,7 @@ fn hydroponic_work(
                                 hydroponic_transform.translation() + Vec3::Y,
                             )
                             .with_scale(Vec3::splat(size)),
-                            text: Text::from_section(format!("Water refilled"), text_style),
+                            text: Text::from_section("Water refilled".to_string(), text_style),
                             ..default()
                         })
                         .insert(FlowUpText { lifetime: 1.0 });
@@ -271,7 +270,7 @@ fn hydroponic_work(
                                 hydroponic_transform.translation() + Vec3::Y,
                             )
                             .with_scale(Vec3::splat(size)),
-                            text: Text::from_section(format!("Growing start"), text_style),
+                            text: Text::from_section("Growing start".to_string(), text_style),
                             ..default()
                         })
                         .insert(FlowUpText { lifetime: 1.0 });

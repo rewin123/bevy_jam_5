@@ -2,7 +2,6 @@ use bevy::color::Color;
 
 pub mod action_button;
 pub mod debt;
-pub mod end_screen;
 pub mod resource_panel;
 pub mod resource_slider;
 

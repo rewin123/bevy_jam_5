@@ -196,6 +196,16 @@ fn clear_states(mut q: Query<&mut CharacterStates>) {
     }
 }
 
+/// States that should trigger the alarm
+const ALARM_CHAR_STATES: [CharState; 6] = [
+    CharState::WantOxigen,
+    CharState::TooManyOxigen,
+    CharState::WantDrink,
+    CharState::WantPee,
+    CharState::WantEat,
+    CharState::WantEat,
+];
+
 fn set_house_state(
     mut q_char: Query<(&CharacterStates)>,
     mut next_state: ResMut<NextState<HouseState>>,
@@ -203,7 +213,7 @@ fn set_house_state(
     let has_warning = q_char
         .iter()
         .map(|char| char.get_importantest_state())
-        .any(|state| state == CharState::WantOxigen);
+        .any(|state| ALARM_CHAR_STATES.contains(&state));
 
     if (has_warning) {
         next_state.set(HouseState::Alarm);
@@ -218,7 +228,7 @@ fn play_alarm(mut commands: Commands, sounds: Res<HandleMap<SfxKey>>) {
             source: sounds[&SfxKey::Alarm].clone_weak(),
             settings: PlaybackSettings {
                 mode: PlaybackMode::Loop,
-                volume: Volume::new(2.0),
+                volume: Volume::new(3.0),
                 ..Default::default()
             },
         },
@@ -269,30 +279,6 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
     }
 }
 
-fn check_oxigen(
-    mut q_char: Query<&mut CharacterStates>,
-    oxygen: Res<Oxygen>,
-    oxygen_regeneration: Res<OxygenRecycling>,
-) {
-    for mut states in q_char.iter_mut() {
-        let (min_o, max_o) = oxygen.warning_thresholds();
-        let amount = oxygen.amount();
-
-        match (
-            oxygen.warning_thresholds(),
-            oxygen.amount(),
-            oxygen_regeneration.working,
-        ) {
-            ((Some(min), _), amount, _) if min > amount => {
-                states.add(CharState::WantOxigen);
-            }
-            ((_, Some(max)), amount, true) if max < amount => {
-                states.add(CharState::TooManyOxigen);
-            }
-            _ => {}
-        };
-    }
-}
 fn set_resource_warnings<T: GameResource + Clone>(
     mut q_char: Query<&mut CharacterStates>,
     resource: ResMut<T>,
@@ -326,12 +312,20 @@ fn set_resource_warnings<T: GameResource + Clone>(
     }
 }
 
+/**
+ * Map from a [`GameResource`] to it's [`CharState`]
+ * Used in [`set_resources_warnings`] to automatically set billboards
+ */
 fn resource_to_state<T: GameResource + Any>(res: T, is_deficiency: bool) -> CharState {
     let oxygen_id = TypeId::of::<Oxygen>();
+    let pee_id = TypeId::of::<Pee>();
+    let thirst_id = TypeId::of::<Thirst>();
 
     match (res.type_id(), is_deficiency) {
         (oxygen_id, false) => CharState::TooManyOxigen,
         (oxygen_id, true) => CharState::WantOxigen,
+        (pee_id, false) => CharState::WantPee,
+        (thirst_id, false) => CharState::WantDrink,
         _ => CharState::Idle,
     }
 }

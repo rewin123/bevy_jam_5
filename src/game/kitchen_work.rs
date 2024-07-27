@@ -45,19 +45,25 @@ impl CharacterAction for KitchenWorkAction {
 pub fn update_work_in_kitchen(
     mut commands: Commands,
     time: Res<GameTime>,
-    kitchen_work_config: Res<KitchenWorkConfig>,
+    mut kitchen_work_config: ResMut<KitchenWorkConfig>,
     mut q_kitchen_work: Query<(Entity, &mut KitchenWork, &mut CharacterStates)>,
     q_kitchen: Query<&GlobalTransform, With<Kitchen>>,
 
     mut hungry: ResMut<Hungry>,
     mut food: ResMut<Food>,
     mut pee: ResMut<Pee>
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
         states.add(CharState::Working);
         kitchen_work.work_time += time.delta_seconds();
         if kitchen_work.work_time > kitchen_work_config.work_time {
-         
+            let current_time = time.elapsed_seconds();
+
+            kitchen_work_config.last_updated = current_time;
+            // todo : Add poop so that you need to go to the toilet again. Recycle so that you can produce food
+            // todo: complete so that you can change ressource
+
             commands.entity(entity).remove::<KitchenWork>();
             commands.trigger_targets(NextAction, entity);
 
@@ -65,41 +71,23 @@ pub fn update_work_in_kitchen(
                 food.decrease(RACION_SIZE);
                 hungry.set_amount(0.0);
                 pee.increase(RACION_SIZE / 2.0);
-
-                if let Ok(pc_transform) = q_kitchen.get_single() {
-                    let text_style = TextStyle {
-                        color: Color::linear_rgb(0.0, 1.0, 0.0),
-                        font_size: 94.0,
-                        ..default()
-                    };
-                    commands
-                        .spawn(BillboardTextBundle {
-                            transform: Transform::from_translation(pc_transform.translation())
-                                .with_scale(Vec3::splat(0.01)),
-                            text: Text::from_section("Eating", text_style),
-                            ..default()
-                        })
-                        .insert(FlowUpText { lifetime: 1.0 });
-                }
-            } else {
-                if let Ok(pc_transform) = q_kitchen.get_single() {
-                    let text_style = TextStyle {
-                        color: Color::linear_rgb(1.0, 0.0, 0.0),
-                        font_size: 94.0,
-                        ..default()
-                    };
-                    commands
-                        .spawn(BillboardTextBundle {
-                            transform: Transform::from_translation(pc_transform.translation())
-                                .with_scale(Vec3::splat(0.01)),
-                            text: Text::from_section("Not Enough Food", text_style),
-                            ..default()
-                        })
-                        .insert(FlowUpText { lifetime: 1.0 });
-                }
             }
 
-            
+            if let Ok(pc_transform) = q_kitchen.get_single() {
+                let text_style = TextStyle {
+                    color: Color::linear_rgb(0.0, 1.0, 0.0),
+                    font_size: 94.0,
+                    ..default()
+                };
+                commands
+                    .spawn(BillboardTextBundle {
+                        transform: Transform::from_translation(pc_transform.translation())
+                            .with_scale(Vec3::splat(0.01)),
+                        text: Text::from_section("Making Food", text_style),
+                        ..default()
+                    })
+                    .insert(FlowUpText { lifetime: 1.0 });
+            }
         }
     }
 }

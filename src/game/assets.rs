@@ -76,6 +76,9 @@ pub enum SfxKey {
     Step4,
     Fire,
     Alarm,
+    Coin,
+    Kitchen,
+    ToiletFlush,
 }
 
 impl AssetKey for SfxKey {
@@ -100,6 +103,18 @@ impl FromWorld for HandleMap<SfxKey> {
             (SfxKey::Step4, asset_server.load("audio/sfx/step4.ogg")),
             (SfxKey::Fire, asset_server.load("audio/sfx/fire.ogg")),
             (SfxKey::Alarm, asset_server.load("audio/sfx/alarm.ogg")),
+            (
+                SfxKey::Coin,
+                asset_server.load("audio/sfx/coins_sounds/coin.6.ogg"),
+            ),
+            (
+                SfxKey::Kitchen,
+                asset_server.load("audio/sfx/dishes_03.ogg"),
+            ),
+            (
+                SfxKey::ToiletFlush,
+                asset_server.load("audio/sfx/toilet_02.ogg"),
+            ),
         ]
         .into()
     }
