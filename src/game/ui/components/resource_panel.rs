@@ -1,7 +1,6 @@
 use bevy::{ecs::world::unsafe_world_cell::UnsafeWorldCell, prelude::*};
 use node_tree::{
-    tree::{IntoNodeTree, NodeTree},
-    InsertNodumEntity,
+    div, styling::Styling, tree::{IntoNodeTree, NodeTree}, InsertNodumEntity
 };
 
 use super::*;
@@ -16,6 +15,7 @@ const METAL_WASTE_COLOR: &str = "#4a8c4a";
 const CO2_COLOR: &str = "#8c4a4a";
 const THIRST_COLOR: &str = "#4a8ccc";
 const FOOD_COLOR: &str = "#cc8c4a";
+const TOILET_COLOR: &str = "#8c8c8c";
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Startup, |mut cmds: Commands| {
@@ -68,7 +68,18 @@ fn draw_resource_panel(world: &mut World) {
             })
             .with_child(oxygen_cycle(&mut cell, &style))
             .with_child(water_cycle(&mut cell, &style))
-            .with_child(other_resources(&mut cell, &style));
+            .with_child(
+                div()
+                    .with_height(Val::Percent(30.0))
+                    .with_width(Val::Percent(100.0))
+                    .with_display(Display::Flex)
+                    .with_flex_direction(FlexDirection::Row)
+                    .with_child(needs(
+                        &mut cell,
+                        &style,
+                    ))
+                    .with_child(resources(&mut cell, &style)),
+            );
 
         let root = cell
             .world_mut()
@@ -248,13 +259,12 @@ unsafe fn water_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) ->
     )
 }
 
-unsafe fn other_resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> NodeTree {
+unsafe fn needs(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> NodeTree {
     NodeBundle {
         style: Style {
             display: Display::Flex,
             flex_direction: FlexDirection::Column,
-            height: Val::Percent(30.0),
-            width: Val::Percent(100.0),
+            height: Val::Percent(100.0),
             margin: UiRect::all(Val::Px(10.0)),
             ..default()
         },
@@ -262,7 +272,7 @@ unsafe fn other_resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle
     }
     .into_node_tree()
     .with_child(
-        TextBundle::from_section("Other Resources", style.text.clone()).with_style(Style {
+        TextBundle::from_section("Needs", style.text.clone()).with_style(Style {
             align_self: AlignSelf::Center,
             margin: UiRect::bottom(Val::Px(10.0)),
             ..default()
@@ -281,10 +291,10 @@ unsafe fn other_resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle
             ..default()
         }
         .into_node_tree()
-        .with_child(bar::<Food>(
+        .with_child(bar::<Hungry>(
             cell,
             ResourceBar {
-                name: "Food",
+                name: "Hunger",
                 color: hex2color(FOOD_COLOR),
                 text_style: style.text.clone(),
             },
@@ -296,8 +306,31 @@ unsafe fn other_resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle
                 color: hex2color(THIRST_COLOR),
                 text_style: style.text.clone(),
             },
+        ))
+        .with_child(bar::<Toilet>(
+            cell,
+            ResourceBar {
+                name: "Toilet",
+                color: hex2color(TOILET_COLOR),
+                text_style: style.text.clone(),
+            },
         )),
     )
+}
+
+unsafe fn resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> NodeTree {
+    div()
+        .with_display(Display::Flex)
+        .with_flex_direction(FlexDirection::Column)
+        .with_height(Val::Percent(100.0))
+        .with_child(TextBundle::from_section("Food", style.text.clone()).with_style(Style {
+            align_self: AlignSelf::Center,
+            ..default()
+        }))
+        .with_child(TextBundle::from_section(format!("{}", cell.world().resource::<Food>().amount()), style.text.clone()).with_style(Style {
+            align_self: AlignSelf::Center,
+            ..default()
+        }))
 }
 
 /// Resource bar <-----------------------------------------------------------------------

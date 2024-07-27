@@ -2,14 +2,7 @@ use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
-    bilboard_state::BillboardContent,
-    character::{CharState, CharacterStates, GoToAction},
-    daycycle::GameTime,
-    device_state::{DeviceState, DeviceStatePlugin},
-    resources::*,
-    selectable::OnMouseClick,
-    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
-    spawn::player::Player,
+    bilboard_state::BillboardContent, character::{CharState, CharacterStates, GoToAction}, daycycle::GameTime, device_state::{DeviceState, DeviceStatePlugin}, difficult::{HYDROPONIC_FOOD_PER_HARVEST, HYDROPONIC_OXYGEN_RATE, HYDROPONIC_TIME_TO_FOOD, HYDROPONIC_WATER_MAX, HYDROPONIC_WATER_RATE}, resources::*, selectable::OnMouseClick, sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction}, spawn::player::Player
 };
 
 use super::flowup_text::*;
@@ -35,7 +28,7 @@ impl DeviceState for HydroponicState {
         match *self {
             HydroponicState::Growing => BillboardContent::None,
             HydroponicState::Growed => BillboardContent::Text(Text::from_section(
-                "Growed",
+                "Grown",
                 TextStyle {
                     color: Color::srgb(0.0, 1.0, 0.0),
                     ..default()
@@ -59,9 +52,6 @@ impl DeviceState for HydroponicState {
     }
 }
 
-const GROW_DURATION: f32 = 10.0;
-const FOOD_PER_CYCLE: f32 = 20.0;
-
 #[derive(Component)]
 pub struct Hydroponic {
     pub water: f32,
@@ -76,10 +66,10 @@ impl Default for Hydroponic {
     fn default() -> Self {
         Self {
             water: 10.0,
-            max_water: 10.0,
-            time_to_food: GROW_DURATION,
-            food_per_cycle: FOOD_PER_CYCLE,
-            water_consumption_rate: 0.5,
+            max_water: HYDROPONIC_WATER_MAX,
+            time_to_food: HYDROPONIC_TIME_TO_FOOD,
+            food_per_cycle: HYDROPONIC_FOOD_PER_HARVEST * 1.5,
+            water_consumption_rate: HYDROPONIC_WATER_RATE,
             dead: false,
         }
     }
@@ -90,6 +80,7 @@ fn update_hydroponic(
     mut query: Query<(&mut HydroponicState, &mut Hydroponic)>,
     mut bad_water: EventWriter<Generate<BadWater>>,
     mut oxygen: EventWriter<Generate<Oxygen>>,
+    mut co2: EventWriter<Generate<CarbonDioxide>>,
 ) {
     for (mut state, mut hydroponic) in query.iter_mut() {
         let dt = time.delta_seconds();
@@ -102,7 +93,7 @@ fn update_hydroponic(
         if hydroponic.water < 0.0 {
             *state = HydroponicState::Dead;
             hydroponic.dead = true;
-            hydroponic.time_to_food = GROW_DURATION;
+            hydroponic.time_to_food = HYDROPONIC_TIME_TO_FOOD;
             continue;
         }
 
@@ -110,7 +101,9 @@ fn update_hydroponic(
             hydroponic.time_to_food -= dt;
             hydroponic.water -= hydroponic.water_consumption_rate * dt;
             bad_water.send(Generate::new(hydroponic.water_consumption_rate * 0.5));
-            oxygen.send(Generate::new(hydroponic.water_consumption_rate));
+            oxygen.send(Generate::new(HYDROPONIC_OXYGEN_RATE));
+            co2.send(Generate::new(-HYDROPONIC_OXYGEN_RATE));
+
         }
 
         if hydroponic.water < 3.0 {
@@ -240,7 +233,7 @@ fn hydroponic_work(
                 }
                 HydroponicState::Growed => {
                     food.increase(hydrponic.food_per_cycle);
-                    hydrponic.time_to_food = GROW_DURATION;
+                    hydrponic.time_to_food = HYDROPONIC_TIME_TO_FOOD;
 
                     commands
                         .spawn(BillboardTextBundle {

@@ -4,8 +4,7 @@ use bevy_quill::Cx;
 use crate::screen::Screen;
 
 use super::{
-    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed},
-    ui::components::resource_slider::ResourceSlider,
+    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed}, difficult::OXYGEN_REGENRATE_SPEED, ui::components::resource_slider::ResourceSlider
 };
 
 pub(crate) fn plugin(app: &mut App) {
@@ -14,6 +13,8 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<FoodGeneration>();
     app.init_resource::<Electricity>();
     app.init_resource::<Temperature>();
+    app.init_resource::<Hungry>();
+    app.init_resource::<Toilet>();
 
     app.add_plugins((
         GameResourcePlugin::<Oxygen>::default(),
@@ -26,6 +27,8 @@ pub(crate) fn plugin(app: &mut App) {
         GameResourcePlugin::<Metal>::default(),
         GameResourcePlugin::<MetalTrash>::default(),
         GameResourcePlugin::<Thirst>::default(),
+        GameResourcePlugin::<Hungry>::default(),
+        GameResourcePlugin::<Toilet>::default(),
     ));
 
     #[cfg(feature = "dev")]
@@ -168,22 +171,22 @@ macro_rules! simple_game_resource {
 // Now let's redefine our resources with optional deficiency reasons
 simple_game_resource!(
     Water,
-    50.0,
+    90.0,
     100.0,
     Some(10.0),
-    None,
-    ResourceThreshold::Necessity,
+    Some(90.0),
+    ResourceThreshold::Waste,
     "You couldn't pay your water bill and dried up like your dreams of early mortgage repayment.",
     "You drowned in debt and water simultaneously. At least your mortgage is now waterproof!"
 );
 
 simple_game_resource!(
     Food,
-    50.0,
+    5.0,
     100.0,
-    Some(10.0),
     None,
-    ResourceThreshold::Necessity,
+    None,
+    ResourceThreshold::Limitless,
     "You ate your last instant noodle. Now you're bankrupt and in heaven, where mortgage is just a myth.",
     "You burst from overeating. Too bad your mortgage didn't burst with you."
 );
@@ -203,8 +206,8 @@ simple_game_resource!(
     Hydrogen,
     50.0,
     100.0,
-    Some(10.0),
-    Some(90.0),
+    None,
+    None,
     ResourceThreshold::HealthyRange,
     "Your hydrogen engine stalled. Now you're drifting in space, like your mortgage in a sea of debt.",
     "Boom! You turned into a small sun. The mortgage bank is already billing your relatives for light pollution."
@@ -212,6 +215,16 @@ simple_game_resource!(
 
 simple_game_resource!(
     Pee,
+    0.0,
+    100.0,
+    None,
+    Some(90.0),
+    ResourceThreshold::Limitless,
+    ""
+);
+
+simple_game_resource!(
+    Toilet,
     0.0,
     100.0,
     None,
@@ -225,8 +238,8 @@ simple_game_resource!(
     10.0,
     100.0,
     None,
-    Some(90.0),
-    ResourceThreshold::Necessity,
+    Some(80.0),
+    ResourceThreshold::Waste,
     "You died of thirst. Your last thought was about the mortgage, not water.",
     "You died of thirst, refusing to drink anything but elite champagne. Your mortgage remained unpaid, just like your thirst."
 );
@@ -246,13 +259,27 @@ simple_game_resource!(
     0.0,
     100.0,
     None,
-    Some(90.0),
+    None,
     ResourceThreshold::Waste,
     "You suffocated in carbon dioxide. Your last breath was used to inflate a balloon saying 'For Sale: Almost Paid Off Mortgage'."
 );
 
+simple_game_resource!(
+    Hungry,
+    50.0,
+    100.0,
+    None,
+    Some(80.0),
+    ResourceThreshold::Waste,
+    "You died of starvation. Your last thought was about the mortgage, not food."
+);
+
+
+
+
 impl_limitless_resource!(MetalTrash);
 impl_limitless_resource!(Metal);
+
 
 #[derive(Resource, Default)]
 pub struct AllResourcesGetter {
@@ -270,9 +297,9 @@ pub struct OxygenRecycling {
 impl Default for OxygenRecycling {
     fn default() -> Self {
         Self {
-            oxygen_generation_rate: 5.5,
+            oxygen_generation_rate: OXYGEN_REGENRATE_SPEED,
             // While on, consumes a bit more than is generated
-            co2_consumption_rate: 5.5,
+            co2_consumption_rate: OXYGEN_REGENRATE_SPEED,
             working: true,
         }
     }
