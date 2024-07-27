@@ -112,10 +112,7 @@ impl IntoNodeTree for &str {
 
 impl IntoNodeTree for String {
     fn into_node_tree(self) -> NodeTree {
-        NodeTree::default().with_bundle(TextBundle::from_section(
-            self,
-            TextStyle::default(),
-        ))
+        NodeTree::default().with_bundle(TextBundle::from_section(self, TextStyle::default()))
     }
 }
 

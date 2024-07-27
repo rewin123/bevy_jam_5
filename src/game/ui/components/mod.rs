@@ -1,10 +1,10 @@
 use bevy::color::Color;
 
 pub mod action_button;
+pub mod debt;
 pub mod end_screen;
 pub mod resource_panel;
 pub mod resource_slider;
-pub mod debt;
 
 pub const BORDER_COLOR: &str = "#8080b3";
 pub const BACKGROUND_COLOR: &str = "#2a2a3a";

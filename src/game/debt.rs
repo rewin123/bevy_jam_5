@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use super::{daycycle::{GameTime, PlayerState}, ui::components::debt::{Plot, PlotPoint}};
+use super::{
+    daycycle::{GameTime, PlayerState},
+    ui::components::debt::{Plot, PlotPoint},
+};
 
 #[allow(dead_code)]
 pub struct DebtPlugin;
@@ -11,7 +14,9 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(PreUpdate, win_on_zero_debt);
     app.add_systems(PreUpdate, update_plot);
 
-    app.insert_resource(DebtPlot { timer: Timer::from_seconds(1.0, TimerMode::Repeating) });
+    app.insert_resource(DebtPlot {
+        timer: Timer::from_seconds(2.0, TimerMode::Repeating),
+    });
 
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
@@ -29,7 +34,7 @@ pub struct Debt {
 
 #[derive(Resource)]
 pub struct DebtPlot {
-    timer: Timer
+    timer: Timer,
 }
 
 impl Debt {
@@ -71,10 +76,11 @@ fn update_plot(
     time: Res<GameTime>,
     mut debt_plot: ResMut<DebtPlot>,
     mut debt: ResMut<Debt>,
-    mut plot: ResMut<Plot>
+    mut plot: ResMut<Plot>,
 ) {
     if debt_plot.timer.tick(time.delta()).finished() {
-        plot.points.push(PlotPoint::new(time.elapsed_seconds(), debt.amount));
+        plot.points
+            .push(PlotPoint::new(time.elapsed_seconds(), debt.amount));
 
         if plot.points.len() > 30 {
             plot.points.remove(0);

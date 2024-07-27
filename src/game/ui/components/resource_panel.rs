@@ -4,8 +4,8 @@ use node_tree::{
     InsertNodumEntity,
 };
 
-use crate::game::resources::*;
 use super::*;
+use crate::game::resources::*;
 
 const OXYGEN_COLOR: &str = "#4a4a8c";
 const WATER_COLOR: &str = "#4a8c4a";
@@ -15,6 +15,7 @@ const METAL_COLOR: &str = "#8c4a8c";
 const METAL_WASTE_COLOR: &str = "#4a8c4a";
 const CO2_COLOR: &str = "#8c4a4a";
 const THIRST_COLOR: &str = "#4a8ccc";
+const FOOD_COLOR: &str = "#cc8c4a";
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Startup, |mut cmds: Commands| {
@@ -82,8 +83,6 @@ fn draw_resource_panel(world: &mut World) {
         });
     }
 }
-
-
 
 unsafe fn oxygen_cycle(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> NodeTree {
     NodeBundle {
@@ -282,19 +281,11 @@ unsafe fn other_resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle
             ..default()
         }
         .into_node_tree()
-        .with_child(bar::<Metal>(
+        .with_child(bar::<Food>(
             cell,
             ResourceBar {
-                name: "Metal",
-                color: hex2color(METAL_COLOR),
-                text_style: style.text.clone(),
-            },
-        ))
-        .with_child(bar::<MetalTrash>(
-            cell,
-            ResourceBar {
-                name: "Metal Trash",
-                color: hex2color(METAL_WASTE_COLOR),
+                name: "Food",
+                color: hex2color(FOOD_COLOR),
                 text_style: style.text.clone(),
             },
         ))

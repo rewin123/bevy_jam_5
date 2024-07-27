@@ -15,7 +15,7 @@ pub type GameTime = Time<GameTimeContext>;
 pub struct GameTimePlugin;
 
 pub(crate) fn plugin(app: &mut App) {
-    app.insert_resource(DayDuration(30.0));
+    app.insert_resource(DayDuration(60.0));
     app.insert_resource(DayPassed(0));
     app.insert_resource(TimeSpeed::Pause);
     app.insert_resource(DayState::Day);

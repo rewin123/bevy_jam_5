@@ -1,8 +1,6 @@
-
-
 use bevy::prelude::*;
-use node_tree::tree::{IntoNodeTree, NodeTree};
 use node_tree::styling::Styling;
+use node_tree::tree::{IntoNodeTree, NodeTree};
 use node_tree::InsertNodumEntity;
 
 use crate::game::daycycle::GameTime;
@@ -18,7 +16,6 @@ pub(crate) fn plugin(app: &mut App) {
         cmds.spawn(DebtMarker);
     });
 }
-
 
 #[derive(Resource, PartialEq, Clone, Debug)]
 pub struct Plot {
@@ -40,7 +37,6 @@ impl PlotPoint {
 #[derive(Component)]
 struct DebtMarker;
 
-
 fn spawn_debt_ui(
     mut commands: Commands,
     mut plot: ResMut<Plot>,
@@ -49,15 +45,15 @@ fn spawn_debt_ui(
     q_ui: Query<Entity, With<DebtMarker>>,
     asset_server: Res<AssetServer>,
 ) {
-
     let dept_width = 250.0;
     let debt_height = 150.0;
-    
+
     let plot_shift_left = 10.0;
     let plot_shift = 20.0;
 
     let mut plot = plot.clone();
-    plot.points.push(PlotPoint::new(time.elapsed_seconds(), debt.amount));
+    plot.points
+        .push(PlotPoint::new(time.elapsed_seconds(), debt.amount));
 
     let mut parent = div()
         .with_top(Val::Px(0.0))
@@ -69,7 +65,6 @@ fn spawn_debt_ui(
         .with_border_color(hex2color(BORDER_COLOR))
         .with_position_type(PositionType::Absolute);
 
-
     let plot_width = dept_width - plot_shift_left * 2.0;
     let plot_height = debt_height - plot_shift * 3.0;
     let inner_plot = draw_plot_inner(&plot, plot_width, plot_height);
@@ -80,35 +75,38 @@ fn spawn_debt_ui(
         ..default()
     };
 
-    parent = parent
-        .with_child(
-            TextBundle::from_section("Your \"happy\" mortage debt", style.clone())
-                .into_node_tree()
-                .with_top(Val::Px(0.0))
-                .with_width(Val::Px(plot_width))
-                .with_height(Val::Px(19.0))
-                .with_position_type(PositionType::Absolute)
-                .with_align_self(AlignSelf::Center),
-        );
+    parent = parent.with_child(
+        TextBundle::from_section("Your \"happy\" mortgage debt", style.clone())
+            .into_node_tree()
+            .with_top(Val::Px(0.0))
+            .with_width(Val::Px(plot_width))
+            .with_height(Val::Px(19.0))
+            .with_position_type(PositionType::Absolute)
+            .with_align_self(AlignSelf::Center),
+    );
 
     //Draw debt
 
-    parent = parent
-        .with_child(
-            TextBundle::from_section(format!("Debt: {:.0} (+{:.0}/s)", debt.amount, debt.amount * debt.second_rate), TextStyle {
+    parent = parent.with_child(
+        TextBundle::from_section(
+            format!(
+                "Debt: {:.0} (+{:.0}/s)",
+                debt.amount,
+                debt.amount * debt.second_rate
+            ),
+            TextStyle {
                 font: asset_server.load(FONT_PATH),
                 font_size: 24.0,
-                color: hex2color("#8c4a4a").lighter(0.4)
-            })
-                .into_node_tree()
-                .with_bottom(Val::Px(0.0))
-                .with_left(Val::Px(plot_shift_left))
-                .with_width(Val::Px(plot_width))
-                .with_height(Val::Px(30.0))
-                .with_position_type(PositionType::Absolute)
-        );
-    
-
+                color: hex2color("#8c4a4a").lighter(0.4),
+            },
+        )
+        .into_node_tree()
+        .with_bottom(Val::Px(0.0))
+        .with_left(Val::Px(plot_shift_left))
+        .with_width(Val::Px(plot_width))
+        .with_height(Val::Px(30.0))
+        .with_position_type(PositionType::Absolute),
+    );
 
     parent = parent.with_child(
         inner_plot
@@ -118,7 +116,10 @@ fn spawn_debt_ui(
     );
 
     let target = q_ui.single();
-    commands.add(InsertNodumEntity { entity: target, nodum: parent });
+    commands.add(InsertNodumEntity {
+        entity: target,
+        nodum: parent,
+    });
 }
 
 fn draw_plot_inner(plot: &Plot, width: f32, hieght: f32) -> NodeTree {
@@ -155,19 +156,16 @@ fn draw_plot_inner(plot: &Plot, width: f32, hieght: f32) -> NodeTree {
             .with_height(Val::Px(hieght))
             .with_left(Val::Px(width / 2.0))
             .with_position_type(PositionType::Absolute)
-            .with_background_color(hex2color(BORDER_COLOR))
+            .with_background_color(hex2color(BORDER_COLOR)),
     );
-
 
     let bar_width = width / plot.points.len().max(30) as f32;
 
     for i in 0..plot.points.len() {
-
         let x = plot.points[i].x;
         let y = plot.points[i].y;
 
         let bar_end = y / max_y;
-        
 
         let bar_x = bar_width * i as f32;
 
@@ -179,16 +177,13 @@ fn draw_plot_inner(plot: &Plot, width: f32, hieght: f32) -> NodeTree {
                 .with_width(Val::Px(bar_width.max(0.0)))
                 .with_height(Val::Px(bar_end.max(0.0) * hieght))
                 .with_left(Val::Px(bar_x))
-                .with_top(Val::Px(
-                    (1.0 - bar_end).max(0.0) * hieght
-                ))
+                .with_top(Val::Px((1.0 - bar_end).max(0.0) * hieght))
                 .with_border(UiRect::all(Val::Px(1.0)))
                 .with_border_color(border_color)
                 .with_background_color(color)
                 .with_position_type(PositionType::Absolute),
-            );
+        );
     }
-
 
     display
 }

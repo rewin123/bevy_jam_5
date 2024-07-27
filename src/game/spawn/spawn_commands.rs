@@ -5,7 +5,11 @@ use bevy::{ecs::world::Command, prelude::*};
 use crate::game::{
     assets::{HandleMap, SceneKey},
     character::IgnoreJustMoving,
-    components::{earth::Earth, kitchen::Kitchen},
+    components::{
+        earth::Earth,
+        hydroponic::{Hydroponic, HydroponicState},
+        kitchen::Kitchen,
+    },
     selectable::Selectable,
 };
 
@@ -65,7 +69,12 @@ impl Command for SpawnHydroponic {
             ..default()
         };
 
-        world.spawn(bundle).insert(Selectable);
+        world
+            .spawn(bundle)
+            .insert(Selectable)
+            .insert(IgnoreJustMoving)
+            .insert(Hydroponic::default())
+            .insert(HydroponicState::Growing);
     }
 }
 

@@ -287,7 +287,6 @@ pub trait Styling: Sized {
     }
 }
 
-
 impl NodeTree {
     pub fn with_background_color(mut self, color: Color) -> Self {
         self.insert_bundle(BackgroundColor(color));

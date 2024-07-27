@@ -11,6 +11,8 @@ pub mod toilet;
 pub mod water_cleaner;
 pub mod water_dispenser;
 
+pub mod hydroponic;
+
 pub(crate) fn plugin(app: &mut bevy::prelude::App) {
     app.add_plugins((
         earth::plugin,
@@ -24,6 +26,8 @@ pub(crate) fn plugin(app: &mut bevy::prelude::App) {
         water_dispenser::plugin,
         water_cleaner::plugin,
     ));
+
+    app.add_plugins((hydroponic::plugin,));
 
     app.add_plugins(WorldInspectorPlugin::new());
 }
