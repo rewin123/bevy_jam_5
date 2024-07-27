@@ -11,6 +11,7 @@ pub mod components;
 mod computer_menu;
 pub mod constants;
 mod context_menu;
+mod game_over;
 mod root;
 
 pub(super) fn plugin(app: &mut App) {
@@ -24,6 +25,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_plugins(EguiPlugin);
     app.add_plugins(components::resource_panel::plugin);
     app.add_plugins(components::debt::plugin);
+    app.add_plugins(game_over::plugin);
 }
 
 #[derive(Event, Debug)]

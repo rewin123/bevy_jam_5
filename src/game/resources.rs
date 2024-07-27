@@ -393,7 +393,6 @@ impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
         app.insert_resource(GameResInfo::<T>::new());
         app.init_resource::<T>();
         app.add_event::<Generate<T>>();
-        app.add_event::<PlayerDied<T>>();
         app.add_systems(PostUpdate, collect_generations::<T>);
         app.add_systems(PostUpdate, check_death_conditions::<T>);
 
@@ -478,7 +477,7 @@ impl<T: GameResource> GameResInfo<T> {
 fn check_death_conditions<T: GameResource + Clone>(
     resource: ResMut<T>,
     mut time_speed: ResMut<TimeSpeed>,
-    mut death: EventWriter<PlayerDied<T>>,
+    mut death: EventWriter<PlayerDied>,
     mut next_state: ResMut<NextState<PlayerState>>,
     screen: Res<State<Screen>>,
 ) {
@@ -491,18 +490,25 @@ fn check_death_conditions<T: GameResource + Clone>(
     }
 
     let amount = resource.amount();
-    let player_died: bool = match (resource.resource_threshold(), resource.limit()) {
-        (ResourceThreshold::Necessity, _) => amount <= 0.0,
-        (ResourceThreshold::Waste, Some(_)) => amount >= resource.limit().unwrap(),
-        (ResourceThreshold::HealthyRange, Some(_)) => {
-            amount <= 0.0 || amount >= resource.limit().unwrap()
-        }
-        _ => false,
-    };
+    let (player_died, is_deficiency): (bool, bool) =
+        match (resource.resource_threshold(), resource.limit()) {
+            (ResourceThreshold::Necessity, _) => (amount <= 0.0, true),
+            (ResourceThreshold::Waste, Some(limit)) => (amount >= limit, false),
+            (ResourceThreshold::HealthyRange, Some(limit)) if amount >= limit => (true, false),
+            (ResourceThreshold::HealthyRange, _) if (amount <= 0.0) => (true, true),
+            _ => (false, false),
+        };
+    // info!("is dead {} {}", player_died, is_deficiency);
     if player_died {
         info!("Die by {}. Amount: {}", resource.label(), amount);
-        death.send(PlayerDied(resource.clone()));
+        let death_reason: String = resource
+            .death_reason(is_deficiency)
+            .unwrap_or("Capitalism Won".to_string());
+
+        death.send(PlayerDied(death_reason));
         *time_speed = TimeSpeed::Pause;
+        // This state is unnecesarry now
+        // But we can still use it for music I guess
         next_state.set(PlayerState::Dead);
     }
 }

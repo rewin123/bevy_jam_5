@@ -24,8 +24,8 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_state::<PlayerState>();
     app.add_event::<NightStart>();
     app.add_event::<DayStart>();
+    app.add_event::<PlayerDied>();
 
-    // app.add_systems(PreUpdate, stop_game_on_death);
     app.add_systems(PreUpdate, (time_speed, update_time).chain());
     app.add_systems(PreUpdate, day_events);
     app.add_systems(Update, change_time_speed);
@@ -70,7 +70,7 @@ pub enum DeathCause {
 }
 
 #[derive(Event)]
-pub struct PlayerDied<T: GameResource>(pub T);
+pub struct PlayerDied(pub String);
 
 #[derive(Event)]
 pub struct NightStart;
@@ -151,17 +151,6 @@ fn change_time_speed(
     keyboard_input.clear();
 }
 
-// fn stop_game_on_death(
-//     mut death_events: EventReader<PlayerDied>,
-//     mut time_speed: ResMut<TimeSpeed>,
-//     mut next_state: ResMut<NextState<PlayerState>>,
-// ) {
-//     for _ in death_events.read() {
-//         *time_speed = TimeSpeed::Pause;
-//         next_state.set(PlayerState::Dead);
-//     }
-// }
-//
 #[derive(Default)]
 pub struct GameTimeContext {
     relative_speed: f32,

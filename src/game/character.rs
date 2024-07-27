@@ -279,30 +279,6 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
     }
 }
 
-fn check_oxigen(
-    mut q_char: Query<&mut CharacterStates>,
-    oxygen: Res<Oxygen>,
-    oxygen_regeneration: Res<OxygenRecycling>,
-) {
-    for mut states in q_char.iter_mut() {
-        let (min_o, max_o) = oxygen.warning_thresholds();
-        let amount = oxygen.amount();
-
-        match (
-            oxygen.warning_thresholds(),
-            oxygen.amount(),
-            oxygen_regeneration.working,
-        ) {
-            ((Some(min), _), amount, _) if min > amount => {
-                states.add(CharState::WantOxigen);
-            }
-            ((_, Some(max)), amount, true) if max < amount => {
-                states.add(CharState::TooManyOxigen);
-            }
-            _ => {}
-        };
-    }
-}
 fn set_resource_warnings<T: GameResource + Clone>(
     mut q_char: Query<&mut CharacterStates>,
     resource: ResMut<T>,
@@ -336,6 +312,10 @@ fn set_resource_warnings<T: GameResource + Clone>(
     }
 }
 
+/**
+ * Map from a [`GameResource`] to it's [`CharState`]
+ * Used in [`set_resources_warnings`] to automatically set billboards
+ */
 fn resource_to_state<T: GameResource + Any>(res: T, is_deficiency: bool) -> CharState {
     let oxygen_id = TypeId::of::<Oxygen>();
     let pee_id = TypeId::of::<Pee>();
