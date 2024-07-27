@@ -2,11 +2,15 @@
 
 use bevy::prelude::*;
 
-use crate::game::{
-    assets::{HandleMap, SceneKey},
-    components::pc::Pc,
-    daycycle::TimeSpeed,
-    selectable::Selectable,
+use crate::{
+    game::{
+        assets::{HandleMap, SceneKey},
+        components::pc::Pc,
+        daycycle::TimeSpeed,
+        selectable::Selectable,
+        ui::game_over::ResetGame,
+    },
+    screen::Screen,
 };
 
 use super::{
@@ -20,6 +24,19 @@ use super::{
 pub(super) fn plugin(app: &mut App) {
     app.observe(spawn_level);
     app.observe(setup_camera);
+    app.add_systems(PreUpdate, listen_reset.run_if(in_state(Screen::Playing)));
+}
+
+fn listen_reset(
+    mut commands: Commands,
+    keys: Res<ButtonInput<KeyCode>>,
+    mut reset: EventWriter<ResetGame>,
+) {
+    if keys.just_pressed(KeyCode::KeyR) {
+        reset.send(ResetGame {
+            target: commands.spawn_empty().id(),
+        });
+    }
 }
 
 #[derive(Event, Debug)]
