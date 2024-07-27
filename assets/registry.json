@@ -15003,7 +15003,8 @@
         "Wave",
         "Typing",
         "Cooking",
-        "StartMachine"
+        "StartMachine",
+        "Valve"
       ],
       "short_name": "SfxKey",
       "title": "hieghest_apartment::game::assets::SfxKey",

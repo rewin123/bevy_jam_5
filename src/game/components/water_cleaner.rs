@@ -1,7 +1,11 @@
-use bevy::prelude::*;
+use bevy::{
+    audio::{PlaybackMode, Volume},
+    prelude::*,
+};
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
+    assets::{HandleMap, SfxKey},
     character::{CharState, CharacterStates, GoToAction},
     components::flowup_text::FlowUpText,
     daycycle::GameTime,
@@ -28,6 +32,7 @@ fn on_selected(
     mut commands: Commands,
     q_players: Query<Entity, With<Player>>,
     mut q_pcs: Query<&GlobalTransform, With<WaterCleaner>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     let target = trigger.entity();
 
@@ -42,7 +47,7 @@ fn on_selected(
             target,
             target_pos: pc_transform.translation(),
         });
-        actions.add(WaterCleanerWorkAction);
+        actions.add(WaterCleanerWorkAction(sounds[&SfxKey::Valve].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {
@@ -56,7 +61,7 @@ fn on_selected(
     }
 }
 
-pub struct WaterCleanerWorkAction;
+pub struct WaterCleanerWorkAction(Handle<AudioSource>);
 
 #[derive(Component, Default)]
 pub struct WaterCleanerWork {
@@ -86,7 +91,18 @@ impl Default for WaterCleanerConfig {
 
 impl CharacterAction for WaterCleanerWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
-        commands.entity(target).insert(WaterCleanerWork::default());
+        commands
+            .entity(target)
+            .insert(WaterCleanerWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Remove,
+                    volume: Volume::new(3.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
