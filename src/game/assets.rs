@@ -84,6 +84,11 @@ pub enum SfxKey {
     Typing,
     Cooking,
     StartMachine,
+    Valve,
+    NotEnoughResource,
+    Eating,
+    SprayPlant,
+    Peeing,
 }
 
 impl AssetKey for SfxKey {
@@ -102,18 +107,21 @@ impl FromWorld for HandleMap<SfxKey> {
                 SfxKey::ButtonPress,
                 asset_server.load("audio/sfx/button_press.ogg"),
             ),
+            (SfxKey::Peeing, asset_server.load("audio/sfx/peeing.ogg")),
             (SfxKey::Step1, asset_server.load("audio/sfx/step1.ogg")),
             (SfxKey::Step2, asset_server.load("audio/sfx/step2.ogg")),
             (SfxKey::Step3, asset_server.load("audio/sfx/step3.ogg")),
             (SfxKey::Step4, asset_server.load("audio/sfx/step4.ogg")),
+            (SfxKey::SprayPlant, asset_server.load("audio/sfx/spray.ogg")),
             (
                 SfxKey::StartMachine,
                 asset_server.load("audio/sfx/metal_interaction1.ogg"),
             ),
             (
                 SfxKey::Cooking,
-                asset_server.load("audio/sfx/dishes_03.ogg"),
+                asset_server.load("audio/sfx/cooking_pot.ogg"),
             ),
+            (SfxKey::Valve, asset_server.load("audio/sfx/dishes_03.ogg")),
             (SfxKey::Fire, asset_server.load("audio/sfx/fire.ogg")),
             (SfxKey::Alarm, asset_server.load("audio/sfx/alarm.ogg")),
             (
@@ -125,12 +133,16 @@ impl FromWorld for HandleMap<SfxKey> {
                 asset_server.load("audio/sfx/coins_sounds/coin.6.ogg"),
             ),
             (
-                SfxKey::Kitchen,
+                SfxKey::Eating,
                 asset_server.load("audio/sfx/crunch/crunch.2.ogg"),
             ),
             (
                 SfxKey::ToiletFlush,
-                asset_server.load("audio/sfx/toilet_02.ogg"),
+                asset_server.load("audio/sfx/toilet_sound_02.ogg"),
+            ),
+            (
+                SfxKey::NotEnoughResource,
+                asset_server.load("audio/sfx/invalid_action.ogg"),
             ),
             (SfxKey::Water, asset_server.load("audio/sfx/bottle.ogg")),
             (SfxKey::Wave, asset_server.load("audio/sfx/wave.ogg")),

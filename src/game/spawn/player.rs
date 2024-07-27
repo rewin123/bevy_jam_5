@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::game::{
     assets::{HandleMap, SceneKey},
-    bilboard_state::{BillboardContent, BillboardSpawner},
+    billboard_state::{BillboardContent, BillboardSpawner},
     character::CharacterStates,
     movement::{Movement, MovementController},
     sequence::Sequence,

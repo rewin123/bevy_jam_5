@@ -15003,7 +15003,12 @@
         "Wave",
         "Typing",
         "Cooking",
-        "StartMachine"
+        "StartMachine",
+        "Valve",
+        "NotEnoughResource",
+        "Eating",
+        "SprayPlant",
+        "Peeing"
       ],
       "short_name": "SfxKey",
       "title": "hieghest_apartment::game::assets::SfxKey",

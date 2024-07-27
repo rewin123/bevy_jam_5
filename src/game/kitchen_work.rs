@@ -7,6 +7,7 @@ use bevy_mod_billboard::BillboardTextBundle;
 use crate::game::{components::flowup_text::FlowUpText, sequence::NextAction};
 
 use super::{
+    assets::{HandleMap, SfxKey},
     character::{CharState, CharacterStates},
     components::kitchen::Kitchen,
     daycycle::GameTime,
@@ -51,7 +52,7 @@ impl CharacterAction for KitchenWorkAction {
                 source: self.0.clone_weak(),
                 settings: PlaybackSettings {
                     mode: PlaybackMode::Remove,
-                    volume: Volume::new(1.0),
+                    volume: Volume::new(3.0),
                     ..Default::default()
                 },
                 ..default()
@@ -72,6 +73,7 @@ pub fn update_work_in_kitchen(
     mut hungry: ResMut<Hungry>,
     mut food: ResMut<Food>,
     mut pee: ResMut<Pee>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
         states.add(CharState::Working);
@@ -105,7 +107,11 @@ pub fn update_work_in_kitchen(
                             text: Text::from_section("Eating", text_style),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::Eating].clone_weak(),
+                            ..default()
+                        });
                 }
             } else {
                 if let Ok(pc_transform) = q_kitchen.get_single() {
@@ -121,7 +127,11 @@ pub fn update_work_in_kitchen(
                             text: Text::from_section("Not Enough Food", text_style),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::NotEnoughResource].clone_weak(),
+                            ..default()
+                        });
                 }
             }
         }

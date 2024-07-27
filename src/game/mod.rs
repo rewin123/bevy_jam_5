@@ -7,7 +7,7 @@ mod animation;
 pub mod assets;
 pub mod audio;
 pub mod auto_anim;
-pub mod bilboard_state;
+pub mod billboard_state;
 pub mod character;
 pub mod components;
 mod daycycle;
@@ -59,7 +59,7 @@ pub(super) fn plugin(app: &mut App) {
         kitchen_work::plugin,
         sequence::plugin,
         resource_flow::plugin,
-        bilboard_state::plugin,
+        billboard_state::plugin,
     ));
 
     app.add_plugins(sprite_material::SpriteMaterialPlugin);
