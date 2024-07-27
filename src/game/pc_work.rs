@@ -92,11 +92,17 @@ fn update_pc_work(
                     font_size: 94.0,
                     ..default()
                 };
+
+                let mut show_debt = 0.0;
+                for m in 1..=work_config.multiplier {
+                    show_debt += m as f32 * work_config.amount_after_work;
+                }
+
                 commands
                     .spawn(BillboardTextBundle {
                         transform: Transform::from_translation(pc_transform.translation())
                             .with_scale(Vec3::splat(0.01)),
-                        text: Text::from_section(format!("+{}$", dept_decrease), text_style),
+                        text: Text::from_section(format!("+{}$", show_debt), text_style),
                         ..default()
                     })
                     .insert(FlowUpText { lifetime: 1.0 })
