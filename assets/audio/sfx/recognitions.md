@@ -5,3 +5,4 @@ toilet flusing, metal, gears- https://opengameart.org/content/100-cc0-sfx
 bottle - https://opengameart.org/content/rpg-sound-pack
 Drink, Money, kitchen - https://opengameart.org/content/202-more-sound-effects
 Metal Interaction - https://opengameart.org/content/metal-interactions
+Food - https://opengameart.org/content/7-eating-crunches

@@ -47,7 +47,6 @@ impl CharacterAction for KitchenWorkAction {
             .insert(AudioBundle {
                 source: self.0.clone_weak(),
                 settings: PlaybackSettings {
-                    mode: PlaybackMode::Loop,
                     volume: Volume::new(3.0),
                     ..Default::default()
                 },

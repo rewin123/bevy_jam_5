@@ -39,7 +39,7 @@ fn on_selected(
             target_pos: kitchen_transform.translation(),
         });
 
-        actions.add(KitchenWorkAction(sounds[&SfxKey::Wave].clone_weak()));
+        actions.add(KitchenWorkAction(sounds[&SfxKey::Cooking].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {
