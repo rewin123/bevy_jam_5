@@ -6,7 +6,8 @@ use crate::game::{
     character::{CharState, CharacterStates, GoToAction},
     components::flowup_text::FlowUpText,
     daycycle::GameTime,
-    resources::{BadWater, GameResource, Pee},
+    difficult::RES_LIMIT,
+    resources::{BadWater, GameResource, Generate, Pee},
     selectable::OnMouseClick,
     sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
     spawn::{player::Player, spawn_commands::Toilet},
@@ -20,6 +21,9 @@ pub fn plugin(app: &mut App) {
 }
 
 const TOILET_WORK_GROUP: &str = "toilet_work";
+
+const TOILIET_TIME: f32 = 0.5;
+const TOILET_RATE: f32 = RES_LIMIT / TOILIET_TIME;
 
 fn on_selected(
     trigger: Trigger<OnMouseClick>,
@@ -96,9 +100,11 @@ fn update_pee_work(
     time: Res<GameTime>,
     mut q_toilet_work: Query<(Entity, &mut ToiletWork, &mut CharacterStates)>,
     toilet_work_config: Res<ToiletWorkConfig>,
-    mut pee: ResMut<Pee>,
-    mut toilet: ResMut<crate::game::resources::Toilet>,
-    mut bad_water: ResMut<BadWater>,
+    mut pee: EventWriter<Generate<Pee>>,
+    real_pee: Res<Pee>,
+    mut real_toilet: ResMut<crate::game::resources::Toilet>,
+    mut toilet: EventWriter<Generate<crate::game::resources::Toilet>>,
+    mut bad_water: EventWriter<Generate<BadWater>>,
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
     sounds: Res<HandleMap<SfxKey>>,
 ) {
@@ -106,15 +112,20 @@ fn update_pee_work(
         states.add(CharState::Peeing);
 
         toilet_work.work_time += time.delta_seconds();
-        if toilet_work.work_time > toilet_work_config.work_time {
-            pee.decrease(toilet_work_config.work_decrease);
-            bad_water.increase(toilet_work_config.work_decrease);
-            toilet.set_amount(0.0);
-            info!(
-                "Peeing decreased : pee {}, bad water {}",
-                pee.amount(),
-                bad_water.amount()
-            );
+        pee.send(Generate::new(-TOILET_RATE));
+        toilet.send(Generate::new(-TOILET_RATE));
+        bad_water.send(Generate::new(TOILET_RATE));
+
+        if toilet_work.work_time > toilet_work_config.work_time || real_pee.amount() <= 0.0 {
+            // pee.decrease(toilet_work_config.work_decrease);
+            // bad_water.increase(toilet_work_config.work_decrease);
+            // toilet.set_amount(0.0);
+            // info!(
+            //     "Peeing decreased : pee {}, bad water {}",
+            //     pee.amount(),
+            //     bad_water.amount()
+            // );
+            real_toilet.set_amount(0.0);
             commands.entity(entity).remove::<ToiletWork>();
             commands.trigger_targets(NextAction, entity);
 

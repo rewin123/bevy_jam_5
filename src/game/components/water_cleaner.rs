@@ -5,7 +5,8 @@ use crate::game::{
     character::{CharState, CharacterStates, GoToAction},
     components::flowup_text::FlowUpText,
     daycycle::GameTime,
-    resources::{BadWater, GameResource, Water},
+    difficult::RES_LIMIT,
+    resources::{BadWater, GameResource, Generate, Water},
     selectable::OnMouseClick,
     sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
     spawn::{
@@ -63,23 +64,20 @@ pub struct WaterCleanerWork {
     pub work_time: f32,
 }
 
+const WATER_CLEARING_TIME: f32 = 1.0;
+const WATER_CLEARING_RATE: f32 = RES_LIMIT / WATER_CLEARING_TIME;
+
 /// Separated values for increase/decrease to allow for difficulty changes
 #[derive(Resource)]
 pub struct WaterCleanerConfig {
     /// Times it takes for a [`WaterDispenserWorkAction`] takes
     pub work_time: f32,
-    // Amount the [`BadWater`] goes decreases
-    pub bad_water_down: f32,
-    // Amount the [`Water`] goes increases
-    pub water_up: f32,
 }
 
 impl Default for WaterCleanerConfig {
     fn default() -> Self {
         Self {
-            work_time: 0.25,
-            bad_water_down: 10.0,
-            water_up: 10.0,
+            work_time: WATER_CLEARING_TIME,
         }
     }
 }
@@ -101,61 +99,50 @@ fn updated_water_cleaner(
     water_cleaner_config: Res<WaterCleanerConfig>,
     mut water: ResMut<Water>,
     mut bad_water: ResMut<BadWater>,
+
+    mut water_events: EventWriter<Generate<Water>>,
+    mut bad_water_events: EventWriter<Generate<BadWater>>,
+
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
 ) {
     for (entity, mut toilet_work, mut states) in q_toilet_work.iter_mut() {
         states.add(CharState::Working);
 
         toilet_work.work_time += time.delta_seconds();
-        if toilet_work.work_time > water_cleaner_config.work_time {
-            if bad_water.amount() < water_cleaner_config.bad_water_down {
-                commands.entity(entity).remove::<WaterCleanerWork>();
-                commands.trigger_targets(NextAction, entity);
 
-                if let Ok(pc_transform) = q_toilet.get_single() {
-                    let text_style = TextStyle {
-                        color: Color::linear_rgb(0.0, 1.0, 1.0),
-                        font_size: 94.0,
-                        ..default()
-                    };
-                    commands
-                        .spawn(BillboardTextBundle {
-                            transform: Transform::from_translation(pc_transform.translation())
-                                .with_scale(Vec3::splat(0.01)),
-                            text: Text::from_section("Not Enough Bad Water", text_style),
-                            ..default()
-                        })
-                        .insert(FlowUpText { lifetime: 1.0 });
-                }
-            } else {
-                water.increase(water_cleaner_config.water_up);
-                bad_water.decrease(water_cleaner_config.bad_water_down);
-                info!(
-                    "Clean Water: , water {}, bad_water {}",
-                    water.amount(),
-                    bad_water.amount(),
-                );
-                commands.entity(entity).remove::<WaterCleanerWork>();
-                commands.trigger_targets(NextAction, entity);
+        water_events.send(Generate::new(WATER_CLEARING_RATE));
+        bad_water_events.send(Generate::new(-WATER_CLEARING_RATE));
 
-                if let Ok(pc_transform) = q_toilet.get_single() {
-                    let text_style = TextStyle {
-                        color: Color::linear_rgb(0.0, 1.0, 0.0),
-                        font_size: 94.0,
-                        ..default()
-                    };
-                    commands
-                        .spawn(BillboardTextBundle {
-                            transform: Transform::from_translation(pc_transform.translation())
-                                .with_scale(Vec3::splat(0.01)),
-                            text: Text::from_section(
-                                format!("+{} Water", water_cleaner_config.bad_water_down),
-                                text_style,
+        if toilet_work.work_time > water_cleaner_config.work_time || bad_water.amount() <= 0.0 {
+            info!(
+                "Clean Water: water {}, bad water {}",
+                water.amount(),
+                bad_water.amount(),
+            );
+            commands.entity(entity).remove::<WaterCleanerWork>();
+            commands.trigger_targets(NextAction, entity);
+
+            if let Ok(pc_transform) = q_toilet.get_single() {
+                let text_style = TextStyle {
+                    color: Color::linear_rgb(0.0, 1.0, 0.0),
+                    font_size: 94.0,
+                    ..default()
+                };
+                commands
+                    .spawn(BillboardTextBundle {
+                        transform: Transform::from_translation(pc_transform.translation())
+                            .with_scale(Vec3::splat(0.01)),
+                        text: Text::from_section(
+                            format!(
+                                "Clean Water: water {}, bad water {}",
+                                water.amount(),
+                                bad_water.amount(),
                             ),
-                            ..default()
-                        })
-                        .insert(FlowUpText { lifetime: 1.0 });
-                }
+                            text_style,
+                        ),
+                        ..default()
+                    })
+                    .insert(FlowUpText { lifetime: 1.0 });
             }
         }
     }

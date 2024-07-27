@@ -3,6 +3,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
+    assets::{HandleMap, SfxKey},
     character::{GoToAction, IgnoreJustMoving},
     pc_work::PcWorkAction,
     selectable::OnMouseClick,
@@ -38,6 +39,7 @@ fn on_selected(
     mut commands: Commands,
     q_players: Query<Entity, With<Player>>,
     mut q_pcs: Query<&GlobalTransform, With<Pc>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     let target = trigger.entity();
 
@@ -52,7 +54,7 @@ fn on_selected(
             target,
             target_pos: pc_transform.translation(),
         });
-        actions.add(PcWorkAction);
+        actions.add(PcWorkAction(sounds[&SfxKey::Typing].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {

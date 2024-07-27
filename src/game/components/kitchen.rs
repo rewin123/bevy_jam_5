@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
+    assets::{HandleMap, SfxKey},
     character::GoToAction,
     kitchen_work::KitchenWorkAction,
     selectable::OnMouseClick,
@@ -22,6 +23,7 @@ fn on_selected(
     mut commands: Commands,
     q_players: Query<Entity, With<Player>>,
     mut q_kitchen: Query<&GlobalTransform, With<Kitchen>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     let target = trigger.entity();
 
@@ -37,7 +39,7 @@ fn on_selected(
             target_pos: kitchen_transform.translation(),
         });
 
-        actions.add(KitchenWorkAction);
+        actions.add(KitchenWorkAction(sounds[&SfxKey::Cooking].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {

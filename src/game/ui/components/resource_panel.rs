@@ -352,11 +352,16 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
     let val = cell.world().resource::<T>();
     let info = cell.world().resource::<GameResInfo<T>>();
 
-    let rate = info.generation_rate;
+    let mut rate = info.generation_rate;
 
     let limit = val.limit().unwrap_or(100.0);
     let lvl = val.amount() / limit;
     let lvl = lvl.clamp(0.0, 1.0);
+
+    if rate.abs() > 0.00001 {
+        let rate_k = rate.abs().min(lvl * limit) / rate.abs();
+        rate *= rate_k;
+    }
 
     let mut bar_tree = NodeTree::default()
         .with_bundle(NodeBundle {
@@ -390,11 +395,7 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
         bar.color.darker(0.1)
     };
 
-    let dp = if rate > 0.0 {
-        -rate / limit * 100.0
-    } else {
-        rate / limit * 100.0
-    };
+    let dp = if rate > 0.0 { 0.0 } else { 0.0 };
 
     bar_tree = bar_tree.with_child(NodeBundle {
         style: Style {

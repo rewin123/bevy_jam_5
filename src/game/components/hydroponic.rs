@@ -39,7 +39,7 @@ impl DeviceState for HydroponicState {
         match *self {
             HydroponicState::Growing => BillboardContent::None,
             HydroponicState::Growed => BillboardContent::Text(Text::from_section(
-                "Growed",
+                "Grown",
                 TextStyle {
                     color: Color::srgb(0.0, 1.0, 0.0),
                     ..default()

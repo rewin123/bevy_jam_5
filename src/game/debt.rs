@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use super::{
     daycycle::{GameTime, PlayerState},
+    difficult::money_k,
     ui::components::debt::{Plot, PlotPoint},
 };
 
@@ -61,10 +62,13 @@ impl Default for Debt {
 
         let second_rate = (1.0f64 + day_rate).powf(1.0 / day_duration) - 1.0;
 
+        let real_rate = money_k();
+        println!("Current rate is {}", second_rate);
+
         Self {
             amount: 13000.0,
             day_rate: day_rate as f32,
-            second_rate: second_rate as f32,
+            second_rate: real_rate as f32,
             last_updated: 0,
         }
     }
