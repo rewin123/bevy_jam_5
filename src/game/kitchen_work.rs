@@ -37,11 +37,22 @@ pub struct KitchenWork {
     pub work_time: f32,
 }
 
-pub struct KitchenWorkAction;
+pub struct KitchenWorkAction(pub Handle<AudioSource>);
 
 impl CharacterAction for KitchenWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
-        commands.entity(target).insert(KitchenWork::default());
+        commands
+            .entity(target)
+            .insert(KitchenWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Loop,
+                    volume: Volume::new(3.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
@@ -59,16 +70,6 @@ pub fn update_work_in_kitchen(
 ) {
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
         states.add(CharState::Working);
-
-        commands.entity(entity).insert(AudioBundle {
-            source: sounds[&SfxKey::Wave].clone_weak(),
-            settings: PlaybackSettings {
-                mode: PlaybackMode::Loop,
-                volume: Volume::new(3.0),
-                ..Default::default()
-            },
-            ..default()
-        });
 
         kitchen_work.work_time += time.delta_seconds();
         if kitchen_work.work_time > kitchen_work_config.work_time {
