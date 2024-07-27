@@ -1,7 +1,11 @@
-use bevy::prelude::*;
+use bevy::{
+    audio::{PlaybackMode, Volume},
+    prelude::*,
+};
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
+    assets::{HandleMap, SfxKey},
     character::{CharState, CharacterStates, GoToAction},
     components::flowup_text::FlowUpText,
     daycycle::GameTime,
@@ -19,6 +23,7 @@ pub fn plugin(app: &mut App) {
     app.observe(on_selected);
 
     app.add_systems(Update, updated_water_drinking);
+    app.add_systems(Update, drinking_sfx);
 }
 
 const WATER_DISPENSER_GROUP: &str = "water_dispenser_work";
@@ -108,9 +113,10 @@ fn updated_water_drinking(
     mut pee: ResMut<Pee>,
     mut thirst: ResMut<Thirst>,
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut toilet_work, mut states) in q_toilet_work.iter_mut() {
-        states.add(CharState::Driking);
+        states.add(CharState::Drinking);
 
         toilet_work.work_time += time.delta_seconds();
         if toilet_work.work_time > water_dispenser_config.work_time {
@@ -143,8 +149,34 @@ fn updated_water_drinking(
                         ),
                         ..default()
                     })
-                    .insert(FlowUpText { lifetime: 1.0 });
+                    .insert(FlowUpText { lifetime: 1.0 })
+                    .insert(AudioBundle {
+                        source: sounds[&SfxKey::Water].clone_weak(),
+                        ..default()
+                    });
             }
+        }
+    }
+}
+
+fn drinking_sfx(
+    mut commands: Commands,
+    sounds: Res<HandleMap<SfxKey>>,
+    mut q_character_state: Query<(Entity, &mut CharacterStates)>,
+) {
+    for (entity, state) in q_character_state.iter_mut() {
+        let state = state.get_importantest_state();
+
+        if state == CharState::Drinking {
+            commands.entity(entity).insert(AudioBundle {
+                source: sounds[&SfxKey::Wave].clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Loop,
+                    volume: Volume::new(3.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
         }
     }
 }

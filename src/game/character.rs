@@ -139,7 +139,7 @@ pub enum CharState {
     Idle,
     Working,
     Peeing,
-    Driking,
+    Drinking,
     WantEat,
     WantSleep,
     WantDrink,
@@ -157,7 +157,7 @@ impl CharState {
             CharState::Idle => 0,
             CharState::Working => 1,
             CharState::Peeing => 2,
-            CharState::Driking => 3,
+            CharState::Drinking => 3,
             CharState::WantEat => 4,
             CharState::WantSleep => 5,
             CharState::WantDrink => 6,
@@ -250,7 +250,7 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
             CharState::Idle => BillboardContent::None,
             CharState::Working => BillboardContent::Text(Text::from_section("Working", usual_text)),
             CharState::Peeing => BillboardContent::Text(Text::from_section("Peeing", usual_text)),
-            CharState::Driking => {
+            CharState::Drinking => {
                 BillboardContent::Text(Text::from_section("Drinking", usual_text))
             }
             CharState::WantEat => {

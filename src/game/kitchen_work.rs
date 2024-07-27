@@ -14,7 +14,7 @@ use super::{
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(KitchenWorkConfig {
         work_time: 0.25,
-        amount_after_work: 5.0,
+        amount_after_work: 10.0,
         multiplier: 1,
         last_updated: 0.0,
     });
