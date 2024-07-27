@@ -118,6 +118,7 @@ fn updated_water_cleaner(
     mut water: ResMut<Water>,
     mut bad_water: ResMut<BadWater>,
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut toilet_work, mut states) in q_toilet_work.iter_mut() {
         states.add(CharState::Working);
@@ -170,7 +171,11 @@ fn updated_water_cleaner(
                             ),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::Water].clone_weak(),
+                            ..default()
+                        });
                 }
             }
         }
