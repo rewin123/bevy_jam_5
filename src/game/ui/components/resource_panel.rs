@@ -1,6 +1,9 @@
 use bevy::{ecs::world::unsafe_world_cell::UnsafeWorldCell, prelude::*};
 use node_tree::{
-    div, styling::Styling, tree::{IntoNodeTree, NodeTree}, InsertNodumEntity
+    div,
+    styling::Styling,
+    tree::{IntoNodeTree, NodeTree},
+    InsertNodumEntity,
 };
 
 use super::*;
@@ -74,10 +77,7 @@ fn draw_resource_panel(world: &mut World) {
                     .with_width(Val::Percent(100.0))
                     .with_display(Display::Flex)
                     .with_flex_direction(FlexDirection::Row)
-                    .with_child(needs(
-                        &mut cell,
-                        &style,
-                    ))
+                    .with_child(needs(&mut cell, &style))
                     .with_child(resources(&mut cell, &style)),
             );
 
@@ -323,14 +323,22 @@ unsafe fn resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> N
         .with_display(Display::Flex)
         .with_flex_direction(FlexDirection::Column)
         .with_height(Val::Percent(100.0))
-        .with_child(TextBundle::from_section("Food", style.text.clone()).with_style(Style {
-            align_self: AlignSelf::Center,
-            ..default()
-        }))
-        .with_child(TextBundle::from_section(format!("{}", cell.world().resource::<Food>().amount()), style.text.clone()).with_style(Style {
-            align_self: AlignSelf::Center,
-            ..default()
-        }))
+        .with_child(
+            TextBundle::from_section("Food", style.text.clone()).with_style(Style {
+                align_self: AlignSelf::Center,
+                ..default()
+            }),
+        )
+        .with_child(
+            TextBundle::from_section(
+                format!("{}", cell.world().resource::<Food>().amount()),
+                style.text.clone(),
+            )
+            .with_style(Style {
+                align_self: AlignSelf::Center,
+                ..default()
+            }),
+        )
 }
 
 /// Resource bar <-----------------------------------------------------------------------
@@ -387,11 +395,7 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
         bar.color.darker(0.1)
     };
 
-    let dp = if rate > 0.0 {
-        0.0
-    } else {
-        0.0
-    };
+    let dp = if rate > 0.0 { 0.0 } else { 0.0 };
 
     bar_tree = bar_tree.with_child(NodeBundle {
         style: Style {

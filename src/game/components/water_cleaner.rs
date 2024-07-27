@@ -2,10 +2,17 @@ use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
-    character::{CharState, CharacterStates, GoToAction}, components::flowup_text::FlowUpText, daycycle::GameTime, difficult::RES_LIMIT, resources::{BadWater, GameResource, Generate, Water}, selectable::OnMouseClick, sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction}, spawn::{
+    character::{CharState, CharacterStates, GoToAction},
+    components::flowup_text::FlowUpText,
+    daycycle::GameTime,
+    difficult::RES_LIMIT,
+    resources::{BadWater, GameResource, Generate, Water},
+    selectable::OnMouseClick,
+    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
+    spawn::{
         player::Player,
         spawn_commands::{Toilet, WaterCleaner},
-    }
+    },
 };
 
 pub fn plugin(app: &mut App) {
@@ -106,9 +113,7 @@ fn updated_water_cleaner(
         water_events.send(Generate::new(WATER_CLEARING_RATE));
         bad_water_events.send(Generate::new(-WATER_CLEARING_RATE));
 
-
         if toilet_work.work_time > water_cleaner_config.work_time || bad_water.amount() <= 0.0 {
-            
             info!(
                 "Clean Water: water {}, bad water {}",
                 water.amount(),
@@ -128,15 +133,17 @@ fn updated_water_cleaner(
                         transform: Transform::from_translation(pc_transform.translation())
                             .with_scale(Vec3::splat(0.01)),
                         text: Text::from_section(
-                            format!("Clean Water: water {}, bad water {}",
-                            water.amount(),
-                            bad_water.amount(),
-                        ), text_style,),
+                            format!(
+                                "Clean Water: water {}, bad water {}",
+                                water.amount(),
+                                bad_water.amount(),
+                            ),
+                            text_style,
+                        ),
                         ..default()
                     })
                     .insert(FlowUpText { lifetime: 1.0 });
             }
-            
         }
     }
 }

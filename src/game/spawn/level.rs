@@ -42,9 +42,8 @@ fn spawn_level(
 
     commands.insert_resource(AmbientLight {
         brightness: 80.0,
-        color: Color::srgb(0.9, 0.9, 1.0)
+        color: Color::srgb(0.9, 0.9, 1.0),
     });
-
 
     let light_grid_size = 3;
     let map_size = 9.0;
@@ -58,17 +57,15 @@ fn spawn_level(
             let x_pos = (x as f32 + 1.0) * light_dist;
             let y_pos = (y as f32 + 1.0) * light_dist;
 
-            commands
-                .spawn(NightLight)
-                .insert(SpotLightBundle {
-                    transform: Transform::from_translation(Vec3::new(x_pos, h, y_pos)),
-                    spot_light: SpotLight {
-                        inner_angle: inner_angle,
-                        outer_angle: outer_angle,
-                        ..default()
-                    },
+            commands.spawn(NightLight).insert(SpotLightBundle {
+                transform: Transform::from_translation(Vec3::new(x_pos, h, y_pos)),
+                spot_light: SpotLight {
+                    inner_angle: inner_angle,
+                    outer_angle: outer_angle,
                     ..default()
-                });
+                },
+                ..default()
+            });
         }
     }
 

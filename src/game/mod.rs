@@ -13,6 +13,7 @@ pub mod components;
 mod daycycle;
 mod debt;
 pub mod device_state;
+pub mod difficult;
 mod highlight;
 mod kitchen_work;
 mod map;
@@ -28,7 +29,6 @@ pub mod spawn;
 pub mod sprite_material;
 mod trouble_planner;
 pub mod ui;
-pub mod difficult;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);

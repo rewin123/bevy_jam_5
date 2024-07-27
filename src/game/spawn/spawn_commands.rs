@@ -1,6 +1,9 @@
 use std::f32::consts::PI;
 
-use bevy::{ecs::{system::EntityCommands, world::Command}, prelude::*};
+use bevy::{
+    ecs::{system::EntityCommands, world::Command},
+    prelude::*,
+};
 
 use crate::game::{
     assets::{HandleMap, SceneKey},
@@ -106,29 +109,25 @@ pub struct SpawnEarth;
 
 impl Command for SpawnEarth {
     fn apply(self, world: &mut World) {
-
         let dir = Vec3::new(-0.0, -1.0, -0.0).normalize();
         let earth_r = 6371000.0; // 6 371 km
         let space_height = 2000000.0; // 1000 km
         let distance = earth_r + space_height;
         let pos = dir * distance;
 
-
-
-        let sun_id = world.spawn(DirectionalLightBundle {
-            transform: Transform::from_translation(-Vec3::Z).looking_at(Vec3::ZERO, Vec3::X),
-            directional_light: DirectionalLight {
-                shadows_enabled: true,
-                illuminance: 2000.0,
+        let sun_id = world
+            .spawn(DirectionalLightBundle {
+                transform: Transform::from_translation(-Vec3::Z).looking_at(Vec3::ZERO, Vec3::X),
+                directional_light: DirectionalLight {
+                    shadows_enabled: true,
+                    illuminance: 2000.0,
+                    ..default()
+                },
                 ..default()
-            },
-            ..default()
-        }).id();
-
-
+            })
+            .id();
 
         let scene = world.resource::<HandleMap<SceneKey>>()[&SceneKey::Earth].clone_weak();
-        
 
         let bundle = SceneBundle {
             scene,
@@ -138,10 +137,7 @@ impl Command for SpawnEarth {
             ..default()
         };
 
-        world.spawn(bundle).insert(Earth)
-            .add_child(sun_id);
-
-        
+        world.spawn(bundle).insert(Earth).add_child(sun_id);
     }
 }
 

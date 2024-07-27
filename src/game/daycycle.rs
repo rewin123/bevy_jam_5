@@ -43,7 +43,7 @@ const SPOTLIGHT_COLOR: &str = "#a85032";
 
 fn night_light(
     mut q_lights: Query<(&mut Transform, &mut SpotLight), With<NightLight>>,
-    q_dir_light: Query<&GlobalTransform, With<DirectionalLight>>
+    q_dir_light: Query<&GlobalTransform, With<DirectionalLight>>,
 ) {
     let Ok(dir_light) = q_dir_light.get_single() else {
         return;
@@ -150,7 +150,6 @@ fn update_time(mut gametime: ResMut<GameTime>, real_time: Res<Time>) {
     let delta = real_time.delta_seconds() * gametime.context().relative_speed;
 
     gametime.advance_by(Duration::from_secs_f32(delta));
-
 }
 
 fn change_time_speed(

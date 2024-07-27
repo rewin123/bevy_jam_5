@@ -4,7 +4,9 @@ use bevy_quill::Cx;
 use crate::screen::Screen;
 
 use super::{
-    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed}, difficult::OXYGEN_REGENRATE_SPEED, ui::components::resource_slider::ResourceSlider
+    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed},
+    difficult::OXYGEN_REGENRATE_SPEED,
+    ui::components::resource_slider::ResourceSlider,
 };
 
 pub(crate) fn plugin(app: &mut App) {
@@ -274,12 +276,8 @@ simple_game_resource!(
     "You died of starvation. Your last thought was about the mortgage, not food."
 );
 
-
-
-
 impl_limitless_resource!(MetalTrash);
 impl_limitless_resource!(Metal);
-
 
 #[derive(Resource, Default)]
 pub struct AllResourcesGetter {

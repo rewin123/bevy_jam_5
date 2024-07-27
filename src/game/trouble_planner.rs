@@ -4,7 +4,12 @@ use rand::prelude::*;
 use rand_distr::{Distribution, Poisson};
 
 use super::{
-    assets::{HandleMap, SceneKey}, character::DestinationTarget, components::fire::InFire, difficult::{EVENTS_IN_LOOP, EVENT_LOOP_DURATION, FIRE_MEAN_PERIOD}, selectable::Selectable, spawn::{player::Player, spawn_commands::MetalTrashPile}
+    assets::{HandleMap, SceneKey},
+    character::DestinationTarget,
+    components::fire::InFire,
+    difficult::{EVENTS_IN_LOOP, EVENT_LOOP_DURATION, FIRE_MEAN_PERIOD},
+    selectable::Selectable,
+    spawn::{player::Player, spawn_commands::MetalTrashPile},
 };
 
 #[derive(Resource, Debug)]
@@ -76,7 +81,6 @@ fn fix_trouble(
         }
     }
 }
-
 
 // Fire will destroy things if they are burning for X amount of time
 fn tick_fire(

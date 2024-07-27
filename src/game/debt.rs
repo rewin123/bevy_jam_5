@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 
 use super::{
-    daycycle::{GameTime, PlayerState}, difficult::money_k, ui::components::debt::{Plot, PlotPoint}
+    daycycle::{GameTime, PlayerState},
+    difficult::money_k,
+    ui::components::debt::{Plot, PlotPoint},
 };
 
 #[allow(dead_code)]

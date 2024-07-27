@@ -2,7 +2,15 @@ use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
-    assets::{HandleMap, SfxKey}, character::{CharState, CharacterStates, GoToAction}, components::flowup_text::FlowUpText, daycycle::GameTime, difficult::RES_LIMIT, resources::{BadWater, GameResource, Generate, Pee}, selectable::OnMouseClick, sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction}, spawn::{player::Player, spawn_commands::Toilet}
+    assets::{HandleMap, SfxKey},
+    character::{CharState, CharacterStates, GoToAction},
+    components::flowup_text::FlowUpText,
+    daycycle::GameTime,
+    difficult::RES_LIMIT,
+    resources::{BadWater, GameResource, Generate, Pee},
+    selectable::OnMouseClick,
+    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
+    spawn::{player::Player, spawn_commands::Toilet},
 };
 
 pub fn plugin(app: &mut App) {
@@ -107,8 +115,6 @@ fn update_pee_work(
         pee.send(Generate::new(-TOILET_RATE));
         toilet.send(Generate::new(-TOILET_RATE));
         bad_water.send(Generate::new(TOILET_RATE));
-        
-
 
         if toilet_work.work_time > toilet_work_config.work_time || real_pee.amount() <= 0.0 {
             // pee.decrease(toilet_work_config.work_decrease);

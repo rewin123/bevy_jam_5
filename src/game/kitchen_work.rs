@@ -7,7 +7,13 @@ use bevy_mod_billboard::BillboardTextBundle;
 use crate::game::{components::flowup_text::FlowUpText, sequence::NextAction};
 
 use super::{
-    assets::{HandleMap, SfxKey}, character::{CharState, CharacterStates}, components::kitchen::Kitchen, daycycle::GameTime, difficult::RACION_SIZE, resources::{Food, GameResource, Hungry, Pee}, sequence::CharacterAction
+    assets::{HandleMap, SfxKey},
+    character::{CharState, CharacterStates},
+    components::kitchen::Kitchen,
+    daycycle::GameTime,
+    difficult::RACION_SIZE,
+    resources::{Food, GameResource, Hungry, Pee},
+    sequence::CharacterAction,
 };
 
 pub(crate) fn plugin(app: &mut App) {
@@ -116,7 +122,7 @@ pub fn update_work_in_kitchen(
                             ..default()
                         })
                         .insert(FlowUpText { lifetime: 1.0 });
-                }    
+                }
             }
         }
     }
