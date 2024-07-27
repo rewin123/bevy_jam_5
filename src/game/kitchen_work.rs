@@ -49,7 +49,7 @@ impl CharacterAction for KitchenWorkAction {
 pub fn update_work_in_kitchen(
     mut commands: Commands,
     time: Res<GameTime>,
-    kitchen_work_config: Res<KitchenWorkConfig>,
+    mut kitchen_work_config: ResMut<KitchenWorkConfig>,
     mut q_kitchen_work: Query<(Entity, &mut KitchenWork, &mut CharacterStates)>,
     q_kitchen: Query<&GlobalTransform, With<Kitchen>>,
     sounds: Res<HandleMap<SfxKey>>,
@@ -58,6 +58,9 @@ pub fn update_work_in_kitchen(
         states.add(CharState::Working);
         kitchen_work.work_time += time.delta_seconds();
         if kitchen_work.work_time > kitchen_work_config.work_time {
+            let current_time = time.elapsed_seconds();
+
+            kitchen_work_config.last_updated = current_time;
             // todo : Add poop so that you need to go to the toilet again. Recycle so that you can produce food
             // todo: complete so that you can change ressource
 
