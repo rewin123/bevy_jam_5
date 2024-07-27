@@ -1,5 +1,7 @@
+use crate::game::assets::SfxKey;
 use crate::game::components::flowup_text::FlowUpText;
 
+use super::assets::HandleMap;
 use super::character::{CharState, CharacterStates};
 use super::components::pc::Pc;
 use super::daycycle::GameTime;
@@ -51,6 +53,7 @@ fn update_pc_work(
     mut work_config: ResMut<PcWorkConfig>,
     mut debt: ResMut<Debt>,
     q_pcs: Query<&GlobalTransform, With<Pc>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut pc_work, mut states) in q_pc_work.iter_mut() {
         states.add(CharState::Working);
@@ -84,7 +87,11 @@ fn update_pc_work(
                         text: Text::from_section(format!("+{}$", dept_decrease), text_style),
                         ..default()
                     })
-                    .insert(FlowUpText { lifetime: 1.0 });
+                    .insert(FlowUpText { lifetime: 1.0 })
+                    .insert(AudioBundle {
+                        source: sounds[&SfxKey::Coin].clone_weak(),
+                        ..default()
+                    });
             }
         }
     }
