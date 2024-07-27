@@ -1,3 +1,4 @@
+use bevy::audio::{PlaybackMode, Volume};
 use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
@@ -26,6 +27,7 @@ fn on_selected(
     mut commands: Commands,
     q_players: Query<Entity, With<Player>>,
     mut q_pcs: Query<&GlobalTransform, With<Toilet>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     let target = trigger.entity();
 
@@ -40,7 +42,7 @@ fn on_selected(
             target,
             target_pos: pc_transform.translation(),
         });
-        actions.add(ToiletWorkAction);
+        actions.add(ToiletWorkAction(sounds[&SfxKey::Water].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {
@@ -54,7 +56,7 @@ fn on_selected(
     }
 }
 
-pub struct ToiletWorkAction;
+pub struct ToiletWorkAction(pub Handle<AudioSource>);
 
 #[derive(Component, Default)]
 pub struct ToiletWork {
@@ -83,7 +85,18 @@ impl Default for ToiletWorkConfig {
 
 impl CharacterAction for ToiletWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
-        commands.entity(target).insert(ToiletWork::default());
+        commands
+            .entity(target)
+            .insert(ToiletWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Remove,
+                    volume: Volume::new(4.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
@@ -137,6 +150,7 @@ fn update_pee_work(
                     .insert(FlowUpText { lifetime: 1.0 })
                     .insert(AudioBundle {
                         source: sounds[&SfxKey::ToiletFlush].clone_weak(),
+
                         ..default()
                     });
             }
