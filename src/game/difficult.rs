@@ -1,6 +1,6 @@
 //// This file contains all major constans for game difficulty calculated from idea that distance between events must have known mean time distance
 
-pub const EVENT_DISTANCE: f32 = 2.0; //some action nead to do every 2.5 second
+pub const EVENT_DISTANCE: f32 = 1.5; //some action nead to do every 2.5 second
 pub const EVENT_DURATION: f32 = 2.0; //duration for each action (approximatly)
 
 /// How many non work events per game loop
@@ -91,6 +91,12 @@ pub const EARNING_IN_LOOP: f32 = (2.0 * START_PAY + DPAY * (N_PAYS - 1.0)) / 2.0
 // I can not use powf in const expressiong. So here is function
 pub fn money_k() -> f32 {
     let k = (1.0_f32 + EARNING_IN_LOOP / START_MONEY).powf(1.0 / EVENT_LOOP_DURATION) - 1.0;
+    println!("Money per second coef is {}", k);
+    k
+}
+
+pub fn second_money_k() -> f32 {
+    let k = (1.0_f32 + EARNING_IN_LOOP / 5000.0).powf(1.0 / EVENT_DURATION) - 1.0;
     println!("Money per second coef is {}", k);
     k
 }

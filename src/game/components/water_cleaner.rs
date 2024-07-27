@@ -64,7 +64,7 @@ pub struct WaterCleanerWork {
     pub work_time: f32,
 }
 
-const WATER_CLEARING_TIME: f32 = 1.0;
+const WATER_CLEARING_TIME: f32 = 1.5;
 const WATER_CLEARING_RATE: f32 = RES_LIMIT / WATER_CLEARING_TIME;
 
 /// Separated values for increase/decrease to allow for difficulty changes

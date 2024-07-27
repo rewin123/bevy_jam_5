@@ -82,7 +82,7 @@ pub struct WaterDispenserConfig {
     pub pee_up: f32,
 }
 
-const DRINK_TIME: f32 = 0.5;
+const DRINK_TIME: f32 = 1.5;
 const DRINK_RATE: f32 = RES_LIMIT / DRINK_TIME;
 const WATER_SPENT_RATE: f32 = 10.0 / DRINK_TIME;
 

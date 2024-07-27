@@ -22,7 +22,7 @@ pub fn plugin(app: &mut App) {
 
 const TOILET_WORK_GROUP: &str = "toilet_work";
 
-const TOILIET_TIME: f32 = 0.5;
+const TOILIET_TIME: f32 = 2.0;
 const TOILET_RATE: f32 = RES_LIMIT / TOILIET_TIME;
 
 fn on_selected(
@@ -79,7 +79,7 @@ pub struct ToiletWorkConfig {
 impl Default for ToiletWorkConfig {
     fn default() -> Self {
         Self {
-            work_time: 1.0,
+            work_time: TOILIET_TIME,
             work_decrease: 10.0,
         }
     }
