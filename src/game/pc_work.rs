@@ -35,11 +35,22 @@ pub struct PcWork {
     pub work_time: f32,
 }
 
-pub struct PcWorkAction;
+pub struct PcWorkAction(pub Handle<AudioSource>);
 
 impl CharacterAction for PcWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
-        commands.entity(target).insert(PcWork::default());
+        commands
+            .entity(target)
+            .insert(PcWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Loop,
+                    volume: Volume::new(3.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
@@ -58,16 +69,6 @@ fn update_pc_work(
 ) {
     for (entity, mut pc_work, mut states) in q_pc_work.iter_mut() {
         states.add(CharState::Working);
-
-        commands.entity(entity).insert(AudioBundle {
-            source: sounds[&SfxKey::Typing].clone_weak(),
-            settings: PlaybackSettings {
-                mode: PlaybackMode::Loop,
-                volume: Volume::new(3.0),
-                ..Default::default()
-            },
-            ..default()
-        });
 
         pc_work.work_time += time.delta_seconds();
         if pc_work.work_time >= work_config.work_time {
