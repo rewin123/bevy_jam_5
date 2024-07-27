@@ -75,7 +75,7 @@ fn win_on_zero_debt(debt: Res<Debt>, mut player_state: ResMut<NextState<PlayerSt
 fn update_plot(
     time: Res<GameTime>,
     mut debt_plot: ResMut<DebtPlot>,
-    mut debt: ResMut<Debt>,
+    debt: ResMut<Debt>,
     mut plot: ResMut<Plot>,
 ) {
     if debt_plot.timer.tick(time.delta()).finished() {
