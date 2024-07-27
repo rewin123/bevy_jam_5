@@ -17,6 +17,7 @@ use crate::{
 pub(super) fn plugin(app: &mut App) {
     app.add_event::<ResetGame>();
     app.add_systems(PostUpdate, spawn_game_over_screen);
+    app.add_systems(PostUpdate, remove_end_screen_on_reset);
 }
 
 #[derive(Event, Clone, EntityEvent)]
@@ -29,6 +30,21 @@ impl From<ListenerInput<Pointer<Click>>> for ResetGame {
     fn from(value: ListenerInput<Pointer<Click>>) -> Self {
         Self {
             target: value.target(),
+        }
+    }
+}
+
+fn remove_end_screen_on_reset(
+    mut commands: Commands,
+    mut reset_events: EventReader<ResetGame>,
+    game_over_ui: Query<Entity, With<GameOverScreen>>,
+) {
+    for _ in reset_events.read() {
+        for entity in game_over_ui.iter() {
+            let Some(screen) = commands.get_entity(entity) else {
+                continue;
+            };
+            screen.despawn_recursive();
         }
     }
 }

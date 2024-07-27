@@ -57,7 +57,7 @@ fn night_light(
     let dir = dir_light.forward();
     let sunset = dir.dot(-Vec3::Y);
 
-    for (mut transform, mut light) in &mut q_lights {
+    for (mut transform, mut light) in q_lights.iter_mut() {
         if sunset > 0.7 {
             light.intensity = 0.0;
         } else {
@@ -201,16 +201,19 @@ impl GameTimeContext {
 fn reset_time(
     mut commands: Commands,
     mut resets: EventReader<ResetGame>,
-    mut day_duration: ResMut<DayDuration>,
     mut day_pased: ResMut<DayPassed>,
     mut gametime: ResMut<GameTime>,
     mut day_state: ResMut<DayState>,
+    mut day_start: EventWriter<DayStart>,
+    mut time_speed: ResMut<TimeSpeed>,
 ) {
     for _ in resets.read() {
-        day_duration.0 = 0.0;
         day_pased.0 = 0;
+        *time_speed = TimeSpeed::Normal;
         *day_state = DayState::Day;
-        commands.insert_resource(GameTime::default());
+        let mut new_game_time = GameTime::default();
+        new_game_time.advance_by(Duration::from_millis(1000 / 60));
+        commands.insert_resource(new_game_time);
     }
 }
 
