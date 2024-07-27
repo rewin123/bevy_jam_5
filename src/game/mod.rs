@@ -28,6 +28,7 @@ pub mod spawn;
 pub mod sprite_material;
 mod trouble_planner;
 pub mod ui;
+pub mod difficult;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(node_tree::NodumTreePlugin);

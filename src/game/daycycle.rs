@@ -7,7 +7,7 @@ use bevy::{
     prelude::*,
 };
 
-use super::resources::GameResource;
+use super::{resources::GameResource, ui::components::hex2color};
 
 pub type GameTime = Time<GameTimeContext>;
 
@@ -30,8 +30,39 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(PreUpdate, day_events);
     app.add_systems(Update, change_time_speed);
 
+    app.add_systems(Update, night_light);
+
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
+}
+
+#[derive(Component)]
+pub struct NightLight;
+
+const SPOTLIGHT_COLOR: &str = "#a85032";
+
+fn night_light(
+    mut q_lights: Query<(&mut Transform, &mut SpotLight), With<NightLight>>,
+    q_dir_light: Query<&GlobalTransform, With<DirectionalLight>>
+) {
+    let Ok(dir_light) = q_dir_light.get_single() else {
+        return;
+    };
+
+    let dir = dir_light.forward();
+    let sunset = dir.dot(-Vec3::Y);
+
+    for (mut transform, mut light) in &mut q_lights {
+        if sunset > 0.7 {
+            light.intensity = 0.0;
+        } else {
+            let intensity_multiplier = (sunset - 0.7).abs().min(0.5) * 2.0;
+            light.intensity = 1_000_000.0 * 10.0 * intensity_multiplier;
+            light.color = hex2color(SPOTLIGHT_COLOR).lighter(0.4);
+            let pos = transform.translation;
+            transform.look_at(pos - Vec3::Y, Vec3::X);
+        }
+    }
 }
 
 #[derive(Resource, Debug, PartialEq, Eq)]

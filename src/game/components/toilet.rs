@@ -96,6 +96,7 @@ fn update_pee_work(
     mut q_toilet_work: Query<(Entity, &mut ToiletWork, &mut CharacterStates)>,
     toilet_work_config: Res<ToiletWorkConfig>,
     mut pee: ResMut<Pee>,
+    mut toilet: ResMut<crate::game::resources::Toilet>,
     mut bad_water: ResMut<BadWater>,
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
 ) {
@@ -106,6 +107,7 @@ fn update_pee_work(
         if toilet_work.work_time > toilet_work_config.work_time {
             pee.decrease(toilet_work_config.work_decrease);
             bad_water.increase(toilet_work_config.work_decrease);
+            toilet.set_amount(0.0);
             info!(
                 "Peeing decreased : pee {}, bad water {}",
                 pee.amount(),

@@ -1,11 +1,13 @@
 //! Spawn the main level by triggering other observers.
 
+use std::f32::consts::PI;
+
 use bevy::prelude::*;
 
 use crate::game::{
     assets::{HandleMap, SceneKey},
     components::pc::Pc,
-    daycycle::TimeSpeed,
+    daycycle::{NightLight, TimeSpeed},
     selectable::Selectable,
 };
 
@@ -38,16 +40,48 @@ fn spawn_level(
     // but add things like walls etc. here.
     commands.trigger(SpawnPlayer);
 
-    commands.spawn(DirectionalLightBundle {
-        transform: Transform::from_translation(Vec3::new(2.0, 5.0, 0.0))
-            .looking_at(Vec3::ZERO, Vec3::Y),
-        directional_light: DirectionalLight {
-            shadows_enabled: true,
-            illuminance: 2000.0,
-            ..default()
-        },
-        ..default()
+    commands.insert_resource(AmbientLight {
+        brightness: 80.0,
+        color: Color::srgb(0.9, 0.9, 1.0)
     });
+
+
+    let light_grid_size = 3;
+    let map_size = 9.0;
+    let light_dist = map_size / (light_grid_size as f32 + 1.0);
+    let h = 15.0;
+    let outer_angle = (light_dist * 2.0_f32.sqrt() / h / 2.0).atan();
+    let inner_angle = (light_dist / h / 2.0).atan();
+
+    for x in 0..light_grid_size {
+        for y in 0..light_grid_size {
+            let x_pos = (x as f32 + 1.0) * light_dist;
+            let y_pos = (y as f32 + 1.0) * light_dist;
+
+            commands
+                .spawn(NightLight)
+                .insert(SpotLightBundle {
+                    transform: Transform::from_translation(Vec3::new(x_pos, h, y_pos)),
+                    spot_light: SpotLight {
+                        inner_angle: inner_angle,
+                        outer_angle: outer_angle,
+                        ..default()
+                    },
+                    ..default()
+                });
+        }
+    }
+
+    // let sun_id = commands.spawn(DirectionalLightBundle {
+    //     transform: Transform::from_translation(Vec3::new(2.0, 5.0, 0.0))
+    //         .looking_at(Vec3::ZERO, Vec3::Y),
+    //     directional_light: DirectionalLight {
+    //         shadows_enabled: true,
+    //         illuminance: 2000.0,
+    //         ..default()
+    //     },
+    //     ..default()
+    // }).id();
 
     commands.insert_resource(TimeSpeed::Normal);
 

@@ -4,11 +4,7 @@ use rand::prelude::*;
 use rand_distr::{Distribution, Poisson};
 
 use super::{
-    assets::{HandleMap, SceneKey},
-    character::DestinationTarget,
-    components::fire::InFire,
-    selectable::Selectable,
-    spawn::{player::Player, spawn_commands::MetalTrashPile},
+    assets::{HandleMap, SceneKey}, character::DestinationTarget, components::fire::InFire, difficult::{EVENTS_IN_LOOP, EVENT_LOOP_DURATION, FIRE_MEAN_PERIOD}, selectable::Selectable, spawn::{player::Player, spawn_commands::MetalTrashPile}
 };
 
 #[derive(Resource, Debug)]
@@ -16,8 +12,8 @@ pub struct TroublePlanner {
     pub peace_time: f32,
     pub distribution: f32,
 }
-pub const DEFAULT_PEACE_TIME: f32 = 5.0;
-pub const DEFAULT_DISTRIBUTION: f32 = 10.0;
+pub const DEFAULT_PEACE_TIME: f32 = FIRE_MEAN_PERIOD / 3.0;
+pub const DEFAULT_DISTRIBUTION: f32 = FIRE_MEAN_PERIOD;
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(TroublePlanner {
@@ -60,7 +56,8 @@ fn plan_trouble(
 fn fix_trouble(
     mut commands: Commands,
     mut query: Query<(&mut Transform, &DestinationTarget), With<Player>>,
-    q_items_in_fire: Query<Entity, With<InFire>>,
+    q_items_in_fire: Query<(Entity, &InFire)>,
+    time: Res<GameTime>,
 ) {
     for (transform, target) in query.iter_mut() {
         let player_position = transform.translation;
@@ -69,14 +66,17 @@ fn fix_trouble(
         let distance = player_position.distance(target_position);
 
         if distance <= target.accept_radius {
-            for items_in_fire in q_items_in_fire.iter() {
+            for (items_in_fire, fire) in q_items_in_fire.iter() {
                 if target.target == items_in_fire {
+                    let alive_time = time.elapsed_seconds() - fire.started_at;
+                    info!("Fire was alive for {} seconds", alive_time);
                     commands.entity(target.target).remove::<InFire>();
                 }
             }
         }
     }
 }
+
 
 // Fire will destroy things if they are burning for X amount of time
 fn tick_fire(

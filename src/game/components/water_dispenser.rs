@@ -79,7 +79,7 @@ pub struct WaterDispenserConfig {
 impl Default for WaterDispenserConfig {
     fn default() -> Self {
         Self {
-            work_time: 1.0,
+            work_time: 0.5,
             thirst_down: 10.0,
             water_down: 10.0,
             pee_up: 10.0,
@@ -115,7 +115,7 @@ fn updated_water_drinking(
         toilet_work.work_time += time.delta_seconds();
         if toilet_work.work_time > water_dispenser_config.work_time {
             water.decrease(water_dispenser_config.water_down);
-            thirst.decrease(water_dispenser_config.thirst_down);
+            thirst.set_amount(0.0);
             pee.increase(water_dispenser_config.pee_up);
             info!(
                 "Drinking decreased : thirst {}, water {}, pee {}, limit {:#?}",

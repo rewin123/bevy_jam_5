@@ -3,12 +3,9 @@
 use bevy::prelude::*;
 
 use super::{
-    components::fire::InFire,
-    daycycle::{DeathCause, GameTime, PlayerDied, TimeSpeed},
-    resources::{
-        CarbonDioxide, Food, FoodGeneration, GameResource, Generate, Oxygen, OxygenRecycling, Pee,
-        Thirst, Water,
-    },
+    components::fire::InFire, daycycle::{DeathCause, GameTime, PlayerDied, TimeSpeed}, difficult::{BREATH_RATE, FIRE_RATE, HUNGRY_RATE, THIRST_RATE, TOILET_K}, resources::{
+        CarbonDioxide, Food, FoodGeneration, GameResource, Generate, Hungry, Oxygen, OxygenRecycling, Pee, Thirst, Toilet, Water
+    }
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -16,12 +13,19 @@ pub(super) fn plugin(app: &mut App) {
         Update,
         (
             update_oxygen_and_co2,
-            update_food,
             fire_oxigen,
             update_thirst,
+            update_hungry,
+            update_toilet
         ),
     );
     // app.add_systems(PostUpdate, (bad_air_death, too_many_oxigen_death));
+}
+
+fn update_hungry(
+    mut hungry: EventWriter<Generate<Hungry>>,
+) {
+    hungry.send(Generate::new(HUNGRY_RATE));
 }
 
 fn update_oxygen_and_co2(
@@ -43,8 +47,8 @@ fn update_oxygen_and_co2(
     co2.send(Generate::new(-oxygen_generation));
 
     //breate
-    oxygen.send(Generate::new(-1.0));
-    co2.send(Generate::new(1.0));
+    oxygen.send(Generate::new(-BREATH_RATE));
+    co2.send(Generate::new(BREATH_RATE));
 }
 
 // fn bad_air_death(
@@ -71,13 +75,7 @@ fn update_oxygen_and_co2(
 //     }
 // }
 //
-fn update_food(
-    mut food: EventWriter<Generate<Food>>,
-    food_generation: Res<FoodGeneration>,
-    gametime: Res<GameTime>,
-) {
-    food.send(Generate::new(food_generation.generation_rate));
-}
+
 
 fn calculate_new_amount(
     amount: f32,
@@ -99,7 +97,7 @@ fn fire_oxigen(
 ) {
     let count = q_in_fire.iter().count();
     if count > 0 {
-        let consuming = count as f32 * 3.0;
+        let consuming = count as f32 * FIRE_RATE;
 
         oxigen.send(Generate::new(-consuming));
         co2.send(Generate::new(consuming));
@@ -107,5 +105,12 @@ fn fire_oxigen(
 }
 
 fn update_thirst(mut thirst: EventWriter<Generate<Thirst>>) {
-    thirst.send(Generate::new(2.0));
+    thirst.send(Generate::new(THIRST_RATE));
+}
+
+fn update_toilet(
+    mut toilet: EventWriter<Generate<Toilet>>,
+    pee: Res<Pee>
+) {
+    toilet.send(Generate::new(pee.amount() * TOILET_K));
 }

@@ -8,6 +8,7 @@ pub mod typed_component_holder;
 use byte_holder::*;
 use component_holder::*;
 use raw_component_holder::*;
+use styling::Styling;
 use tree::*;
 use typed_component_holder::*;
 
@@ -200,4 +201,12 @@ fn children_cache_system(
         commands.entity(entity).remove::<NodumChildrenCache>();
         spawned_count.0 += 1;
     }
+}
+
+
+pub fn div() -> NodeTree {
+    NodeBundle::default()
+        .into_node_tree()
+        .with_width(Val::Percent(100.0))
+        .with_height(Val::Percent(100.0))
 }

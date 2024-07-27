@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use node_tree::styling::Styling;
 use node_tree::tree::{IntoNodeTree, NodeTree};
-use node_tree::InsertNodumEntity;
+use node_tree::{div, InsertNodumEntity};
 
 use crate::game::daycycle::GameTime;
 use crate::game::debt::Debt;
@@ -60,7 +60,7 @@ fn spawn_debt_ui(
         .with_right(Val::Px(0.0))
         .with_height(Val::Px(debt_height))
         .with_width(Val::Px(dept_width))
-        .with_border(UiRect::px(0.0, 1.0, 1.0, 1.0))
+        .with_border(UiRect::all(Val::Px(1.0)))
         .with_background_color(hex2color(BACKGROUND_COLOR))
         .with_border_color(hex2color(BORDER_COLOR))
         .with_position_type(PositionType::Absolute);
@@ -186,11 +186,4 @@ fn draw_plot_inner(plot: &Plot, width: f32, hieght: f32) -> NodeTree {
     }
 
     display
-}
-
-fn div() -> NodeTree {
-    NodeBundle::default()
-        .into_node_tree()
-        .with_width(Val::Percent(100.0))
-        .with_height(Val::Percent(100.0))
 }
