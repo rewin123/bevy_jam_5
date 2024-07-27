@@ -2,16 +2,10 @@ use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
-    character::{CharState, CharacterStates, GoToAction},
-    components::flowup_text::FlowUpText,
-    daycycle::GameTime,
-    resources::{GameResource, Pee, Thirst, Water},
-    selectable::OnMouseClick,
-    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
-    spawn::{
+    character::{CharState, CharacterStates, GoToAction}, components::flowup_text::FlowUpText, daycycle::GameTime, difficult::RES_LIMIT, resources::{GameResource, Generate, Pee, Thirst, Water}, selectable::OnMouseClick, sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction}, spawn::{
         player::Player,
         spawn_commands::{Toilet, WaterDispenser},
-    },
+    }
 };
 
 pub fn plugin(app: &mut App) {
@@ -76,10 +70,14 @@ pub struct WaterDispenserConfig {
     pub pee_up: f32,
 }
 
+const DRINK_TIME: f32 = 0.5;
+const DRINK_RATE: f32 = RES_LIMIT / DRINK_TIME;
+const WATER_SPENT_RATE: f32 = 10.0 / DRINK_TIME;
+
 impl Default for WaterDispenserConfig {
     fn default() -> Self {
         Self {
-            work_time: 0.5,
+            work_time: DRINK_TIME,
             thirst_down: 10.0,
             water_down: 10.0,
             pee_up: 10.0,
@@ -107,16 +105,26 @@ fn updated_water_drinking(
     mut water: ResMut<Water>,
     mut pee: ResMut<Pee>,
     mut thirst: ResMut<Thirst>,
+
+    mut pee_events: EventWriter<Generate<Pee>>,
+    mut water_events: EventWriter<Generate<Water>>,
+    mut thrist_events: EventWriter<Generate<Thirst>>,
+
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
 ) {
     for (entity, mut toilet_work, mut states) in q_toilet_work.iter_mut() {
         states.add(CharState::Driking);
 
         toilet_work.work_time += time.delta_seconds();
-        if toilet_work.work_time > water_dispenser_config.work_time {
-            water.decrease(water_dispenser_config.water_down);
+
+        pee_events.send(Generate::new(WATER_SPENT_RATE));
+        water_events.send(Generate::new(-WATER_SPENT_RATE));
+        thrist_events.send(Generate::new(-DRINK_RATE));
+
+
+        if toilet_work.work_time > water_dispenser_config.work_time || water.amount() <= 0.0 || thirst.amount() <= 0.0 {
+           
             thirst.set_amount(0.0);
-            pee.increase(water_dispenser_config.pee_up);
             info!(
                 "Drinking decreased : thirst {}, water {}, pee {}, limit {:#?}",
                 thirst.amount(),
@@ -138,7 +146,7 @@ fn updated_water_drinking(
                         transform: Transform::from_translation(pc_transform.translation())
                             .with_scale(Vec3::splat(0.01)),
                         text: Text::from_section(
-                            format!("-{} THIRST", water_dispenser_config.thirst_down),
+                            format!("- THIRST"),
                             text_style,
                         ),
                         ..default()
