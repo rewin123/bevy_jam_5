@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    audio::{AddAudioSource, PlaybackMode, Volume},
+    prelude::*,
+};
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{components::flowup_text::FlowUpText, sequence::NextAction};
@@ -10,7 +13,7 @@ use super::{
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(KitchenWorkConfig {
         work_time: 0.25,
-        amount_after_work: 5.0,
+        amount_after_work: 10.0,
         multiplier: 1,
         last_updated: 0.0,
     });
@@ -30,11 +33,22 @@ pub struct KitchenWork {
     pub work_time: f32,
 }
 
-pub struct KitchenWorkAction;
+pub struct KitchenWorkAction(pub Handle<AudioSource>);
 
 impl CharacterAction for KitchenWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
-        commands.entity(target).insert(KitchenWork::default());
+        commands
+            .entity(target)
+            .insert(KitchenWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Remove,
+                    volume: Volume::new(1.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
@@ -55,6 +69,7 @@ pub fn update_work_in_kitchen(
 ) {
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
         states.add(CharState::Working);
+
         kitchen_work.work_time += time.delta_seconds();
         if kitchen_work.work_time > kitchen_work_config.work_time {
             let current_time = time.elapsed_seconds();

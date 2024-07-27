@@ -14998,7 +14998,12 @@
         "Alarm",
         "Coin",
         "Kitchen",
-        "ToiletFlush"
+        "ToiletFlush",
+        "Water",
+        "Wave",
+        "Typing",
+        "Cooking",
+        "StartMachine"
       ],
       "short_name": "SfxKey",
       "title": "hieghest_apartment::game::assets::SfxKey",

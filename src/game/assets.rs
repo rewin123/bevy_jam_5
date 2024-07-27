@@ -79,6 +79,11 @@ pub enum SfxKey {
     Coin,
     Kitchen,
     ToiletFlush,
+    Water,
+    Wave,
+    Typing,
+    Cooking,
+    StartMachine,
 }
 
 impl AssetKey for SfxKey {
@@ -101,20 +106,34 @@ impl FromWorld for HandleMap<SfxKey> {
             (SfxKey::Step2, asset_server.load("audio/sfx/step2.ogg")),
             (SfxKey::Step3, asset_server.load("audio/sfx/step3.ogg")),
             (SfxKey::Step4, asset_server.load("audio/sfx/step4.ogg")),
+            (
+                SfxKey::StartMachine,
+                asset_server.load("audio/sfx/metal_interaction1.ogg"),
+            ),
+            (
+                SfxKey::Cooking,
+                asset_server.load("audio/sfx/dishes_03.ogg"),
+            ),
             (SfxKey::Fire, asset_server.load("audio/sfx/fire.ogg")),
             (SfxKey::Alarm, asset_server.load("audio/sfx/alarm.ogg")),
+            (
+                SfxKey::Typing,
+                asset_server.load("audio/sfx/typing_man.ogg"),
+            ),
             (
                 SfxKey::Coin,
                 asset_server.load("audio/sfx/coins_sounds/coin.6.ogg"),
             ),
             (
                 SfxKey::Kitchen,
-                asset_server.load("audio/sfx/dishes_03.ogg"),
+                asset_server.load("audio/sfx/crunch/crunch.2.ogg"),
             ),
             (
                 SfxKey::ToiletFlush,
                 asset_server.load("audio/sfx/toilet_02.ogg"),
             ),
+            (SfxKey::Water, asset_server.load("audio/sfx/bottle.ogg")),
+            (SfxKey::Wave, asset_server.load("audio/sfx/wave.ogg")),
         ]
         .into()
     }

@@ -1,7 +1,11 @@
-use bevy::prelude::*;
+use bevy::{
+    audio::{PlaybackMode, Volume},
+    prelude::*,
+};
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
+    assets::{HandleMap, SfxKey},
     character::{CharState, CharacterStates, GoToAction},
     components::flowup_text::FlowUpText,
     daycycle::GameTime,
@@ -28,6 +32,7 @@ fn on_selected(
     mut commands: Commands,
     q_players: Query<Entity, With<Player>>,
     mut q_pcs: Query<&GlobalTransform, With<WaterDispenser>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     let target = trigger.entity();
 
@@ -42,7 +47,7 @@ fn on_selected(
             target,
             target_pos: pc_transform.translation(),
         });
-        actions.add(WaterDispenserWorkAction);
+        actions.add(WaterDispenserWorkAction(sounds[&SfxKey::Wave].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {
@@ -56,7 +61,7 @@ fn on_selected(
     }
 }
 
-pub struct WaterDispenserWorkAction;
+pub struct WaterDispenserWorkAction(Handle<AudioSource>);
 
 #[derive(Component, Default)]
 pub struct WaterDispenserWork {
@@ -91,7 +96,16 @@ impl CharacterAction for WaterDispenserWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
         commands
             .entity(target)
-            .insert(WaterDispenserWork::default());
+            .insert(WaterDispenserWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Remove,
+                    volume: Volume::new(3.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
@@ -108,9 +122,10 @@ fn updated_water_drinking(
     mut pee: ResMut<Pee>,
     mut thirst: ResMut<Thirst>,
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut toilet_work, mut states) in q_toilet_work.iter_mut() {
-        states.add(CharState::Driking);
+        states.add(CharState::Drinking);
 
         toilet_work.work_time += time.delta_seconds();
         if toilet_work.work_time > water_dispenser_config.work_time {
@@ -143,7 +158,11 @@ fn updated_water_drinking(
                         ),
                         ..default()
                     })
-                    .insert(FlowUpText { lifetime: 1.0 });
+                    .insert(FlowUpText { lifetime: 1.0 })
+                    .insert(AudioBundle {
+                        source: sounds[&SfxKey::Water].clone_weak(),
+                        ..default()
+                    });
             }
         }
     }
