@@ -4,6 +4,7 @@ use bevy_mod_billboard::BillboardTextBundle;
 use crate::game::{components::flowup_text::FlowUpText, sequence::NextAction};
 
 use super::{
+    assets::{HandleMap, SfxKey},
     character::{CharState, CharacterStates},
     components::kitchen::Kitchen,
     daycycle::GameTime,
@@ -51,6 +52,7 @@ pub fn update_work_in_kitchen(
     kitchen_work_config: Res<KitchenWorkConfig>,
     mut q_kitchen_work: Query<(Entity, &mut KitchenWork, &mut CharacterStates)>,
     q_kitchen: Query<&GlobalTransform, With<Kitchen>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
         states.add(CharState::Working);
@@ -75,7 +77,11 @@ pub fn update_work_in_kitchen(
                         text: Text::from_section("Making Food", text_style),
                         ..default()
                     })
-                    .insert(FlowUpText { lifetime: 1.0 });
+                    .insert(FlowUpText { lifetime: 1.0 })
+                    .insert(AudioBundle {
+                        source: sounds[&SfxKey::Kitchen].clone_weak(),
+                        ..default()
+                    });
             }
         }
     }

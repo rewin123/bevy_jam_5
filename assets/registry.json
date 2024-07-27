@@ -14995,7 +14995,10 @@
         "Step3",
         "Step4",
         "Fire",
-        "Alarm"
+        "Alarm",
+        "Coin",
+        "Kitchen",
+        "ToiletFlush"
       ],
       "short_name": "SfxKey",
       "title": "hieghest_apartment::game::assets::SfxKey",
