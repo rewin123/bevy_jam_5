@@ -88,6 +88,7 @@ pub enum SfxKey {
     NotEnoughResource,
     Eating,
     SprayPlant,
+    Peeing,
 }
 
 impl AssetKey for SfxKey {
@@ -106,6 +107,7 @@ impl FromWorld for HandleMap<SfxKey> {
                 SfxKey::ButtonPress,
                 asset_server.load("audio/sfx/button_press.ogg"),
             ),
+            (SfxKey::Peeing, asset_server.load("audio/sfx/peeing.ogg")),
             (SfxKey::Step1, asset_server.load("audio/sfx/step1.ogg")),
             (SfxKey::Step2, asset_server.load("audio/sfx/step2.ogg")),
             (SfxKey::Step3, asset_server.load("audio/sfx/step3.ogg")),

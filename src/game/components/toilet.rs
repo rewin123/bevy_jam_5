@@ -42,7 +42,7 @@ fn on_selected(
             target,
             target_pos: pc_transform.translation(),
         });
-        actions.add(ToiletWorkAction(sounds[&SfxKey::Water].clone_weak()));
+        actions.add(ToiletWorkAction(sounds[&SfxKey::Peeing].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {
