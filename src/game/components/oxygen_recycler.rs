@@ -1,6 +1,10 @@
-use bevy::prelude::*;
+use bevy::{
+    audio::{PlaybackMode, Volume},
+    prelude::*,
+};
 
 use crate::game::{
+    assets::{HandleMap, SfxKey},
     bilboard_state::BillboardContent,
     character::{CharState, CharacterStates, GoToAction},
     daycycle::GameTime,
@@ -52,6 +56,7 @@ fn on_selected(
     mut commands: Commands,
     q_players: Query<Entity, With<Player>>,
     mut q_oxygen_recyclers: Query<&GlobalTransform, With<OxygenRecyler>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     let target = trigger.entity();
 
@@ -65,7 +70,7 @@ fn on_selected(
             target,
             target_pos: or_transform.translation(),
         });
-        actions.add(OxygenRecyclerAction);
+        actions.add(OxygenRecyclerAction(sounds[&SfxKey::Cooking].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {
@@ -79,7 +84,7 @@ fn on_selected(
     }
 }
 
-pub struct OxygenRecyclerAction;
+pub struct OxygenRecyclerAction(pub Handle<AudioSource>);
 
 #[derive(Component, Default)]
 pub struct OxygenRecyclerWork {
@@ -91,7 +96,16 @@ impl CharacterAction for OxygenRecyclerAction {
         info!("trigger start or");
         commands
             .entity(target)
-            .insert(OxygenRecyclerWork::default());
+            .insert(OxygenRecyclerWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Remove,
+                    volume: Volume::new(1.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
