@@ -142,7 +142,11 @@ fn updated_water_cleaner(
                             text: Text::from_section("Not Enough Bad Water", text_style),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::NotEnoughResource].clone_weak(),
+                            ..default()
+                        });
                 }
             } else {
                 water.increase(water_cleaner_config.water_up);

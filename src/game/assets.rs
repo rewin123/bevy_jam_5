@@ -85,6 +85,8 @@ pub enum SfxKey {
     Cooking,
     StartMachine,
     Valve,
+    NotEnoughResource,
+    Eating,
 }
 
 impl AssetKey for SfxKey {
@@ -127,12 +129,16 @@ impl FromWorld for HandleMap<SfxKey> {
                 asset_server.load("audio/sfx/coins_sounds/coin.6.ogg"),
             ),
             (
-                SfxKey::Kitchen,
+                SfxKey::Eating,
                 asset_server.load("audio/sfx/crunch/crunch.2.ogg"),
             ),
             (
                 SfxKey::ToiletFlush,
                 asset_server.load("audio/sfx/toilet_02.ogg"),
+            ),
+            (
+                SfxKey::NotEnoughResource,
+                asset_server.load("audio/sfx/invalid_action.ogg"),
             ),
             (SfxKey::Water, asset_server.load("audio/sfx/bottle.ogg")),
             (SfxKey::Wave, asset_server.load("audio/sfx/wave.ogg")),
