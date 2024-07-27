@@ -1,11 +1,22 @@
-use bevy::prelude::*;
+use bevy::{
+    audio::{PlaybackMode, Volume},
+    prelude::*,
+};
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
-    character::{CharState, CharacterStates, GoToAction}, components::flowup_text::FlowUpText, daycycle::GameTime, difficult::RES_LIMIT, resources::{GameResource, Generate, Pee, Thirst, Water}, selectable::OnMouseClick, sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction}, spawn::{
+    assets::{HandleMap, SfxKey},
+    character::{CharState, CharacterStates, GoToAction},
+    components::flowup_text::FlowUpText,
+    daycycle::GameTime,
+    difficult::RES_LIMIT,
+    resources::{GameResource, Generate, Pee, Thirst, Water},
+    selectable::OnMouseClick,
+    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
+    spawn::{
         player::Player,
         spawn_commands::{Toilet, WaterDispenser},
-    }
+    },
 };
 
 pub fn plugin(app: &mut App) {
@@ -22,6 +33,7 @@ fn on_selected(
     mut commands: Commands,
     q_players: Query<Entity, With<Player>>,
     mut q_pcs: Query<&GlobalTransform, With<WaterDispenser>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     let target = trigger.entity();
 
@@ -36,7 +48,7 @@ fn on_selected(
             target,
             target_pos: pc_transform.translation(),
         });
-        actions.add(WaterDispenserWorkAction);
+        actions.add(WaterDispenserWorkAction(sounds[&SfxKey::Wave].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {
@@ -50,7 +62,7 @@ fn on_selected(
     }
 }
 
-pub struct WaterDispenserWorkAction;
+pub struct WaterDispenserWorkAction(Handle<AudioSource>);
 
 #[derive(Component, Default)]
 pub struct WaterDispenserWork {
@@ -89,7 +101,16 @@ impl CharacterAction for WaterDispenserWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
         commands
             .entity(target)
-            .insert(WaterDispenserWork::default());
+            .insert(WaterDispenserWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Remove,
+                    volume: Volume::new(3.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
@@ -111,9 +132,10 @@ fn updated_water_drinking(
     mut thrist_events: EventWriter<Generate<Thirst>>,
 
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut toilet_work, mut states) in q_toilet_work.iter_mut() {
-        states.add(CharState::Driking);
+        states.add(CharState::Drinking);
 
         toilet_work.work_time += time.delta_seconds();
 
@@ -121,9 +143,10 @@ fn updated_water_drinking(
         water_events.send(Generate::new(-WATER_SPENT_RATE));
         thrist_events.send(Generate::new(-DRINK_RATE));
 
-
-        if toilet_work.work_time > water_dispenser_config.work_time || water.amount() <= 0.0 || thirst.amount() <= 0.0 {
-           
+        if toilet_work.work_time > water_dispenser_config.work_time
+            || water.amount() <= 0.0
+            || thirst.amount() <= 0.0
+        {
             thirst.set_amount(0.0);
             info!(
                 "Drinking decreased : thirst {}, water {}, pee {}, limit {:#?}",
@@ -145,13 +168,14 @@ fn updated_water_drinking(
                     .spawn(BillboardTextBundle {
                         transform: Transform::from_translation(pc_transform.translation())
                             .with_scale(Vec3::splat(0.01)),
-                        text: Text::from_section(
-                            format!("- THIRST"),
-                            text_style,
-                        ),
+                        text: Text::from_section(format!("- THIRST"), text_style),
                         ..default()
                     })
-                    .insert(FlowUpText { lifetime: 1.0 });
+                    .insert(FlowUpText { lifetime: 1.0 })
+                    .insert(AudioBundle {
+                        source: sounds[&SfxKey::Water].clone_weak(),
+                        ..default()
+                    });
             }
         }
     }

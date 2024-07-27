@@ -7,6 +7,7 @@ use super::components::pc::Pc;
 use super::daycycle::GameTime;
 use super::debt::Debt;
 use super::sequence::{CharacterAction, NextAction};
+use bevy::audio::{PlaybackMode, Volume};
 use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
@@ -34,11 +35,22 @@ pub struct PcWork {
     pub work_time: f32,
 }
 
-pub struct PcWorkAction;
+pub struct PcWorkAction(pub Handle<AudioSource>);
 
 impl CharacterAction for PcWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
-        commands.entity(target).insert(PcWork::default());
+        commands
+            .entity(target)
+            .insert(PcWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Remove,
+                    volume: Volume::new(4.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
