@@ -2,7 +2,8 @@ use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
-    bilboard_state::BillboardContent,
+    assets::{HandleMap, SfxKey},
+    billboard_state::BillboardContent,
     character::{CharState, CharacterStates, GoToAction},
     daycycle::GameTime,
     device_state::{DeviceState, DeviceStatePlugin},
@@ -200,6 +201,7 @@ fn hydroponic_work(
     time: Res<GameTime>,
     mut water: ResMut<Water>,
     mut food: ResMut<Food>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (player_entity, mut work, mut states) in q_players.iter_mut() {
         let Ok((state, mut hydrponic, hydroponic_transform)) = q_hydroponics.get_mut(work.target)
@@ -238,7 +240,11 @@ fn hydroponic_work(
                             text: Text::from_section("Water refilled".to_string(), text_style),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::SprayPlant].clone_weak(),
+                            ..default()
+                        });
                 }
                 HydroponicState::Growed => {
                     food.increase(hydrponic.food_per_cycle);
@@ -256,7 +262,11 @@ fn hydroponic_work(
                             ),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::Eating].clone_weak(),
+                            ..default()
+                        });
                 }
                 HydroponicState::NeedWater(_) => {
                     commands
@@ -268,7 +278,11 @@ fn hydroponic_work(
                             text: Text::from_section("Water refilled".to_string(), text_style),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::SprayPlant].clone_weak(),
+                            ..default()
+                        });
                 }
                 HydroponicState::Dead => {
                     hydrponic.dead = false;

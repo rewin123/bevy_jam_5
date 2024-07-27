@@ -12,7 +12,7 @@ use crate::screen::Screen;
 
 use super::{
     assets::{HandleMap, SfxKey},
-    bilboard_state::{BillboardContent, BillboardSpawner},
+    billboard_state::{BillboardContent, BillboardSpawner},
     daycycle::{GameTime, TimeSpeed},
     resources::{
         CarbonDioxide, GameResource, Oxygen, OxygenRecycling, Pee, ResourceThreshold, Thirst,

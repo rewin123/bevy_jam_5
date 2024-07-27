@@ -41,7 +41,7 @@ fn on_selected(
     mut q_pcs: Query<&GlobalTransform, With<Pc>>,
     sounds: Res<HandleMap<SfxKey>>,
 ) {
-    let target = trigger.entity();
+    let target: Entity = trigger.entity();
 
     if trigger.event().0 != MouseButton::Left {
         return;
