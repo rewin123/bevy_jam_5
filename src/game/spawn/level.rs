@@ -1,14 +1,16 @@
 //! Spawn the main level by triggering other observers.
 
-use std::f32::consts::PI;
-
 use bevy::prelude::*;
 
-use crate::game::{
-    assets::{HandleMap, SceneKey},
-    components::pc::Pc,
-    daycycle::{NightLight, TimeSpeed},
-    selectable::Selectable,
+use crate::{
+    game::{
+        assets::{HandleMap, SceneKey},
+        components::pc::Pc,
+        daycycle::{NightLight, TimeSpeed},
+        selectable::Selectable,
+        ui::game_over::ResetGame,
+    },
+    screen::Screen,
 };
 
 use super::{
@@ -22,6 +24,19 @@ use super::{
 pub(super) fn plugin(app: &mut App) {
     app.observe(spawn_level);
     app.observe(setup_camera);
+    app.add_systems(PreUpdate, listen_reset.run_if(in_state(Screen::Playing)));
+}
+
+fn listen_reset(
+    mut commands: Commands,
+    keys: Res<ButtonInput<KeyCode>>,
+    mut reset: EventWriter<ResetGame>,
+) {
+    if keys.just_pressed(KeyCode::KeyR) {
+        reset.send(ResetGame {
+            target: commands.spawn_empty().id(),
+        });
+    }
 }
 
 #[derive(Event, Debug)]
@@ -60,8 +75,8 @@ fn spawn_level(
             commands.spawn(NightLight).insert(SpotLightBundle {
                 transform: Transform::from_translation(Vec3::new(x_pos, h, y_pos)),
                 spot_light: SpotLight {
-                    inner_angle: inner_angle,
-                    outer_angle: outer_angle,
+                    inner_angle,
+                    outer_angle,
                     ..default()
                 },
                 ..default()

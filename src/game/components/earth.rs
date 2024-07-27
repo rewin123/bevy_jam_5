@@ -1,9 +1,12 @@
 use bevy::prelude::*;
 
-use crate::game::daycycle::{DayDuration, GameTime};
+use crate::game::{
+    daycycle::{DayDuration, GameTime},
+    ui::game_over::ResetGame,
+};
 
 pub(crate) fn plugin(app: &mut App) {
-    app.add_systems(Update, rotate_earth);
+    app.add_systems(Update, (reset_earth, rotate_earth).chain());
 }
 
 #[derive(Component)]
@@ -21,4 +24,15 @@ fn rotate_earth(
 
     let rotate_speed = 2.0 * std::f32::consts::PI * freq;
     earth_transform.rotate_z(time.delta_seconds() * rotate_speed);
+}
+
+fn reset_earth(
+    mut reset: EventReader<ResetGame>,
+    mut q_earths: Query<&mut Transform, With<Earth>>,
+) {
+    for _ in reset.read() {
+        for mut trans in q_earths.iter_mut() {
+            trans.rotation = Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
+        }
+    }
 }

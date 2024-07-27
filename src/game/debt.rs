@@ -42,6 +42,17 @@ impl Debt {
     pub fn increase(&mut self) {
         self.amount += self.second_rate * self.amount;
     }
+    pub fn reset(&mut self) {
+        let day_rate = 0.2;
+        let day_duration = 30.0;
+
+        let second_rate = (1.0f64 + day_rate).powf(1.0 / day_duration) - 1.0;
+
+        self.amount = 13000.0;
+        self.day_rate = day_rate as f32;
+        self.second_rate = second_rate as f32;
+        self.last_updated = 0;
+    }
 }
 
 impl Default for Debt {

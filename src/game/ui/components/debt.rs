@@ -5,6 +5,7 @@ use node_tree::{div, InsertNodumEntity};
 
 use crate::game::daycycle::GameTime;
 use crate::game::debt::Debt;
+use crate::game::ui::game_over::ResetGame;
 
 use super::{hex2color, BACKGROUND_COLOR, BORDER_COLOR, FONT_PATH};
 
@@ -15,6 +16,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Startup, |mut cmds: Commands| {
         cmds.spawn(DebtMarker);
     });
+    app.add_systems(PreUpdate, reset_debt);
 }
 
 #[derive(Resource, PartialEq, Clone, Debug)]
@@ -31,6 +33,13 @@ pub struct PlotPoint {
 impl PlotPoint {
     pub const fn new(x: f32, y: f32) -> Self {
         Self { x, y }
+    }
+}
+
+fn reset_debt(mut debt: ResMut<Debt>, mut resets: EventReader<ResetGame>, mut plot: ResMut<Plot>) {
+    for _ in resets.read() {
+        plot.points = vec![];
+        debt.reset();
     }
 }
 
@@ -134,9 +143,9 @@ fn draw_plot_inner(plot: &Plot, width: f32, hieght: f32) -> NodeTree {
         return display;
     }
 
-    let min_x = plot.points.iter().map(|p| p.x).reduce(f32::min).unwrap();
-    let max_x = plot.points.iter().map(|p| p.x).reduce(f32::max).unwrap();
-    let min_y = plot.points.iter().map(|p| p.y).reduce(f32::min).unwrap();
+    // let min_x = plot.points.iter().map(|p| p.x).reduce(f32::min).unwrap();
+    // let max_x = plot.points.iter().map(|p| p.x).reduce(f32::max).unwrap();
+    // let min_y = plot.points.iter().map(|p| p.y).reduce(f32::min).unwrap();
     let max_y = plot.points.iter().map(|p| p.y).reduce(f32::max).unwrap() + 0.000001;
 
     // mid x line
@@ -162,7 +171,7 @@ fn draw_plot_inner(plot: &Plot, width: f32, hieght: f32) -> NodeTree {
     let bar_width = width / plot.points.len().max(30) as f32;
 
     for i in 0..plot.points.len() {
-        let x = plot.points[i].x;
+        // let x = plot.points[i].x;
         let y = plot.points[i].y;
 
         let bar_end = y / max_y;

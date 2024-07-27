@@ -11,7 +11,7 @@ pub mod components;
 mod computer_menu;
 pub mod constants;
 mod context_menu;
-mod game_over;
+pub mod game_over;
 mod root;
 
 pub(super) fn plugin(app: &mut App) {

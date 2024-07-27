@@ -1,9 +1,6 @@
 use std::f32::consts::PI;
 
-use bevy::{
-    ecs::{system::EntityCommands, world::Command},
-    prelude::*,
-};
+use bevy::{ecs::world::Command, prelude::*};
 
 use crate::game::{
     assets::{HandleMap, SceneKey},

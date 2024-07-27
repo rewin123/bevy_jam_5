@@ -1,4 +1,4 @@
-//// This file contains all major constans for game difficulty calculated from idea that distance between events must have known mean time distance
+//! This file contains all major constans for game difficulty calculated from idea that distance between events must have known mean time distance
 
 pub const EVENT_DISTANCE: f32 = 1.5; //some action nead to do every 2.5 second
 pub const EVENT_DURATION: f32 = 2.0; //duration for each action (approximatly)

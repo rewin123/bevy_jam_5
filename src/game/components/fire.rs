@@ -3,12 +3,13 @@ use bevy::prelude::*;
 use crate::game::{
     assets::{HandleMap, SfxKey},
     auto_anim::{AnimRange, AnimSet, AutoAnim, AutoAnimPlugin},
+    ui::game_over::ResetGame,
 };
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_plugins(AutoAnimPlugin::<FireSet>::default());
 
-    app.add_systems(PreUpdate, in_fire);
+    app.add_systems(PreUpdate, (reset_fires, in_fire).chain());
 }
 
 #[derive(Default, Component)]
@@ -105,6 +106,18 @@ fn in_fire(
     for (entity, fire_for) in fire.iter_mut() {
         if !q_in_fire.contains(fire_for.0) {
             commands.entity(entity).despawn_recursive();
+        }
+    }
+}
+
+fn reset_fires(
+    mut commands: Commands,
+    mut resets: EventReader<ResetGame>,
+    mut q_in_fire: Query<Entity, With<InFire>>,
+) {
+    for _ in resets.read() {
+        for fire in q_in_fire.iter_mut() {
+            commands.entity(fire).remove::<InFire>();
         }
     }
 }
