@@ -150,6 +150,7 @@ fn update_time(mut gametime: ResMut<GameTime>, real_time: Res<Time>) {
     let delta = real_time.delta_seconds() * gametime.context().relative_speed;
 
     gametime.advance_by(Duration::from_secs_f32(delta));
+
 }
 
 fn change_time_speed(
