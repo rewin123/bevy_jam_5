@@ -117,7 +117,7 @@ impl FromWorld for HandleMap<SfxKey> {
             ),
             (
                 SfxKey::Cooking,
-                asset_server.load("audio/sfx/dishes_03.ogg"),
+                asset_server.load("audio/sfx/cooking_pot.ogg"),
             ),
             (SfxKey::Valve, asset_server.load("audio/sfx/dishes_03.ogg")),
             (SfxKey::Fire, asset_server.load("audio/sfx/fire.ogg")),

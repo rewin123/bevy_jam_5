@@ -50,7 +50,7 @@ impl CharacterAction for KitchenWorkAction {
                 source: self.0.clone_weak(),
                 settings: PlaybackSettings {
                     mode: PlaybackMode::Remove,
-                    volume: Volume::new(1.0),
+                    volume: Volume::new(3.0),
                     ..Default::default()
                 },
                 ..default()
