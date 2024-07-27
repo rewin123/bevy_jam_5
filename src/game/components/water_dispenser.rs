@@ -100,7 +100,7 @@ impl CharacterAction for WaterDispenserWorkAction {
             .insert(AudioBundle {
                 source: self.0.clone_weak(),
                 settings: PlaybackSettings {
-                    mode: PlaybackMode::Loop,
+                    mode: PlaybackMode::Remove,
                     volume: Volume::new(3.0),
                     ..Default::default()
                 },

@@ -1,5 +1,5 @@
 use bevy::{
-    audio::{PlaybackMode, Volume},
+    audio::{AddAudioSource, PlaybackMode, Volume},
     prelude::*,
 };
 use bevy_mod_billboard::BillboardTextBundle;
@@ -47,7 +47,7 @@ impl CharacterAction for KitchenWorkAction {
             .insert(AudioBundle {
                 source: self.0.clone_weak(),
                 settings: PlaybackSettings {
-                    mode: PlaybackMode::Loop,
+                    mode: PlaybackMode::Remove,
                     volume: Volume::new(1.0),
                     ..Default::default()
                 },

@@ -113,7 +113,7 @@ impl FromWorld for HandleMap<SfxKey> {
             (SfxKey::Alarm, asset_server.load("audio/sfx/alarm.ogg")),
             (
                 SfxKey::Typing,
-                asset_server.load("audio/sfx/human_typing.ogg"),
+                asset_server.load("audio/sfx/typing_man.ogg"),
             ),
             (
                 SfxKey::Coin,
