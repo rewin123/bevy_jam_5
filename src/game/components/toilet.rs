@@ -92,7 +92,7 @@ impl CharacterAction for ToiletWorkAction {
                 source: self.0.clone_weak(),
                 settings: PlaybackSettings {
                     mode: PlaybackMode::Remove,
-                    volume: Volume::new(4.0),
+                    volume: Volume::new(3.0),
                     ..Default::default()
                 },
                 ..default()

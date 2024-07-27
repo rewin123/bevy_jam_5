@@ -138,7 +138,7 @@ impl FromWorld for HandleMap<SfxKey> {
             ),
             (
                 SfxKey::ToiletFlush,
-                asset_server.load("audio/sfx/toilet_02.ogg"),
+                asset_server.load("audio/sfx/toilet_sound_02.ogg"),
             ),
             (
                 SfxKey::NotEnoughResource,
