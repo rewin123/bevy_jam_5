@@ -15000,7 +15000,8 @@
         "Kitchen",
         "ToiletFlush",
         "Water",
-        "Wave"
+        "Wave",
+        "Typing"
       ],
       "short_name": "SfxKey",
       "title": "hieghest_apartment::game::assets::SfxKey",

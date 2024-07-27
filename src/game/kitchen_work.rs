@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    audio::{PlaybackMode, Volume},
+    prelude::*,
+};
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{components::flowup_text::FlowUpText, sequence::NextAction};
@@ -56,6 +59,17 @@ pub fn update_work_in_kitchen(
 ) {
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
         states.add(CharState::Working);
+
+        commands.entity(entity).insert(AudioBundle {
+            source: sounds[&SfxKey::Wave].clone_weak(),
+            settings: PlaybackSettings {
+                mode: PlaybackMode::Loop,
+                volume: Volume::new(3.0),
+                ..Default::default()
+            },
+            ..default()
+        });
+
         kitchen_work.work_time += time.delta_seconds();
         if kitchen_work.work_time > kitchen_work_config.work_time {
             let current_time = time.elapsed_seconds();

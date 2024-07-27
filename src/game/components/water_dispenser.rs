@@ -23,7 +23,6 @@ pub fn plugin(app: &mut App) {
     app.observe(on_selected);
 
     app.add_systems(Update, updated_water_drinking);
-    app.add_systems(Update, drinking_sfx);
 }
 
 const WATER_DISPENSER_GROUP: &str = "water_dispenser_work";
@@ -33,6 +32,7 @@ fn on_selected(
     mut commands: Commands,
     q_players: Query<Entity, With<Player>>,
     mut q_pcs: Query<&GlobalTransform, With<WaterDispenser>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     let target = trigger.entity();
 
@@ -47,7 +47,7 @@ fn on_selected(
             target,
             target_pos: pc_transform.translation(),
         });
-        actions.add(WaterDispenserWorkAction);
+        actions.add(WaterDispenserWorkAction(sounds[&SfxKey::Wave].clone_weak()));
 
         commands.trigger_targets(
             NewActionSequence {
@@ -61,7 +61,7 @@ fn on_selected(
     }
 }
 
-pub struct WaterDispenserWorkAction;
+pub struct WaterDispenserWorkAction(Handle<AudioSource>);
 
 #[derive(Component, Default)]
 pub struct WaterDispenserWork {
@@ -96,7 +96,16 @@ impl CharacterAction for WaterDispenserWorkAction {
     fn trigger_start(&self, commands: &mut Commands, target: Entity) {
         commands
             .entity(target)
-            .insert(WaterDispenserWork::default());
+            .insert(WaterDispenserWork::default())
+            .insert(AudioBundle {
+                source: self.0.clone_weak(),
+                settings: PlaybackSettings {
+                    mode: PlaybackMode::Loop,
+                    volume: Volume::new(3.0),
+                    ..Default::default()
+                },
+                ..default()
+            });
     }
 
     fn terminate(&self, commands: &mut Commands, target: Entity) {
@@ -155,28 +164,6 @@ fn updated_water_drinking(
                         ..default()
                     });
             }
-        }
-    }
-}
-
-fn drinking_sfx(
-    mut commands: Commands,
-    sounds: Res<HandleMap<SfxKey>>,
-    mut q_character_state: Query<(Entity, &mut CharacterStates)>,
-) {
-    for (entity, state) in q_character_state.iter_mut() {
-        let state = state.get_importantest_state();
-
-        if state == CharState::Drinking {
-            commands.entity(entity).insert(AudioBundle {
-                source: sounds[&SfxKey::Wave].clone_weak(),
-                settings: PlaybackSettings {
-                    mode: PlaybackMode::Loop,
-                    volume: Volume::new(3.0),
-                    ..Default::default()
-                },
-                ..default()
-            });
         }
     }
 }

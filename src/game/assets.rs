@@ -81,6 +81,7 @@ pub enum SfxKey {
     ToiletFlush,
     Water,
     Wave,
+    Typing,
 }
 
 impl AssetKey for SfxKey {
@@ -105,6 +106,10 @@ impl FromWorld for HandleMap<SfxKey> {
             (SfxKey::Step4, asset_server.load("audio/sfx/step4.ogg")),
             (SfxKey::Fire, asset_server.load("audio/sfx/fire.ogg")),
             (SfxKey::Alarm, asset_server.load("audio/sfx/alarm.ogg")),
+            (
+                SfxKey::Typing,
+                asset_server.load("audio/sfx/human_typing.ogg"),
+            ),
             (
                 SfxKey::Coin,
                 asset_server.load("audio/sfx/coins_sounds/coin.6.ogg"),
