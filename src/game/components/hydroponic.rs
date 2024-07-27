@@ -90,6 +90,7 @@ fn update_hydroponic(
     time: Res<Time>,
     mut query: Query<(&mut HydroponicState, &mut Hydroponic)>,
     mut bad_water: EventWriter<Generate<BadWater>>,
+    mut oxygen: EventWriter<Generate<Oxygen>>,
 ) {
     for (mut state, mut hydroponic) in query.iter_mut() {
         let dt = time.delta_seconds();
@@ -110,6 +111,7 @@ fn update_hydroponic(
             hydroponic.time_to_food -= dt;
             hydroponic.water -= hydroponic.water_consumption_rate * dt;
             bad_water.send(Generate::new(hydroponic.water_consumption_rate * 0.5));
+            oxygen.send(Generate::new(hydroponic.water_consumption_rate));
         }
 
         if hydroponic.water < 3.0 {
