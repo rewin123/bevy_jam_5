@@ -23,28 +23,28 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, update_oxygen_recycler_state);
     app.add_systems(PostUpdate, disable_oxygen_if_no_recycler);
 
-    app.add_plugins(DeviceStatePlugin::<OxygenRegenratorState>::default());
+    app.add_plugins(DeviceStatePlugin::<OxygenRegeneratorState>::default());
 }
 
 #[derive(Component, PartialEq, Clone)]
-pub enum OxygenRegenratorState {
+pub enum OxygenRegeneratorState {
     Idle,
     Work,
     InFire(f32),
 }
 
-impl DeviceState for OxygenRegenratorState {
+impl DeviceState for OxygenRegeneratorState {
     fn content(&self) -> BillboardContent {
         match self {
-            OxygenRegenratorState::Idle => BillboardContent::None,
-            OxygenRegenratorState::Work => BillboardContent::Text(Text::from_section(
-                "Oxigen++",
+            OxygenRegeneratorState::Idle => BillboardContent::None,
+            OxygenRegeneratorState::Work => BillboardContent::Text(Text::from_section(
+                "Oxygen++",
                 TextStyle {
                     color: Color::linear_rgb(0.1, 0.1, 1.0),
                     ..default()
                 },
             )),
-            OxygenRegenratorState::InFire(time) => BillboardContent::time_remaining(*time),
+            OxygenRegeneratorState::InFire(time) => BillboardContent::time_remaining(*time),
         }
     }
 }
@@ -146,13 +146,13 @@ fn update_oxygen_recycler_state(
             let Some(mut entity_cms) = commands.get_entity(entity) else {
                 continue;
             };
-            entity_cms.insert(OxygenRegenratorState::InFire(
+            entity_cms.insert(OxygenRegeneratorState::InFire(
                 fire.time_remaining(time.elapsed_seconds()),
             ));
         } else if recycling.working {
-            commands.entity(entity).insert(OxygenRegenratorState::Work);
+            commands.entity(entity).insert(OxygenRegeneratorState::Work);
         } else {
-            commands.entity(entity).insert(OxygenRegenratorState::Idle);
+            commands.entity(entity).insert(OxygenRegeneratorState::Idle);
         }
     }
 }

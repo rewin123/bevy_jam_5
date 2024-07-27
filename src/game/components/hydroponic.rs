@@ -262,7 +262,11 @@ fn hydroponic_work(
                             ),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::Eating].clone_weak(),
+                            ..default()
+                        });
                 }
                 HydroponicState::NeedWater(_) => {
                     commands
@@ -274,7 +278,11 @@ fn hydroponic_work(
                             text: Text::from_section("Water refilled".to_string(), text_style),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::SprayPlant].clone_weak(),
+                            ..default()
+                        });
                 }
                 HydroponicState::Dead => {
                     hydrponic.dead = false;
