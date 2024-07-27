@@ -46,7 +46,7 @@ impl CharacterAction for PcWorkAction {
                 source: self.0.clone_weak(),
                 settings: PlaybackSettings {
                     mode: PlaybackMode::Remove,
-                    volume: Volume::new(3.0),
+                    volume: Volume::new(4.0),
                     ..Default::default()
                 },
                 ..default()

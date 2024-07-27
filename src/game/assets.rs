@@ -83,6 +83,7 @@ pub enum SfxKey {
     Wave,
     Typing,
     Cooking,
+    StartMachine,
 }
 
 impl AssetKey for SfxKey {
@@ -105,6 +106,10 @@ impl FromWorld for HandleMap<SfxKey> {
             (SfxKey::Step2, asset_server.load("audio/sfx/step2.ogg")),
             (SfxKey::Step3, asset_server.load("audio/sfx/step3.ogg")),
             (SfxKey::Step4, asset_server.load("audio/sfx/step4.ogg")),
+            (
+                SfxKey::StartMachine,
+                asset_server.load("audio/sfx/metal_interaction1.ogg"),
+            ),
             (
                 SfxKey::Cooking,
                 asset_server.load("audio/sfx/dishes_03.ogg"),

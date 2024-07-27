@@ -70,7 +70,9 @@ fn on_selected(
             target,
             target_pos: or_transform.translation(),
         });
-        actions.add(OxygenRecyclerAction(sounds[&SfxKey::Cooking].clone_weak()));
+        actions.add(OxygenRecyclerAction(
+            sounds[&SfxKey::StartMachine].clone_weak(),
+        ));
 
         commands.trigger_targets(
             NewActionSequence {
@@ -101,7 +103,7 @@ impl CharacterAction for OxygenRecyclerAction {
                 source: self.0.clone_weak(),
                 settings: PlaybackSettings {
                     mode: PlaybackMode::Remove,
-                    volume: Volume::new(1.0),
+                    volume: Volume::new(2.0),
                     ..Default::default()
                 },
                 ..default()
