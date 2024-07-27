@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::bilboard_state::{BillboardContent, BillboardSinPos, BillboardSpawner};
+use super::billboard_state::{BillboardContent, BillboardSinPos, BillboardSpawner};
 
 pub struct DeviceStatePlugin<T: DeviceState> {
     _phantom: std::marker::PhantomData<T>,

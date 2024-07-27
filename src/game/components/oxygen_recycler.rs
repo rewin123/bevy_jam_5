@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::game::{
     assets::{HandleMap, SfxKey},
-    bilboard_state::BillboardContent,
+    billboard_state::BillboardContent,
     character::{CharState, CharacterStates, GoToAction},
     daycycle::GameTime,
     device_state::{DeviceState, DeviceStatePlugin},
