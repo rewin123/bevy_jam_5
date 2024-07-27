@@ -38,7 +38,7 @@ impl PlotPoint {
 
 fn reset_debt(mut debt: ResMut<Debt>, mut resets: EventReader<ResetGame>, mut plot: ResMut<Plot>) {
     for _ in resets.read() {
-        (*plot).points = vec![];
+        plot.points = vec![];
         debt.reset();
     }
 }
@@ -143,9 +143,9 @@ fn draw_plot_inner(plot: &Plot, width: f32, hieght: f32) -> NodeTree {
         return display;
     }
 
-    let min_x = plot.points.iter().map(|p| p.x).reduce(f32::min).unwrap();
-    let max_x = plot.points.iter().map(|p| p.x).reduce(f32::max).unwrap();
-    let min_y = plot.points.iter().map(|p| p.y).reduce(f32::min).unwrap();
+    // let min_x = plot.points.iter().map(|p| p.x).reduce(f32::min).unwrap();
+    // let max_x = plot.points.iter().map(|p| p.x).reduce(f32::max).unwrap();
+    // let min_y = plot.points.iter().map(|p| p.y).reduce(f32::min).unwrap();
     let max_y = plot.points.iter().map(|p| p.y).reduce(f32::max).unwrap() + 0.000001;
 
     // mid x line
@@ -171,7 +171,7 @@ fn draw_plot_inner(plot: &Plot, width: f32, hieght: f32) -> NodeTree {
     let bar_width = width / plot.points.len().max(30) as f32;
 
     for i in 0..plot.points.len() {
-        let x = plot.points[i].x;
+        // let x = plot.points[i].x;
         let y = plot.points[i].y;
 
         let bar_end = y / max_y;

@@ -1,6 +1,9 @@
 use bevy::{ecs::world::unsafe_world_cell::UnsafeWorldCell, prelude::*};
 use node_tree::{
-    div, styling::Styling, tree::{IntoNodeTree, NodeTree}, InsertNodumEntity
+    div,
+    styling::Styling,
+    tree::{IntoNodeTree, NodeTree},
+    InsertNodumEntity,
 };
 
 use super::*;
@@ -10,8 +13,8 @@ const OXYGEN_COLOR: &str = "#4a4a8c";
 const WATER_COLOR: &str = "#4a8c4a";
 const PEE_COLOR: &str = "#8c8c4a";
 const BAD_WATER_COLOR: &str = "#8c4a4a";
-const METAL_COLOR: &str = "#8c4a8c";
-const METAL_WASTE_COLOR: &str = "#4a8c4a";
+// const METAL_COLOR: &str = "#8c4a8c";
+// const METAL_WASTE_COLOR: &str = "#4a8c4a";
 const CO2_COLOR: &str = "#8c4a4a";
 const THIRST_COLOR: &str = "#4a8ccc";
 const FOOD_COLOR: &str = "#cc8c4a";
@@ -74,10 +77,7 @@ fn draw_resource_panel(world: &mut World) {
                     .with_width(Val::Percent(100.0))
                     .with_display(Display::Flex)
                     .with_flex_direction(FlexDirection::Row)
-                    .with_child(needs(
-                        &mut cell,
-                        &style,
-                    ))
+                    .with_child(needs(&mut cell, &style))
                     .with_child(resources(&mut cell, &style)),
             );
 
@@ -323,14 +323,22 @@ unsafe fn resources(cell: &mut UnsafeWorldCell, style: &ResourcePanelStyle) -> N
         .with_display(Display::Flex)
         .with_flex_direction(FlexDirection::Column)
         .with_height(Val::Percent(100.0))
-        .with_child(TextBundle::from_section("Food", style.text.clone()).with_style(Style {
-            align_self: AlignSelf::Center,
-            ..default()
-        }))
-        .with_child(TextBundle::from_section(format!("{}", cell.world().resource::<Food>().amount()), style.text.clone()).with_style(Style {
-            align_self: AlignSelf::Center,
-            ..default()
-        }))
+        .with_child(
+            TextBundle::from_section("Food", style.text.clone()).with_style(Style {
+                align_self: AlignSelf::Center,
+                ..default()
+            }),
+        )
+        .with_child(
+            TextBundle::from_section(
+                format!("{}", cell.world().resource::<Food>().amount()),
+                style.text.clone(),
+            )
+            .with_style(Style {
+                align_self: AlignSelf::Center,
+                ..default()
+            }),
+        )
 }
 
 /// Resource bar <-----------------------------------------------------------------------
@@ -348,7 +356,7 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
 
     let limit = val.limit().unwrap_or(100.0);
     let lvl = val.amount() / limit;
-    let lvl = lvl.max(0.0).min(1.0);
+    let lvl = lvl.clamp(0.0, 1.0);
 
     let mut bar_tree = NodeTree::default()
         .with_bundle(NodeBundle {

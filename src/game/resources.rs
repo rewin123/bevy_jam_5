@@ -4,7 +4,9 @@ use bevy_quill::Cx;
 use crate::screen::Screen;
 
 use super::{
-    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed}, difficult::OXYGEN_REGENRATE_SPEED, ui::components::resource_slider::ResourceSlider
+    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed},
+    difficult::OXYGEN_REGENRATE_SPEED,
+    ui::components::resource_slider::ResourceSlider,
     ui::game_over::ResetGame,
 };
 
@@ -283,12 +285,8 @@ simple_game_resource!(
     "You died of starvation. Your last thought was about the mortgage, not food."
 );
 
-
-
-
 impl_limitless_resource!(MetalTrash);
 impl_limitless_resource!(Metal);
-
 
 #[derive(Resource, Default)]
 pub struct AllResourcesGetter {
@@ -316,6 +314,7 @@ impl Default for OxygenRecycling {
 
 #[derive(Resource)]
 pub struct FoodGeneration {
+    #[allow(dead_code)]
     pub generation_rate: f32,
 }
 
@@ -464,6 +463,7 @@ pub enum ResourceThreshold {
     /// Is good if the value is between the threshold values
     HealthyRange,
     /// Is good if there is at least a min
+    #[allow(dead_code)]
     Necessity,
     /// Is good if there is less than the max
     Waste,
@@ -480,7 +480,7 @@ pub trait GameResource: Resource {
     fn label(&self) -> String;
     fn decrease(&mut self, decreate_amount: f32);
     fn increase(&mut self, increase_amount: f32);
-    fn reset(&mut self) -> ();
+    fn reset(&mut self);
 
     fn death_reason(&self, is_deficiency: bool) -> Option<String>;
 }

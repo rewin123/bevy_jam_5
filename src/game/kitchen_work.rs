@@ -4,7 +4,12 @@ use bevy_mod_billboard::BillboardTextBundle;
 use crate::game::{components::flowup_text::FlowUpText, sequence::NextAction};
 
 use super::{
-    assets::{HandleMap, SfxKey}, character::{CharState, CharacterStates}, components::kitchen::Kitchen, daycycle::GameTime, difficult::RACION_SIZE, resources::{Food, GameResource, Hungry, Pee}, sequence::CharacterAction
+    character::{CharState, CharacterStates},
+    components::kitchen::Kitchen,
+    daycycle::GameTime,
+    difficult::RACION_SIZE,
+    resources::{Food, GameResource, Hungry, Pee},
+    sequence::CharacterAction,
 };
 
 pub(crate) fn plugin(app: &mut App) {
@@ -20,7 +25,9 @@ pub(crate) fn plugin(app: &mut App) {
 #[derive(Resource)]
 pub struct KitchenWorkConfig {
     pub work_time: f32,
+    #[allow(dead_code)]
     pub amount_after_work: f32,
+    #[allow(dead_code)]
     pub multiplier: i32,
     pub last_updated: f32,
 }
@@ -51,7 +58,6 @@ pub fn update_work_in_kitchen(
     mut hungry: ResMut<Hungry>,
     mut food: ResMut<Food>,
     mut pee: ResMut<Pee>,
-    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut kitchen_work, mut states) in q_kitchen_work.iter_mut() {
         states.add(CharState::Working);
@@ -86,22 +92,20 @@ pub fn update_work_in_kitchen(
                         })
                         .insert(FlowUpText { lifetime: 1.0 });
                 }
-            } else {
-                if let Ok(pc_transform) = q_kitchen.get_single() {
-                    let text_style = TextStyle {
-                        color: Color::linear_rgb(0.0, 1.0, 0.0),
-                        font_size: 94.0,
+            } else if let Ok(pc_transform) = q_kitchen.get_single() {
+                let text_style = TextStyle {
+                    color: Color::linear_rgb(0.0, 1.0, 0.0),
+                    font_size: 94.0,
+                    ..default()
+                };
+                commands
+                    .spawn(BillboardTextBundle {
+                        transform: Transform::from_translation(pc_transform.translation())
+                            .with_scale(Vec3::splat(0.01)),
+                        text: Text::from_section("Not Enough Food", text_style),
                         ..default()
-                    };
-                    commands
-                        .spawn(BillboardTextBundle {
-                            transform: Transform::from_translation(pc_transform.translation())
-                                .with_scale(Vec3::splat(0.01)),
-                            text: Text::from_section("Not Enough Food", text_style),
-                            ..default()
-                        })
-                        .insert(FlowUpText { lifetime: 1.0 });
-                }    
+                    })
+                    .insert(FlowUpText { lifetime: 1.0 });
             }
         }
     }

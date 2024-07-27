@@ -2,7 +2,18 @@ use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
-    bilboard_state::BillboardContent, character::{CharState, CharacterStates, GoToAction}, daycycle::GameTime, device_state::{DeviceState, DeviceStatePlugin}, difficult::{HYDROPONIC_FOOD_PER_HARVEST, HYDROPONIC_OXYGEN_RATE, HYDROPONIC_TIME_TO_FOOD, HYDROPONIC_WATER_MAX, HYDROPONIC_WATER_RATE}, resources::*, selectable::OnMouseClick, sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction}, spawn::player::Player
+    bilboard_state::BillboardContent,
+    character::{CharState, CharacterStates, GoToAction},
+    daycycle::GameTime,
+    device_state::{DeviceState, DeviceStatePlugin},
+    difficult::{
+        HYDROPONIC_FOOD_PER_HARVEST, HYDROPONIC_OXYGEN_RATE, HYDROPONIC_TIME_TO_FOOD,
+        HYDROPONIC_WATER_MAX, HYDROPONIC_WATER_RATE,
+    },
+    resources::*,
+    selectable::OnMouseClick,
+    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
+    spawn::player::Player,
 };
 
 use super::flowup_text::*;
@@ -103,7 +114,6 @@ fn update_hydroponic(
             bad_water.send(Generate::new(hydroponic.water_consumption_rate * 0.5));
             oxygen.send(Generate::new(HYDROPONIC_OXYGEN_RATE));
             co2.send(Generate::new(-HYDROPONIC_OXYGEN_RATE));
-
         }
 
         if hydroponic.water < 3.0 {
@@ -131,7 +141,7 @@ fn on_clicked(
         return;
     }
 
-    if let Ok((hydro, hydro_transform)) = q_hydroponics.get_mut(target) {
+    if let Ok((_, hydro_transform)) = q_hydroponics.get_mut(target) {
         let mut actions = ActionGroup::new(HYDROPONIC_GROUP.to_string());
 
         actions.add(GoToAction {
@@ -192,8 +202,7 @@ fn hydroponic_work(
     mut food: ResMut<Food>,
 ) {
     for (player_entity, mut work, mut states) in q_players.iter_mut() {
-        let Ok((state, mut hydrponic, hydroponic_transform)) =
-            q_hydroponics.get_mut(work.target)
+        let Ok((state, mut hydrponic, hydroponic_transform)) = q_hydroponics.get_mut(work.target)
         else {
             commands.entity(player_entity).remove::<HydroponicWork>();
             commands.trigger_targets(NextAction, player_entity);
