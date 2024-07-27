@@ -5,9 +5,13 @@ use std::time::Duration;
 use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
     prelude::*,
+    transform::commands,
 };
 
-use super::{resources::GameResource, ui::components::hex2color};
+use super::{
+    ui::game_over::ResetGame,
+    {resources::GameResource, ui::components::hex2color},
+};
 
 pub type GameTime = Time<GameTimeContext>;
 
@@ -31,6 +35,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, change_time_speed);
 
     app.add_systems(Update, night_light);
+    app.add_systems(PostUpdate, reset_time);
 
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
@@ -43,7 +48,7 @@ const SPOTLIGHT_COLOR: &str = "#a85032";
 
 fn night_light(
     mut q_lights: Query<(&mut Transform, &mut SpotLight), With<NightLight>>,
-    q_dir_light: Query<&GlobalTransform, With<DirectionalLight>>
+    q_dir_light: Query<&GlobalTransform, With<DirectionalLight>>,
 ) {
     let Ok(dir_light) = q_dir_light.get_single() else {
         return;
@@ -52,7 +57,7 @@ fn night_light(
     let dir = dir_light.forward();
     let sunset = dir.dot(-Vec3::Y);
 
-    for (mut transform, mut light) in &mut q_lights {
+    for (mut transform, mut light) in q_lights.iter_mut() {
         if sunset > 0.7 {
             light.intensity = 0.0;
         } else {
@@ -150,7 +155,6 @@ fn update_time(mut gametime: ResMut<GameTime>, real_time: Res<Time>) {
     let delta = real_time.delta_seconds() * gametime.context().relative_speed;
 
     gametime.advance_by(Duration::from_secs_f32(delta));
-
 }
 
 fn change_time_speed(
@@ -191,6 +195,25 @@ pub struct GameTimeContext {
 impl GameTimeContext {
     pub fn set_relative_speed(&mut self, speed: f32) {
         self.relative_speed = speed;
+    }
+}
+
+fn reset_time(
+    mut commands: Commands,
+    mut resets: EventReader<ResetGame>,
+    mut day_pased: ResMut<DayPassed>,
+    mut gametime: ResMut<GameTime>,
+    mut day_state: ResMut<DayState>,
+    mut day_start: EventWriter<DayStart>,
+    mut time_speed: ResMut<TimeSpeed>,
+) {
+    for _ in resets.read() {
+        day_pased.0 = 0;
+        *time_speed = TimeSpeed::Normal;
+        *day_state = DayState::Day;
+        let mut new_game_time = GameTime::default();
+        new_game_time.advance_by(Duration::from_millis(1000 / 60));
+        commands.insert_resource(new_game_time);
     }
 }
 

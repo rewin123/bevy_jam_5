@@ -4,7 +4,10 @@ use bevy_quill::Cx;
 use crate::screen::Screen;
 
 use super::{
-    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed}, difficult::OXYGEN_REGENRATE_SPEED, ui::components::resource_slider::ResourceSlider
+    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed},
+    difficult::OXYGEN_REGENRATE_SPEED,
+    ui::components::resource_slider::ResourceSlider,
+    ui::game_over::ResetGame,
 };
 
 pub(crate) fn plugin(app: &mut App) {
@@ -55,6 +58,10 @@ macro_rules! impl_limitless_resource {
 
             fn set_amount(&mut self, amount: f32) {
                 self.amount = amount;
+            }
+
+            fn reset(&mut self) -> () {
+                self.amount = 0.0;
             }
 
             fn limit(&self) -> Option<f32> {
@@ -133,6 +140,10 @@ macro_rules! simple_game_resource {
                 self.amount = amount;
             }
 
+            fn reset(&mut self) -> () {
+                self.amount = $initial_amount;
+            }
+
             fn limit(&self) -> Option<f32> {
                 Some(self.limit)
             }
@@ -182,7 +193,7 @@ simple_game_resource!(
 
 simple_game_resource!(
     Food,
-    5.0,
+    13.0,
     100.0,
     None,
     None,
@@ -274,12 +285,8 @@ simple_game_resource!(
     "You died of starvation. Your last thought was about the mortgage, not food."
 );
 
-
-
-
 impl_limitless_resource!(MetalTrash);
 impl_limitless_resource!(Metal);
-
 
 #[derive(Resource, Default)]
 pub struct AllResourcesGetter {
@@ -307,6 +314,7 @@ impl Default for OxygenRecycling {
 
 #[derive(Resource)]
 pub struct FoodGeneration {
+    #[allow(dead_code)]
     pub generation_rate: f32,
 }
 
@@ -422,6 +430,7 @@ impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
         app.add_event::<Generate<T>>();
         app.add_systems(PostUpdate, collect_generations::<T>);
         app.add_systems(PostUpdate, check_death_conditions::<T>);
+        app.add_systems(PostUpdate, reset_resource::<T>);
 
         app.world_mut()
             .resource_mut::<AllResourcesGetter>()
@@ -443,11 +452,18 @@ impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
     }
 }
 
+fn reset_resource<T: GameResource>(mut resource: ResMut<T>, mut resets: EventReader<ResetGame>) {
+    for _ in resets.read() {
+        resource.reset();
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ResourceThreshold {
     /// Is good if the value is between the threshold values
     HealthyRange,
     /// Is good if there is at least a min
+    #[allow(dead_code)]
     Necessity,
     /// Is good if there is less than the max
     Waste,
@@ -464,6 +480,7 @@ pub trait GameResource: Resource {
     fn label(&self) -> String;
     fn decrease(&mut self, decreate_amount: f32);
     fn increase(&mut self, increase_amount: f32);
+    fn reset(&mut self);
 
     fn death_reason(&self, is_deficiency: bool) -> Option<String>;
 }

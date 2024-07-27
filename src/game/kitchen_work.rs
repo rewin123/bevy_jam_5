@@ -1,5 +1,5 @@
 use bevy::{
-    audio::{AddAudioSource, PlaybackMode, Volume},
+    audio::{PlaybackMode, Volume},
     prelude::*,
 };
 use bevy_mod_billboard::BillboardTextBundle;
@@ -29,7 +29,9 @@ pub(crate) fn plugin(app: &mut App) {
 #[derive(Resource)]
 pub struct KitchenWorkConfig {
     pub work_time: f32,
+    #[allow(dead_code)]
     pub amount_after_work: f32,
+    #[allow(dead_code)]
     pub multiplier: i32,
     pub last_updated: f32,
 }

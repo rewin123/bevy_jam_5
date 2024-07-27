@@ -142,7 +142,7 @@ fn on_clicked(
         return;
     }
 
-    if let Ok((hydro, hydro_transform)) = q_hydroponics.get_mut(target) {
+    if let Ok((_, hydro_transform)) = q_hydroponics.get_mut(target) {
         let mut actions = ActionGroup::new(HYDROPONIC_GROUP.to_string());
 
         actions.add(GoToAction {

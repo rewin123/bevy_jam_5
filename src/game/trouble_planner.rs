@@ -4,7 +4,13 @@ use rand::prelude::*;
 use rand_distr::{Distribution, Poisson};
 
 use super::{
-    assets::{HandleMap, SceneKey}, character::DestinationTarget, components::fire::InFire, difficult::{EVENTS_IN_LOOP, EVENT_LOOP_DURATION, FIRE_MEAN_PERIOD}, selectable::Selectable, spawn::{player::Player, spawn_commands::MetalTrashPile}
+    assets::{HandleMap, SceneKey},
+    character::DestinationTarget,
+    components::fire::InFire,
+    difficult::FIRE_MEAN_PERIOD,
+    selectable::Selectable,
+    spawn::{player::Player, spawn_commands::MetalTrashPile},
+    ui::game_over::ResetGame,
 };
 
 #[derive(Resource, Debug)]
@@ -21,9 +27,18 @@ pub(crate) fn plugin(app: &mut App) {
         distribution: DEFAULT_DISTRIBUTION,
     });
 
-    app.add_systems(Update, plan_trouble);
+    app.add_systems(Update, (reset_earth, plan_trouble));
     app.add_systems(Update, fix_trouble);
     app.add_systems(PostUpdate, tick_fire);
+}
+
+fn reset_earth(mut commands: Commands, mut reset: EventReader<ResetGame>) {
+    for _ in reset.read() {
+        commands.insert_resource(TroublePlanner {
+            peace_time: DEFAULT_PEACE_TIME,
+            distribution: DEFAULT_DISTRIBUTION,
+        });
+    }
 }
 
 fn plan_trouble(
@@ -76,7 +91,6 @@ fn fix_trouble(
         }
     }
 }
-
 
 // Fire will destroy things if they are burning for X amount of time
 fn tick_fire(
