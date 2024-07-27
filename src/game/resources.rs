@@ -192,8 +192,8 @@ simple_game_resource!(
     Oxygen,
     50.0,
     100.0,
-    Some(10.0),
-    Some(90.0),
+    Some(20.0),
+    Some(80.0),
     ResourceThreshold::HealthyRange,
     "You suffocated trying to save on oxygen tanks to pay the mortgage. To breathe or to pay - that is the question!",
     "You exploded from excess oxygen. Your mortgage also bubbled up, but alas, didn't pop."
