@@ -5,6 +5,7 @@ use crate::screen::Screen;
 
 use super::{
     daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed}, difficult::OXYGEN_REGENRATE_SPEED, ui::components::resource_slider::ResourceSlider
+    ui::game_over::ResetGame,
 };
 
 pub(crate) fn plugin(app: &mut App) {
@@ -55,6 +56,10 @@ macro_rules! impl_limitless_resource {
 
             fn set_amount(&mut self, amount: f32) {
                 self.amount = amount;
+            }
+
+            fn reset(&mut self) -> () {
+                self.amount = 0.0;
             }
 
             fn limit(&self) -> Option<f32> {
@@ -131,6 +136,10 @@ macro_rules! simple_game_resource {
 
             fn set_amount(&mut self, amount: f32) {
                 self.amount = amount;
+            }
+
+            fn reset(&mut self) -> () {
+                self.amount = $initial_amount;
             }
 
             fn limit(&self) -> Option<f32> {
@@ -422,6 +431,7 @@ impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
         app.add_event::<Generate<T>>();
         app.add_systems(PostUpdate, collect_generations::<T>);
         app.add_systems(PostUpdate, check_death_conditions::<T>);
+        app.add_systems(PostUpdate, reset_resource::<T>);
 
         app.world_mut()
             .resource_mut::<AllResourcesGetter>()
@@ -440,6 +450,12 @@ impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
                     resource_threshold: val.resource_threshold(),
                 }
             }));
+    }
+}
+
+fn reset_resource<T: GameResource>(mut resource: ResMut<T>, mut resets: EventReader<ResetGame>) {
+    for _ in resets.read() {
+        resource.reset();
     }
 }
 
@@ -464,6 +480,7 @@ pub trait GameResource: Resource {
     fn label(&self) -> String;
     fn decrease(&mut self, decreate_amount: f32);
     fn increase(&mut self, increase_amount: f32);
+    fn reset(&mut self) -> ();
 
     fn death_reason(&self, is_deficiency: bool) -> Option<String>;
 }

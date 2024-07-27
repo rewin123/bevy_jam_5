@@ -5,6 +5,7 @@ use node_tree::{div, InsertNodumEntity};
 
 use crate::game::daycycle::GameTime;
 use crate::game::debt::Debt;
+use crate::game::ui::game_over::ResetGame;
 
 use super::{hex2color, BACKGROUND_COLOR, BORDER_COLOR, FONT_PATH};
 
@@ -15,6 +16,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Startup, |mut cmds: Commands| {
         cmds.spawn(DebtMarker);
     });
+    app.add_systems(PreUpdate, reset_debt);
 }
 
 #[derive(Resource, PartialEq, Clone, Debug)]
@@ -31,6 +33,13 @@ pub struct PlotPoint {
 impl PlotPoint {
     pub const fn new(x: f32, y: f32) -> Self {
         Self { x, y }
+    }
+}
+
+fn reset_debt(mut debt: ResMut<Debt>, mut resets: EventReader<ResetGame>, mut plot: ResMut<Plot>) {
+    for _ in resets.read() {
+        (*plot).points = vec![];
+        debt.reset();
     }
 }
 

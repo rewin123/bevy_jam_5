@@ -5,9 +5,13 @@ use std::time::Duration;
 use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
     prelude::*,
+    transform::commands,
 };
 
-use super::{resources::GameResource, ui::components::hex2color};
+use super::{
+    ui::game_over::ResetGame,
+    {resources::GameResource, ui::components::hex2color},
+};
 
 pub type GameTime = Time<GameTimeContext>;
 
@@ -31,6 +35,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, change_time_speed);
 
     app.add_systems(Update, night_light);
+    app.add_systems(PostUpdate, reset_time);
 
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
@@ -43,7 +48,7 @@ const SPOTLIGHT_COLOR: &str = "#a85032";
 
 fn night_light(
     mut q_lights: Query<(&mut Transform, &mut SpotLight), With<NightLight>>,
-    q_dir_light: Query<&GlobalTransform, With<DirectionalLight>>
+    q_dir_light: Query<&GlobalTransform, With<DirectionalLight>>,
 ) {
     let Ok(dir_light) = q_dir_light.get_single() else {
         return;
@@ -190,6 +195,22 @@ pub struct GameTimeContext {
 impl GameTimeContext {
     pub fn set_relative_speed(&mut self, speed: f32) {
         self.relative_speed = speed;
+    }
+}
+
+fn reset_time(
+    mut commands: Commands,
+    mut resets: EventReader<ResetGame>,
+    mut day_duration: ResMut<DayDuration>,
+    mut day_pased: ResMut<DayPassed>,
+    mut gametime: ResMut<GameTime>,
+    mut day_state: ResMut<DayState>,
+) {
+    for _ in resets.read() {
+        day_duration.0 = 0.0;
+        day_pased.0 = 0;
+        *day_state = DayState::Day;
+        commands.insert_resource(GameTime::default());
     }
 }
 

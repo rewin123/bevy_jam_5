@@ -1,9 +1,36 @@
 use bevy::prelude::*;
+use bevy_mod_picking::{
+    events::{Click, Pointer},
+    prelude::{EntityEvent, ListenerInput, On},
+};
 
-use crate::game::daycycle::PlayerDied;
+use crate::{
+    game::daycycle::PlayerDied,
+    ui::{
+        palette::{
+            BUTTON_HOVERED_BACKGROUND, BUTTON_PRESSED_BACKGROUND, BUTTON_TEXT, NODE_BACKGROUND,
+        },
+        prelude::InteractionPalette,
+    },
+};
 
 pub(super) fn plugin(app: &mut App) {
+    app.add_event::<ResetGame>();
     app.add_systems(PostUpdate, spawn_game_over_screen);
+}
+
+#[derive(Event, Clone, EntityEvent)]
+pub(crate) struct ResetGame {
+    #[target]
+    pub target: Entity,
+}
+
+impl From<ListenerInput<Pointer<Click>>> for ResetGame {
+    fn from(value: ListenerInput<Pointer<Click>>) -> Self {
+        Self {
+            target: value.target(),
+        }
+    }
 }
 
 #[derive(Component)]
@@ -54,5 +81,39 @@ fn spawn_game_over_screen(mut commands: Commands, mut death_event: EventReader<P
                 ])
                 .with_text_justify(JustifyText::Center),
             );
+
+            builder
+                .spawn((
+                    ButtonBundle {
+                        style: Style {
+                            width: Val::Px(200.0),
+                            height: Val::Px(65.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..default()
+                        },
+                        background_color: BackgroundColor(NODE_BACKGROUND),
+                        ..default()
+                    },
+                    InteractionPalette {
+                        none: NODE_BACKGROUND,
+                        hovered: BUTTON_HOVERED_BACKGROUND,
+                        pressed: BUTTON_PRESSED_BACKGROUND,
+                    },
+                    On::<Pointer<Click>>::send_event::<ResetGame>(),
+                ))
+                .with_children(|builder| {
+                    builder.spawn((
+                        Name::new("reset button"),
+                        TextBundle::from_section(
+                            "Reset",
+                            TextStyle {
+                                font_size: 40.0,
+                                color: BUTTON_TEXT,
+                                ..default()
+                            },
+                        ),
+                    ));
+                });
         });
 }
