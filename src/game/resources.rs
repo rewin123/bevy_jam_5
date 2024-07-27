@@ -193,7 +193,7 @@ simple_game_resource!(
 
 simple_game_resource!(
     Food,
-    5.0,
+    13.0,
     100.0,
     None,
     None,
