@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
+    assets::{HandleMap, SfxKey},
     character::{CharState, CharacterStates, GoToAction},
     components::flowup_text::FlowUpText,
     daycycle::GameTime,
@@ -98,6 +99,7 @@ fn update_pee_work(
     mut pee: ResMut<Pee>,
     mut bad_water: ResMut<BadWater>,
     q_toilet: Query<&GlobalTransform, With<Toilet>>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (entity, mut toilet_work, mut states) in q_toilet_work.iter_mut() {
         states.add(CharState::Peeing);
@@ -130,7 +132,11 @@ fn update_pee_work(
                         ),
                         ..default()
                     })
-                    .insert(FlowUpText { lifetime: 1.0 });
+                    .insert(FlowUpText { lifetime: 1.0 })
+                    .insert(AudioBundle {
+                        source: sounds[&SfxKey::ToiletFlush].clone_weak(),
+                        ..default()
+                    });
             }
         }
     }
