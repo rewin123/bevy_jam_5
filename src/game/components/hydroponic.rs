@@ -2,7 +2,19 @@ use bevy::prelude::*;
 use bevy_mod_billboard::BillboardTextBundle;
 
 use crate::game::{
-    bilboard_state::BillboardContent, character::{CharState, CharacterStates, GoToAction}, daycycle::GameTime, device_state::{DeviceState, DeviceStatePlugin}, difficult::{HYDROPONIC_FOOD_PER_HARVEST, HYDROPONIC_OXYGEN_RATE, HYDROPONIC_TIME_TO_FOOD, HYDROPONIC_WATER_MAX, HYDROPONIC_WATER_RATE}, resources::*, selectable::OnMouseClick, sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction}, spawn::player::Player
+    assets::{HandleMap, SfxKey},
+    bilboard_state::BillboardContent,
+    character::{CharState, CharacterStates, GoToAction},
+    daycycle::GameTime,
+    device_state::{DeviceState, DeviceStatePlugin},
+    difficult::{
+        HYDROPONIC_FOOD_PER_HARVEST, HYDROPONIC_OXYGEN_RATE, HYDROPONIC_TIME_TO_FOOD,
+        HYDROPONIC_WATER_MAX, HYDROPONIC_WATER_RATE,
+    },
+    resources::*,
+    selectable::OnMouseClick,
+    sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction},
+    spawn::player::Player,
 };
 
 use super::flowup_text::*;
@@ -103,7 +115,6 @@ fn update_hydroponic(
             bad_water.send(Generate::new(hydroponic.water_consumption_rate * 0.5));
             oxygen.send(Generate::new(HYDROPONIC_OXYGEN_RATE));
             co2.send(Generate::new(-HYDROPONIC_OXYGEN_RATE));
-
         }
 
         if hydroponic.water < 3.0 {
@@ -190,10 +201,10 @@ fn hydroponic_work(
     time: Res<GameTime>,
     mut water: ResMut<Water>,
     mut food: ResMut<Food>,
+    sounds: Res<HandleMap<SfxKey>>,
 ) {
     for (player_entity, mut work, mut states) in q_players.iter_mut() {
-        let Ok((state, mut hydrponic, hydroponic_transform)) =
-            q_hydroponics.get_mut(work.target)
+        let Ok((state, mut hydrponic, hydroponic_transform)) = q_hydroponics.get_mut(work.target)
         else {
             commands.entity(player_entity).remove::<HydroponicWork>();
             commands.trigger_targets(NextAction, player_entity);
@@ -229,7 +240,11 @@ fn hydroponic_work(
                             text: Text::from_section("Water refilled".to_string(), text_style),
                             ..default()
                         })
-                        .insert(FlowUpText { lifetime: 1.0 });
+                        .insert(FlowUpText { lifetime: 1.0 })
+                        .insert(AudioBundle {
+                            source: sounds[&SfxKey::SprayPlant].clone_weak(),
+                            ..default()
+                        });
                 }
                 HydroponicState::Growed => {
                     food.increase(hydrponic.food_per_cycle);

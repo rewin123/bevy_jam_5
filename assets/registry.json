@@ -15006,7 +15006,8 @@
         "StartMachine",
         "Valve",
         "NotEnoughResource",
-        "Eating"
+        "Eating",
+        "SprayPlant"
       ],
       "short_name": "SfxKey",
       "title": "hieghest_apartment::game::assets::SfxKey",
