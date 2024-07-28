@@ -5,6 +5,7 @@ use node_tree::{div, InsertNodumEntity};
 
 use crate::game::daycycle::GameTime;
 use crate::game::debt::Debt;
+use crate::game::difficult::money_k;
 use crate::game::ui::game_over::ResetGame;
 
 use super::{hex2color, BACKGROUND_COLOR, BORDER_COLOR, FONT_PATH};
@@ -55,7 +56,7 @@ fn spawn_debt_ui(
     asset_server: Res<AssetServer>,
 ) {
     let dept_width = 250.0;
-    let debt_height = 150.0;
+    let debt_height = 170.0;
 
     let plot_shift_left = 10.0;
     let plot_shift = 20.0;
@@ -75,7 +76,7 @@ fn spawn_debt_ui(
         .with_position_type(PositionType::Absolute);
 
     let plot_width = dept_width - plot_shift_left * 2.0;
-    let plot_height = debt_height - plot_shift * 3.0;
+    let plot_height = debt_height - plot_shift * 3.0 - 20.0;
     let inner_plot = draw_plot_inner(&plot, plot_width, plot_height);
 
     let style = TextStyle {
@@ -101,7 +102,7 @@ fn spawn_debt_ui(
             format!(
                 "Debt: {:.0} (+{:.0}/s)",
                 debt.amount,
-                debt.amount * debt.second_rate
+                debt.amount * debt.second_rate,
             ),
             TextStyle {
                 font: asset_server.load(FONT_PATH),
@@ -113,9 +114,25 @@ fn spawn_debt_ui(
         .with_bottom(Val::Px(0.0))
         .with_left(Val::Px(plot_shift_left))
         .with_width(Val::Px(plot_width))
-        .with_height(Val::Px(30.0))
+        .with_height(Val::Px(50.0))
         .with_position_type(PositionType::Absolute),
-    );
+    )
+    .with_child(
+        TextBundle::from_section(
+            format!("Debt rate: +{:.2}%/s", money_k() * 100.0),
+            TextStyle { 
+                font: asset_server.load(FONT_PATH),
+                font_size: 18.0,
+                color: hex2color("#8c4a4a").lighter(0.4),
+            })
+            .into_node_tree()
+            .with_bottom(Val::Px(5.0))
+            .with_left(Val::Px(plot_shift_left))
+            .with_width(Val::Px(plot_width))
+            .with_height(Val::Px(15.0))
+            .with_position_type(PositionType::Absolute),
+        )
+    ;
 
     parent = parent.with_child(
         inner_plot
