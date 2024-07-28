@@ -8,14 +8,16 @@ use bevy::{
     utils::HashSet,
 };
 
-use crate::screen::Screen;
+use crate::{game::resources::Food, screen::Screen};
 
 use super::{
     assets::{HandleMap, SfxKey},
     billboard_state::{BillboardContent, BillboardSpawner},
+    components::oxygen_recycler,
     daycycle::{GameTime, TimeSpeed},
     resources::{
-        CarbonDioxide, GameResource, Oxygen, OxygenRecycling, Pee, ResourceThreshold, Thirst,
+        CarbonDioxide, GameResource, Hungry, Oxygen, OxygenRecycling, Pee, ResourceThreshold,
+        Thirst,
     },
     selectable::OnMouseClick,
     sequence::{ActionGroup, CharacterAction, NewActionSequence, NewMode, NextAction, Sequence},
@@ -30,6 +32,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, set_resource_warnings::<Oxygen>);
     app.add_systems(Update, set_resource_warnings::<Pee>);
     app.add_systems(Update, set_resource_warnings::<Thirst>);
+    app.add_systems(Update, set_resource_warnings::<Hungry>);
     app.add_systems(PostUpdate, (print_state, set_house_state).chain());
     app.enable_state_scoped_entities::<HouseState>();
     app.add_systems(OnEnter(HouseState::Alarm), play_alarm);
@@ -281,6 +284,7 @@ fn print_state(mut q_char: Query<(&mut CharacterStates, &mut BillboardSpawner)>)
 
 fn set_resource_warnings<T: GameResource + Clone>(
     mut q_char: Query<&mut CharacterStates>,
+    mut oxygen_recycler: Res<OxygenRecycling>,
     resource: ResMut<T>,
     mut time_speed: ResMut<TimeSpeed>,
     screen: Res<State<Screen>>,
@@ -290,19 +294,20 @@ fn set_resource_warnings<T: GameResource + Clone>(
     }
 
     let amount = resource.amount();
+    let oxygen_working = oxygen_recycler.working;
     let (min_o, max_o) = resource.warning_thresholds();
     let state: CharState = match (resource.resource_threshold(), min_o, max_o) {
         (ResourceThreshold::HealthyRange, Some(min), _) if min >= amount => {
-            resource_to_state(resource.clone(), true)
+            resource_to_state(resource.clone(), true, oxygen_working)
         }
         (ResourceThreshold::HealthyRange, _, Some(max)) if max <= amount => {
-            resource_to_state(resource.clone(), false)
+            resource_to_state(resource.clone(), false, oxygen_working)
         }
         (ResourceThreshold::Necessity, Some(min), _) if min >= amount => {
-            resource_to_state(resource.clone(), true)
+            resource_to_state(resource.clone(), true, oxygen_working)
         }
         (ResourceThreshold::Waste, _, Some(max)) if max <= amount => {
-            resource_to_state(resource.clone(), false)
+            resource_to_state(resource.clone(), false, oxygen_working)
         }
         _ => CharState::Idle,
     };
@@ -316,16 +321,34 @@ fn set_resource_warnings<T: GameResource + Clone>(
  * Map from a [`GameResource`] to it's [`CharState`]
  * Used in [`set_resources_warnings`] to automatically set billboards
  */
-fn resource_to_state<T: GameResource + Any>(res: T, is_deficiency: bool) -> CharState {
-    let oxygen_id = TypeId::of::<Oxygen>();
-    let pee_id = TypeId::of::<Pee>();
-    let thirst_id = TypeId::of::<Thirst>();
+fn resource_to_state<T: GameResource + Any>(
+    res: T,
+    is_deficiency: bool,
+    oxygen_working: bool,
+) -> CharState {
+    let any_res = &res as &dyn Any;
 
-    match (res.type_id(), is_deficiency) {
-        (oxygen_id, false) => CharState::TooManyOxigen,
-        (oxygen_id, true) => CharState::WantOxigen,
-        (pee_id, false) => CharState::WantPee,
-        (thirst_id, false) => CharState::WantDrink,
-        _ => CharState::Idle,
+    if any_res.downcast_ref::<Oxygen>().is_some() {
+        return if is_deficiency {
+            CharState::WantOxigen
+        } else if oxygen_working {
+            // Special Case, that only triggers if there is oxygen generation
+            CharState::TooManyOxigen
+        } else {
+            CharState::Idle
+        };
     }
+
+    if any_res.downcast_ref::<Hungry>().is_some() && !is_deficiency {
+        return CharState::WantEat;
+    }
+
+    if any_res.downcast_ref::<Pee>().is_some() && is_deficiency {
+        return CharState::WantPee;
+    }
+
+    if any_res.downcast_ref::<Thirst>().is_some() && !is_deficiency {
+        return CharState::WantDrink;
+    }
+    return CharState::Idle;
 }
