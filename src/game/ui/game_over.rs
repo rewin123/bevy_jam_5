@@ -5,7 +5,7 @@ use bevy_mod_picking::{
 };
 
 use crate::{
-    game::daycycle::PlayerDied,
+    game::daycycle::GameOver,
     ui::{
         palette::{
             BUTTON_HOVERED_BACKGROUND, BUTTON_PRESSED_BACKGROUND, BUTTON_TEXT, NODE_BACKGROUND,
@@ -52,7 +52,7 @@ fn remove_end_screen_on_reset(
 #[derive(Component)]
 pub(crate) struct GameOverScreen;
 
-fn spawn_game_over_screen(mut commands: Commands, mut death_event: EventReader<PlayerDied>) {
+fn spawn_game_over_screen(mut commands: Commands, mut death_event: EventReader<GameOver>) {
     let Some(event) = death_event.read().next() else {
         return;
     };
@@ -81,14 +81,14 @@ fn spawn_game_over_screen(mut commands: Commands, mut death_event: EventReader<P
             builder.spawn(
                 TextBundle::from_sections([
                     TextSection::new(
-                        "You Died\n",
+                        format!("{}\n", event.result.clone()),
                         TextStyle {
                             font_size: 60.0,
                             ..default()
                         },
                     ),
                     TextSection::new(
-                        event.0.clone(),
+                        event.tagline.clone(),
                         TextStyle {
                             font_size: 40.0,
                             ..default()

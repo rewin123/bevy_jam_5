@@ -4,7 +4,7 @@ use bevy_quill::Cx;
 use crate::screen::Screen;
 
 use super::{
-    daycycle::{GameTime, PlayerDied, PlayerState, TimeSpeed},
+    daycycle::{GameOver, GameTime, PlayerState, TimeSpeed},
     difficult::OXYGEN_REGENRATE_SPEED,
     ui::components::resource_slider::ResourceSlider,
     ui::game_over::ResetGame,
@@ -521,7 +521,7 @@ impl<T: GameResource> GameResInfo<T> {
 fn check_death_conditions<T: GameResource + Clone>(
     resource: ResMut<T>,
     mut time_speed: ResMut<TimeSpeed>,
-    mut death: EventWriter<PlayerDied>,
+    mut death: EventWriter<GameOver>,
     mut next_state: ResMut<NextState<PlayerState>>,
     screen: Res<State<Screen>>,
 ) {
@@ -549,7 +549,7 @@ fn check_death_conditions<T: GameResource + Clone>(
             .death_reason(is_deficiency)
             .unwrap_or("Capitalism Won".to_string());
 
-        death.send(PlayerDied(death_reason));
+        death.send(GameOver::died(death_reason));
         *time_speed = TimeSpeed::Pause;
         // This state is unnecesarry now
         // But we can still use it for music I guess

@@ -28,7 +28,7 @@ pub(crate) fn plugin(app: &mut App) {
     app.init_state::<PlayerState>();
     app.add_event::<NightStart>();
     app.add_event::<DayStart>();
-    app.add_event::<PlayerDied>();
+    app.add_event::<GameOver>();
 
     app.add_systems(PreUpdate, (time_speed, update_time).chain());
     app.add_systems(PreUpdate, day_events);
@@ -106,7 +106,26 @@ pub enum DeathCause {
 }
 
 #[derive(Event)]
-pub struct PlayerDied(pub String);
+pub struct GameOver {
+    pub result: String,
+    pub tagline: String,
+}
+
+impl GameOver {
+    pub fn died(tagline: String) -> Self {
+        Self {
+            result: "You Died".to_string(),
+            tagline,
+        }
+    }
+
+    pub fn won(tagline: String) -> Self {
+        Self {
+            result: "You Won".to_string(),
+            tagline,
+        }
+    }
+}
 
 #[derive(Event)]
 pub struct NightStart;

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use super::{
-    daycycle::{GameTime, PlayerState},
+    daycycle::{GameOver, GameTime, PlayerState},
     difficult::money_k,
     ui::components::debt::{Plot, PlotPoint},
 };
@@ -63,7 +63,7 @@ impl Default for Debt {
         let second_rate = (1.0f64 + day_rate).powf(1.0 / day_duration) - 1.0;
 
         let real_rate = money_k();
-        println!("Current rate is {}", second_rate);
+        // info!("Current rate is {}", second_rate);
 
         Self {
             amount: 13000.0,
@@ -81,8 +81,15 @@ fn increase_debt(time: Res<GameTime>, mut debt: ResMut<Debt>) {
     }
 }
 
-fn win_on_zero_debt(debt: Res<Debt>, mut player_state: ResMut<NextState<PlayerState>>) {
+fn win_on_zero_debt(
+    debt: Res<Debt>,
+    mut player_state: ResMut<NextState<PlayerState>>,
+    mut game_over: EventWriter<GameOver>,
+) {
     if debt.amount <= 0.0 {
+        game_over.send(GameOver::won(
+            "You Paid your debt. Now you live in space. Alone, but what a cool view".to_string(),
+        ));
         player_state.set(PlayerState::Won);
     }
 }

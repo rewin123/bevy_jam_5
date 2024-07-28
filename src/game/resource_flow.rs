@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use super::{
     components::fire::InFire,
-    daycycle::{DeathCause, GameTime, PlayerDied, TimeSpeed},
+    daycycle::{DeathCause, GameOver, GameTime, TimeSpeed},
     difficult::{BREATH_RATE, FIRE_RATE, HUNGRY_RATE, THIRST_RATE, TOILET_K},
     resources::{
         CarbonDioxide, Food, FoodGeneration, GameResource, Generate, Hungry, Oxygen,
@@ -52,31 +52,6 @@ fn update_oxygen_and_co2(
     oxygen.send(Generate::new(-BREATH_RATE));
     co2.send(Generate::new(BREATH_RATE));
 }
-
-// fn bad_air_death(
-//     oxygen: Res<Oxygen>,
-//     co2: Res<CarbonDioxide>,
-//     mut death: EventWriter<PlayerDied>,
-//     time_speed: Res<TimeSpeed>,
-// ) {
-//     if *time_speed != TimeSpeed::Pause
-//         && (oxygen.amount() <= 0.0 || co2.amount() >= co2.limit().unwrap_or_default())
-//     {
-//         death.send(PlayerDied(DeathCause::Suffocated));
-//         info!("No more air, o2: {}, co2 {}", oxygen.amount(), co2.amount());
-//     }
-// }
-//
-// fn too_many_oxigen_death(
-//     oxygen: Res<Oxygen>,
-//     mut death: EventWriter<PlayerDied>,
-//     time_speed: Res<TimeSpeed>,
-// ) {
-//     if *time_speed != TimeSpeed::Pause && oxygen.amount() >= oxygen.limit().unwrap_or_default() {
-//         death.send(PlayerDied(DeathCause::TooManyOxigen));
-//     }
-// }
-//
 
 fn calculate_new_amount(
     amount: f32,
