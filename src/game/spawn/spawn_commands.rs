@@ -28,7 +28,7 @@ impl Command for SpawnOxygenGenerator {
         let bundle = SceneBundle {
             scene,
             transform: Transform::from_translation(self.pos).with_scale(Vec3::splat(0.5))
-                .with_rotation(Quat::from_axis_angle(Vec3::Y, PI)),
+                .with_rotation(Quat::from_axis_angle(Vec3::Y, 0.0 / 2.0)),
             ..default()
         };
 
@@ -46,9 +46,9 @@ impl Command for SpawnKitchen {
 
         let bundle = SceneBundle {
             scene,
-            transform: Transform::from_translation(self.pos - Vec3::Y * 0.25)
+            transform: Transform::from_translation(self.pos)
                 .with_scale(Vec3::splat(0.15))
-                .with_rotation(Quat::from_rotation_y(-PI / 2.0)),
+                .with_rotation(Quat::from_rotation_y(0.0 / 2.0)),
             ..default()
         };
 
@@ -183,7 +183,7 @@ impl Command for SpawnWaterDispenser {
             scene,
             transform: Transform::from_translation(self.pos)
                 .with_rotation(self.rot.unwrap_or_default())
-                .with_scale(Vec3::splat(0.35)),
+                .with_scale(Vec3::splat(0.25)),
             ..default()
         };
 

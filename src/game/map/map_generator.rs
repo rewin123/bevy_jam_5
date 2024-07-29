@@ -15,7 +15,7 @@ fn spawn_map(_: Trigger<SpawnLevel>,
 
     commands.spawn(SceneBundle {
         scene: asset_server.load(ship_scene),
-        transform: Transform::from_translation(Vec3::new(3.5, 0.0, 3.5)),
+        transform: Transform::from_translation(Vec3::new(3.5, -0.2, 3.5)),
         ..default()
     });
 

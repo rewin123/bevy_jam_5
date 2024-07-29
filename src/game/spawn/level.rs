@@ -100,7 +100,7 @@ fn spawn_level(
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::Pc].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(4.0, 0.9, 5.0))
+            transform: Transform::from_translation(Vec3::new(1.0, 0.5, 6.5))
                 .with_scale(Vec3::splat(0.5)),
             ..default()
         })
@@ -111,7 +111,7 @@ fn spawn_level(
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::OxygenTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 1.0))
+            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 2.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
         })
@@ -121,7 +121,7 @@ fn spawn_level(
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::WaterTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 2.0))
+            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 1.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
         })
@@ -131,7 +131,7 @@ fn spawn_level(
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::PeeWaterTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 3.0))
+            transform: Transform::from_translation(Vec3::new(2.0, 0.1, 1.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
         })
@@ -141,7 +141,7 @@ fn spawn_level(
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::BadWaterTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 4.0))
+            transform: Transform::from_translation(Vec3::new(3.0, 0.1, 1.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
         })
@@ -151,22 +151,22 @@ fn spawn_level(
     commands
         .spawn(SceneBundle {
             scene: scene_handler[&SceneKey::HydrogenTank].clone_weak(),
-            transform: Transform::from_translation(Vec3::new(1.0, 0.1, 5.0))
+            transform: Transform::from_translation(Vec3::new(4.0, 0.1, 1.0))
                 .with_scale(Vec3::splat(1.0)),
             ..default()
         })
         .insert(Selectable);
 
     commands.add(SpawnOxygenGenerator {
-        pos: Vec3::new(3.0, 0.1, 7.0),
+        pos: Vec3::new(8.0, 0.0, 6.0),
     });
 
     commands.add(SpawnKitchen {
-        pos: Vec3::new(4.5, 1.0, 1.1),
+        pos: Vec3::new(1.0, 0.0, 4.5),
     });
 
     commands.add(SpawnHydroponic {
-        pos: Vec3::new(1.0, 0.1, 7.0),
+        pos: Vec3::new(1.0, 0.1, 8.0),
     });
 
     /*we don't want to have metal trash pile from beginning
@@ -176,18 +176,18 @@ fn spawn_level(
      */
 
     commands.add(SpawnToilet {
-        pos: Vec3::new(8.0, 0.1, 7.5),
+        pos: Vec3::new(8.0, 0.0, 7.5),
         rot: Some(Quat::from_rotation_y((90.0_f32).to_radians())),
     });
 
     commands.add(SpawnWaterDispenser {
-        pos: Vec3::new(8.0, 0.1, 6.0),
-        rot: Some(Quat::from_rotation_y((-90.0_f32).to_radians())),
+        pos: Vec3::new(1.0, 0.0, 3.0),
+        rot: Some(Quat::from_rotation_y((90.0_f32).to_radians())),
     });
 
     commands.add(SpawnWaterCleaner {
-        pos: Vec3::new(8.0, 0.1, 3.0),
-        rot: Some(Quat::from_rotation_y((-90.0_f32).to_radians())),
+        pos: Vec3::new(5.5, 0.0, 1.0),
+        rot: Some(Quat::from_rotation_y((0.0_f32).to_radians())),
     });
 
     commands.add(SpawnEarth);
