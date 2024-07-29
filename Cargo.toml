@@ -12,18 +12,17 @@ log = { version = "0.4", features = [
     "release_max_level_warn",
 ] }
 rand = "0.8"
-node_tree = {path = "node_tree"}
-bevy_quill = { version = "0.1.2"}
-bevy_quill_obsidian = { version = "0.1.0"}
+node_tree = { path = "node_tree" }
+bevy_quill = { version = "0.1.2" }
+bevy_quill_obsidian = { version = "0.1.0" }
 # Required for quill_obsidian
 bevy_mod_stylebuilder = { version = "0.1.1" }
 bevy_mod_picking = "0.20.1"
-bevy_mod_outline = {path = "crates/bevy_mod_outline"}
+bevy_mod_outline = { path = "crates/bevy_mod_outline" }
 rand_distr = "0.4.3"
 bevy_mod_billboard = "0.7.0"
 bevy_gltf_components = "0.6.0"
 bevy_registry_export = "0.4.0"
-bevy-inspector-egui = "0.25.1"
 bevy_egui = "0.28.0"
 
 
@@ -97,5 +96,3 @@ inherits = "release"
 opt-level = 3
 # Keep debug information in the binary.
 strip = "none"
-
-

@@ -234,7 +234,10 @@ impl FromWorld for HandleMap<SceneKey> {
                 SceneKey::MetalTrash,
                 asset_server.load("models/metal_trash.glb#Scene0"),
             ),
-            (SceneKey::Player, asset_server.load("models/guy.glb#Scene0")),
+            (
+                SceneKey::Player,
+                asset_server.load("models/guy-tex.glb#Scene0"),
+            ),
             (
                 SceneKey::Earth,
                 asset_server.load("models/earth.glb#Scene0"),

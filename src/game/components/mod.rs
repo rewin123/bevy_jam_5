@@ -1,5 +1,3 @@
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
-
 pub mod earth;
 pub mod fire;
 pub mod flowup_text;
@@ -28,6 +26,4 @@ pub(crate) fn plugin(app: &mut bevy::prelude::App) {
     ));
 
     app.add_plugins((hydroponic::plugin,));
-
-    app.add_plugins(WorldInspectorPlugin::new());
 }
