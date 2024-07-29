@@ -99,7 +99,6 @@ impl CharacterAction for WaterCleanerWorkAction {
                     volume: Volume::new(3.0),
                     ..Default::default()
                 },
-                ..default()
             });
     }
 
@@ -113,8 +112,8 @@ fn updated_water_cleaner(
     time: Res<GameTime>,
     mut q_toilet_work: Query<(Entity, &mut WaterCleanerWork, &mut CharacterStates)>,
     water_cleaner_config: Res<WaterCleanerConfig>,
-    mut water: ResMut<Water>,
-    mut bad_water: ResMut<BadWater>,
+    water: ResMut<Water>,
+    bad_water: ResMut<BadWater>,
 
     mut water_events: EventWriter<Generate<Water>>,
     mut bad_water_events: EventWriter<Generate<BadWater>>,

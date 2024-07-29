@@ -55,7 +55,6 @@ impl CharacterAction for KitchenWorkAction {
                     volume: Volume::new(3.0),
                     ..Default::default()
                 },
-                ..default()
             });
     }
 
@@ -113,26 +112,24 @@ pub fn update_work_in_kitchen(
                             ..default()
                         });
                 }
-            } else {
-                if let Ok(pc_transform) = q_kitchen.get_single() {
-                    let text_style = TextStyle {
-                        color: Color::linear_rgb(0.0, 1.0, 0.0),
-                        font_size: 94.0,
+            } else if let Ok(pc_transform) = q_kitchen.get_single() {
+                let text_style = TextStyle {
+                    color: Color::linear_rgb(0.0, 1.0, 0.0),
+                    font_size: 94.0,
+                    ..default()
+                };
+                commands
+                    .spawn(BillboardTextBundle {
+                        transform: Transform::from_translation(pc_transform.translation())
+                            .with_scale(Vec3::splat(0.01)),
+                        text: Text::from_section("Not Enough Food", text_style),
                         ..default()
-                    };
-                    commands
-                        .spawn(BillboardTextBundle {
-                            transform: Transform::from_translation(pc_transform.translation())
-                                .with_scale(Vec3::splat(0.01)),
-                            text: Text::from_section("Not Enough Food", text_style),
-                            ..default()
-                        })
-                        .insert(FlowUpText { lifetime: 1.0 })
-                        .insert(AudioBundle {
-                            source: sounds[&SfxKey::NotEnoughResource].clone_weak(),
-                            ..default()
-                        });
-                }
+                    })
+                    .insert(FlowUpText { lifetime: 1.0 })
+                    .insert(AudioBundle {
+                        source: sounds[&SfxKey::NotEnoughResource].clone_weak(),
+                        ..default()
+                    });
             }
         }
     }

@@ -95,8 +95,8 @@ pub fn money_k() -> f32 {
     k
 }
 
-pub fn second_money_k() -> f32 {
-    let k = (1.0_f32 + EARNING_IN_LOOP / 5000.0).powf(1.0 / EVENT_DURATION) - 1.0;
-    println!("Money per second coef is {}", k);
-    k
-}
+// pub fn second_money_k() -> f32 {
+//     let k = (1.0_f32 + EARNING_IN_LOOP / 5000.0).powf(1.0 / EVENT_DURATION) - 1.0;
+//     println!("Money per second coef is {}", k);
+//     k
+// }

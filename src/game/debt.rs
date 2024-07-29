@@ -60,7 +60,7 @@ impl Default for Debt {
         let day_rate = 0.2;
         let day_duration = 30.0;
 
-        let second_rate = (1.0f64 + day_rate).powf(1.0 / day_duration) - 1.0;
+        let _second_rate = (1.0f64 + day_rate).powf(1.0 / day_duration) - 1.0;
 
         let real_rate = money_k();
         // info!("Current rate is {}", second_rate);
@@ -68,7 +68,7 @@ impl Default for Debt {
         Self {
             amount: 13000.0,
             day_rate: day_rate as f32,
-            second_rate: real_rate as f32,
+            second_rate: real_rate,
             last_updated: 0,
         }
     }

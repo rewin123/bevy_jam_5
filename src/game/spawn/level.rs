@@ -16,7 +16,7 @@ use crate::{
 use super::{
     player::{Player, SpawnPlayer},
     spawn_commands::{
-        SpawnEarth, SpawnHydroponic, SpawnKitchen, SpawnMetalTrashPile, SpawnOxygenGenerator,
+        SpawnEarth, SpawnHydroponic, SpawnKitchen, SpawnOxygenGenerator,
         SpawnToilet, SpawnWaterCleaner, SpawnWaterDispenser,
     },
 };

@@ -106,7 +106,6 @@ impl CharacterAction for OxygenRecyclerAction {
                     volume: Volume::new(2.0),
                     ..Default::default()
                 },
-                ..default()
             });
     }
 

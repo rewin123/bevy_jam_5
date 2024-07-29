@@ -99,7 +99,6 @@ impl CharacterAction for ToiletWorkAction {
                     volume: Volume::new(3.0),
                     ..Default::default()
                 },
-                ..default()
             });
     }
 

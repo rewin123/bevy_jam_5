@@ -395,7 +395,7 @@ unsafe fn bar<T: GameResource>(cell: &UnsafeWorldCell, bar: ResourceBar) -> Node
         bar.color.darker(0.1)
     };
 
-    let dp = if rate > 0.0 { 0.0 } else { 0.0 };
+    let dp = 0.0;
 
     bar_tree = bar_tree.with_child(NodeBundle {
         style: Style {

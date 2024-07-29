@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use bevy::{
     audio::{PlaybackMode, Volume},
     prelude::*,
@@ -109,7 +111,6 @@ impl CharacterAction for WaterDispenserWorkAction {
                     volume: Volume::new(3.0),
                     ..Default::default()
                 },
-                ..default()
             });
     }
 
@@ -123,8 +124,8 @@ fn updated_water_drinking(
     time: Res<GameTime>,
     mut q_toilet_work: Query<(Entity, &mut WaterDispenserWork, &mut CharacterStates)>,
     water_dispenser_config: Res<WaterDispenserConfig>,
-    mut water: ResMut<Water>,
-    mut pee: ResMut<Pee>,
+    water: ResMut<Water>,
+    pee: ResMut<Pee>,
     mut thirst: ResMut<Thirst>,
 
     mut pee_events: EventWriter<Generate<Pee>>,
@@ -168,7 +169,7 @@ fn updated_water_drinking(
                     .spawn(BillboardTextBundle {
                         transform: Transform::from_translation(pc_transform.translation())
                             .with_scale(Vec3::splat(0.01)),
-                        text: Text::from_section(format!("- THIRST"), text_style),
+                        text: Text::from_section("- THIRST".to_string(), text_style),
                         ..default()
                     })
                     .insert(FlowUpText { lifetime: 1.0 })

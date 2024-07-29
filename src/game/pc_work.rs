@@ -49,7 +49,6 @@ impl CharacterAction for PcWorkAction {
                     volume: Volume::new(4.0),
                     ..Default::default()
                 },
-                ..default()
             });
     }
 

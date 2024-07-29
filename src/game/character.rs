@@ -350,5 +350,5 @@ fn resource_to_state<T: GameResource + Any>(
     if any_res.downcast_ref::<Thirst>().is_some() && !is_deficiency {
         return CharState::WantDrink;
     }
-    return CharState::Idle;
+    CharState::Idle
 }

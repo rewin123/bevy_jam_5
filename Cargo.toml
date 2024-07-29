@@ -29,7 +29,6 @@ bevy_egui = "0.28.0"
 [features]
 default = [
     # Default to a native dev build.
-    "dev_native",
 ]
 amd_card = []
 dev = [
