@@ -6,16 +6,6 @@ Mortgage is really skyrocketing nowadays in Canada, so we found you this amazing
 
 In this amazing game by ________, you will have to pay your mortgage installs, while you manage your resources to reduce costs. Just beware that every now and then, stuff breaks and blowup. The cycle of life we can say
 
-## Docs
-
-Design doc - https://docs.google.com/document/d/1Fmn5A9aLNOFJ0A6bqsuo7XWaz2jTZ0GFZmN9Elpx3E4/edit?usp=sharing
-
-Miro design board - https://miro.com/welcomeonboard/aE5wcUFEUGJybGdJT1NHcXBybzBKanpWMDhXaEtNUWJlSWNDcmhvSVEzeFFEam5la3ZmZFlPWGc4OVFSS1k2UHwzNDU4NzY0NTk0ODE4NTA1NTkxfDI=?share_link_id=472846460666
-
-Task planning - https://github.com/users/rewin123/projects/6/views/1
-
-Global team info (time zones etc) - https://docs.google.com/spreadsheets/d/1XoyHA536f8EukFLZK38vWAHRh7u84ypvU8089tvwB3E/edit?usp=sharing
-
 
 
 _Brought to you by the Bevy Jam working group._
