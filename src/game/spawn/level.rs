@@ -181,12 +181,12 @@ fn spawn_level(
     });
 
     commands.add(SpawnWaterDispenser {
-        pos: Vec3::new(1.0, 0.0, 3.0),
-        rot: Some(Quat::from_rotation_y((90.0_f32).to_radians())),
+        pos: Vec3::new(5.0, 0.0, 1.0),
+        rot: Some(Quat::from_rotation_y((0.0_f32).to_radians())),
     });
 
     commands.add(SpawnWaterCleaner {
-        pos: Vec3::new(5.5, 0.0, 1.0),
+        pos: Vec3::new(7.0, 0.0, 1.0),
         rot: Some(Quat::from_rotation_y((0.0_f32).to_radians())),
     });
 
@@ -195,7 +195,7 @@ fn spawn_level(
 
 fn setup_camera(_: Trigger<SpawnLevel>, mut q_cameras: Query<&mut Transform, With<Camera>>) {
     for mut transform in &mut q_cameras {
-        transform.translation = Vec3::new(10.0, 10.0, 10.0);
+        transform.translation = Vec3::new(13.0, 7.0, 13.0);
         transform.look_at(Vec3::new(5.0, 0.0, 5.0), Vec3::Y);
     }
 }

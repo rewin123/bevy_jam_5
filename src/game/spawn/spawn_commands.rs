@@ -109,7 +109,7 @@ impl Command for SpawnEarth {
     fn apply(self, world: &mut World) {
         let dir = Vec3::new(-0.0, -1.0, -0.0).normalize();
         let earth_r = 6371000.0; // 6 371 km
-        let space_height = 2000000.0; // 1000 km
+        let space_height = 1000000.0; // 1000 km
         let distance = earth_r + space_height;
         let pos = dir * distance;
 
