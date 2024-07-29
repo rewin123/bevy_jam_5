@@ -162,16 +162,18 @@ fn spawn_level(
     });
 
     commands.add(SpawnKitchen {
-        pos: Vec3::new(4.5, 0.5, 1.1),
+        pos: Vec3::new(4.5, 1.0, 1.1),
     });
 
     commands.add(SpawnHydroponic {
         pos: Vec3::new(1.0, 0.1, 7.0),
     });
 
-    commands.add(SpawnMetalTrashPile {
+    /*we don't want to have metal trash pile from beginning
+        commands.add(SpawnMetalTrashPile {
         pos: Vec3::new(6.0, 0.1, 6.0),
     });
+     */
 
     commands.add(SpawnToilet {
         pos: Vec3::new(8.0, 0.1, 7.5),
