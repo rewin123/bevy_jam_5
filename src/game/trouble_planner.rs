@@ -78,7 +78,7 @@ fn fix_trouble(
         let player_position = transform.translation;
         let target_position = target.target_pos;
 
-        let distance = player_position.distance(target_position);
+        let distance = Vec3::new(player_position.x, 0.0, player_position.z).distance(Vec3::new(target_position.x, 0.0, target_position.z));
 
         if distance <= target.accept_radius {
             for (items_in_fire, fire) in q_items_in_fire.iter() {

@@ -208,7 +208,7 @@ impl FromWorld for HandleMap<SceneKey> {
             (SceneKey::Pc, asset_server.load("models/pc.glb#Scene0")),
             (
                 SceneKey::Kitchen,
-                asset_server.load("models/kitchen.glb#Scene0"),
+                asset_server.load("models/hob-tex.glb#Scene0"),
             ),
             (
                 SceneKey::WaterTank,
@@ -248,7 +248,7 @@ impl FromWorld for HandleMap<SceneKey> {
             ),
             (
                 SceneKey::OxygenGenerator,
-                asset_server.load("models/oxygen_generator.glb#Scene0"),
+                asset_server.load("models/vent-tex2.glb#Scene0"),
             ),
             (
                 SceneKey::Toilet,
