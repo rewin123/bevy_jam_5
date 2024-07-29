@@ -122,7 +122,8 @@ fn move_player_to_target(
 
         let cos_result = Quat::from_scaled_axis(player_position - target_position);
         let direction = (target_position - player_position).normalize();
-        let distance = player_position.distance(target_position);
+        let direction = Vec3::new(direction.x, 0.0, direction.z);
+        let distance = Vec3::new(player_position.x, 0.0, player_position.z).distance(Vec3::new(target_position.x, 0.0, target_position.z));
 
         if distance > target.accept_radius {
             transform.translation += direction * time.delta_seconds() * PLAYER_SPEED;

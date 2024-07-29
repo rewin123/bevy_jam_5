@@ -108,6 +108,7 @@ fn spawn_camera(mut commands: Commands) {
         Camera3dBundle {
             camera: Camera {
                 clear_color: ClearColorConfig::Custom(Color::BLACK),
+                hdr: true,
                 ..default()
             },
             ..default()
