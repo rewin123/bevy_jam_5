@@ -17,8 +17,8 @@ use bevy::render::{
     settings::Backends, settings::RenderCreation, settings::WgpuSettings, RenderPlugin,
 };
 use bevy_mod_picking::DefaultPickingPlugins;
-use bevy_quill::QuillPlugin;
-use bevy_quill_obsidian::ObsidianUiPlugin;
+// use bevy_quill::QuillPlugin;
+// use bevy_quill_obsidian::ObsidianUiPlugin;
 use game::render::cartoon_style::CartoonSettings;
 
 pub struct AppPlugin;
@@ -77,7 +77,8 @@ impl Plugin for AppPlugin {
         #[cfg(not(feature = "amd_card"))]
         app.add_plugins(default_plugin);
 
-        app.add_plugins((DefaultPickingPlugins, QuillPlugin, ObsidianUiPlugin));
+        // app.add_plugins((DefaultPickingPlugins, QuillPlugin, ObsidianUiPlugin));
+        app.add_plugins((DefaultPickingPlugins,));
 
         // Add other plugins.
         app.add_plugins((game::plugin, screen::plugin, ui::plugin));

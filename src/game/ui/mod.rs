@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy_egui::EguiPlugin;
-use bevy_quill::View;
+// use bevy_quill::View;
 
 use super::components::pc::Pc;
 use super::selectable::CloseContextMenu;
@@ -22,7 +21,6 @@ pub(super) fn plugin(app: &mut App) {
     app.observe(set_context_menu_position);
     app.observe(clear_context_menu_position);
 
-    app.add_plugins(EguiPlugin);
     app.add_plugins(components::resource_panel::plugin);
     app.add_plugins(components::debt::plugin);
     app.add_plugins(game_over::plugin);
@@ -52,7 +50,7 @@ fn spawn_root_ui(
         return;
     };
 
-    commands.spawn(root::RootUi { camera: entity }.to_root());
+    // commands.spawn(root::RootUi { camera: entity }.to_root());
 }
 
 fn clear_context_menu_position(

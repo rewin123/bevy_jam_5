@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use bevy::{ecs::world::Command, prelude::*};
+use bevy::{ecs::world::Command, pbr::{CascadeShadowConfig, CascadeShadowConfigBuilder}, prelude::*};
 
 use crate::game::{
     assets::{HandleMap, SceneKey},
@@ -120,6 +120,10 @@ impl Command for SpawnEarth {
                     illuminance: 2000.0,
                     ..default()
                 },
+                cascade_shadow_config: CascadeShadowConfigBuilder {
+                    maximum_distance: 30.0,
+                    ..default()
+                }.build(),
                 ..default()
             })
             .id();

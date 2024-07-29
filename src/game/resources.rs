@@ -1,17 +1,17 @@
 use bevy::prelude::*;
-use bevy_quill::Cx;
+// use bevy_quill::Cx;
 
 use crate::screen::Screen;
 
 use super::{
     daycycle::{GameOver, GameTime, PlayerState, TimeSpeed},
     difficult::OXYGEN_REGENRATE_SPEED,
-    ui::components::resource_slider::ResourceSlider,
+    // ui::components::resource_slider::ResourceSlider,
     ui::game_over::ResetGame,
 };
 
 pub(crate) fn plugin(app: &mut App) {
-    app.init_resource::<AllResourcesGetter>();
+    // app.init_resource::<AllResourcesGetter>();
     app.init_resource::<OxygenRecycling>();
     app.init_resource::<FoodGeneration>();
     app.init_resource::<Electricity>();
@@ -288,10 +288,10 @@ simple_game_resource!(
 impl_limitless_resource!(MetalTrash);
 impl_limitless_resource!(Metal);
 
-#[derive(Resource, Default)]
-pub struct AllResourcesGetter {
-    pub res_plugin: Vec<Box<dyn Fn(&Cx) -> ResourceSlider + Send + Sync>>,
-}
+// #[derive(Resource, Default)]
+// pub struct AllResourcesGetter {
+//     pub res_plugin: Vec<Box<dyn Fn(&Cx) -> ResourceSlider + Send + Sync>>,
+// }
 
 /// Resource for OxygenRecycling configuration
 #[derive(Resource)]
@@ -432,23 +432,23 @@ impl<T: GameResource + Clone + Default> Plugin for GameResourcePlugin<T> {
         app.add_systems(PostUpdate, check_death_conditions::<T>);
         app.add_systems(PostUpdate, reset_resource::<T>);
 
-        app.world_mut()
-            .resource_mut::<AllResourcesGetter>()
-            .res_plugin
-            .push(Box::new(|cx| {
-                let val = cx.use_resource::<T>();
-                let info = cx.use_resource::<GameResInfo<T>>();
-                let (min_threshold, max_threshold) = val.warning_thresholds();
-                ResourceSlider {
-                    limit: val.limit().unwrap_or(100.0),
-                    amount: val.amount(),
-                    label: format!("{} {:+.0}", val.label(), info.generation_rate),
-                    style: bevy_mod_stylebuilder::StyleHandle::default(),
-                    min_threshold,
-                    max_threshold,
-                    resource_threshold: val.resource_threshold(),
-                }
-            }));
+        // app.world_mut()
+        //     .resource_mut::<AllResourcesGetter>()
+        //     .res_plugin
+        //     .push(Box::new(|cx| {
+        //         let val = cx.use_resource::<T>();
+        //         let info = cx.use_resource::<GameResInfo<T>>();
+        //         let (min_threshold, max_threshold) = val.warning_thresholds();
+        //         ResourceSlider {
+        //             limit: val.limit().unwrap_or(100.0),
+        //             amount: val.amount(),
+        //             label: format!("{} {:+.0}", val.label(), info.generation_rate),
+        //             style: bevy_mod_stylebuilder::StyleHandle::default(),
+        //             min_threshold,
+        //             max_threshold,
+        //             resource_threshold: val.resource_threshold(),
+        //         }
+        //     }));
     }
 }
 
