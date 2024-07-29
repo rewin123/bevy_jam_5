@@ -97,42 +97,43 @@ fn spawn_debt_ui(
 
     //Draw debt
 
-    parent = parent.with_child(
-        TextBundle::from_section(
-            format!(
-                "Debt: {:.0} (+{:.0}/s)",
-                debt.amount,
-                debt.amount * debt.second_rate,
-            ),
-            TextStyle {
-                font: asset_server.load(FONT_PATH),
-                font_size: 24.0,
-                color: hex2color("#8c4a4a").lighter(0.4),
-            },
+    parent = parent
+        .with_child(
+            TextBundle::from_section(
+                format!(
+                    "Debt: {:.0} (+{:.0}/s)",
+                    debt.amount,
+                    debt.amount * debt.second_rate,
+                ),
+                TextStyle {
+                    font: asset_server.load(FONT_PATH),
+                    font_size: 24.0,
+                    color: hex2color("#8c4a4a").lighter(0.4),
+                },
+            )
+            .into_node_tree()
+            .with_bottom(Val::Px(0.0))
+            .with_left(Val::Px(plot_shift_left))
+            .with_width(Val::Px(plot_width))
+            .with_height(Val::Px(50.0))
+            .with_position_type(PositionType::Absolute),
         )
-        .into_node_tree()
-        .with_bottom(Val::Px(0.0))
-        .with_left(Val::Px(plot_shift_left))
-        .with_width(Val::Px(plot_width))
-        .with_height(Val::Px(50.0))
-        .with_position_type(PositionType::Absolute),
-    )
-    .with_child(
-        TextBundle::from_section(
-            format!("Debt rate: +{:.2}%/s", money_k() * 100.0),
-            TextStyle { 
-                font: asset_server.load(FONT_PATH),
-                font_size: 18.0,
-                color: hex2color("#8c4a4a").lighter(0.4),
-            })
+        .with_child(
+            TextBundle::from_section(
+                format!("Debt rate: +{:.2}%/s", money_k() * 100.0),
+                TextStyle {
+                    font: asset_server.load(FONT_PATH),
+                    font_size: 18.0,
+                    color: hex2color("#8c4a4a").lighter(0.4),
+                },
+            )
             .into_node_tree()
             .with_bottom(Val::Px(5.0))
             .with_left(Val::Px(plot_shift_left))
             .with_width(Val::Px(plot_width))
             .with_height(Val::Px(15.0))
             .with_position_type(PositionType::Absolute),
-        )
-    ;
+        );
 
     parent = parent.with_child(
         inner_plot
