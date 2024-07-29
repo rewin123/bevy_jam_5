@@ -88,6 +88,8 @@ pub const DPAY: f32 = 10.0;
 pub const N_PAYS: f32 = WORKS_IN_LOOP / 0.25; //0.5 is working action duration
 pub const EARNING_IN_LOOP: f32 = (2.0 * START_PAY + DPAY * (N_PAYS - 1.0)) / 2.0 * N_PAYS;
 
+pub const SECOND_INCREASE_LEVEL: f32 = 5000.0;
+
 // I can not use powf in const expressiong. So here is function
 pub fn money_k() -> f32 {
     let k = (1.0_f32 + EARNING_IN_LOOP / START_MONEY).powf(1.0 / EVENT_LOOP_DURATION) - 1.0;
@@ -95,8 +97,8 @@ pub fn money_k() -> f32 {
     k
 }
 
-// pub fn second_money_k() -> f32 {
-//     let k = (1.0_f32 + EARNING_IN_LOOP / 5000.0).powf(1.0 / EVENT_DURATION) - 1.0;
-//     println!("Money per second coef is {}", k);
-//     k
-// }
+pub fn second_money_k() -> f32 {
+    let k = (1.0_f32 + EARNING_IN_LOOP / SECOND_INCREASE_LEVEL).powf(1.0 / EVENT_LOOP_DURATION) - 1.0;
+    println!("Money per second coef is {}", k);
+    k
+}

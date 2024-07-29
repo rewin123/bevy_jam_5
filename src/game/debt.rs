@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use super::{
     daycycle::{GameOver, GameTime, PlayerState},
-    difficult::money_k,
+    difficult::{money_k, second_money_k, SECOND_INCREASE_LEVEL},
     ui::components::debt::{Plot, PlotPoint},
 };
 
@@ -26,11 +26,11 @@ pub(crate) fn plugin(app: &mut App) {
 #[derive(Resource)]
 pub struct Debt {
     pub amount: f32,
-    #[allow(dead_code)]
-    pub day_rate: f32,
     pub second_rate: f32,
 
     pub last_updated: i32,
+
+    pub second_increased: bool,
 }
 
 #[derive(Resource)]
@@ -43,38 +43,37 @@ impl Debt {
         self.amount += self.second_rate * self.amount;
     }
     pub fn reset(&mut self) {
-        let day_rate = 0.2;
-        let day_duration = 30.0;
 
-        let second_rate = (1.0f64 + day_rate).powf(1.0 / day_duration) - 1.0;
+        let second_rate = money_k();
 
-        self.amount = 13000.0;
-        self.day_rate = day_rate as f32;
+        self.amount = 12500.0;
         self.second_rate = second_rate as f32;
         self.last_updated = 0;
+        self.second_increased = false;
     }
 }
 
 impl Default for Debt {
     fn default() -> Self {
-        let day_rate = 0.2;
-        let day_duration = 30.0;
-
-        let _second_rate = (1.0f64 + day_rate).powf(1.0 / day_duration) - 1.0;
 
         let real_rate = money_k();
-        // info!("Current rate is {}", second_rate);
 
         Self {
-            amount: 13000.0,
-            day_rate: day_rate as f32,
+            amount: 12500.0,
             second_rate: real_rate,
             last_updated: 0,
+            second_increased: false,
         }
     }
 }
 
 fn increase_debt(time: Res<GameTime>, mut debt: ResMut<Debt>) {
+
+    if debt.amount < (SECOND_INCREASE_LEVEL - 1000.0) && !debt.second_increased {
+        debt.second_increased = true;
+        debt.second_rate = second_money_k();
+    }
+
     if time.elapsed_seconds() - debt.last_updated as f32 > 1.0 {
         debt.increase();
         debt.last_updated = time.elapsed_seconds() as i32;
