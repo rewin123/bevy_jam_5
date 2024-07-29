@@ -7,6 +7,7 @@ use bevy::{
     prelude::*,
     transform::commands,
 };
+use node_tree::{styling::Styling, tree::NodeTree, InsertNodumEntity};
 
 use super::{
     ui::game_over::ResetGame,
@@ -37,9 +38,15 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, night_light);
     app.add_systems(PostUpdate, reset_time);
 
+    app.add_systems(Startup, |mut cmds: Commands| {
+        cmds.spawn(TimeSpeedMarker);
+    });
+
     #[cfg(feature = "dev")]
     app.add_plugins(dev::plugin);
 }
+
+
 
 #[derive(Component)]
 pub struct NightLight;
@@ -160,13 +167,50 @@ fn day_events(
     }
 }
 
-fn time_speed(mut time: ResMut<GameTime>, time_speed: ResMut<TimeSpeed>) {
+#[derive(Component)]
+pub struct TimeSpeedMarker;
+
+fn time_speed(
+        mut commands: Commands,
+        mut time: ResMut<GameTime>, 
+        time_speed: ResMut<TimeSpeed>,
+        q_show: Query<Entity, With<TimeSpeedMarker>>
+) {
+    let mut tree = NodeTree::default();
     match *time_speed {
         TimeSpeed::Pause => time.context_mut().set_relative_speed(0.0),
-        TimeSpeed::Normal => time.context_mut().set_relative_speed(1.0),
+        TimeSpeed::Normal => {
+            time.context_mut().set_relative_speed(1.0);
+
+            if time.elapsed_seconds() < 15.0 {
+                let secs = time.elapsed_seconds();
+                time.context_mut().set_relative_speed((secs + 45.0) / 60.0);
+                info!("speed {}", time.context().relative_speed);
+
+                tree = tree.with_bundle(TextBundle::from_section(format!("Time speed: {:.0}%", 100.0 * time.context().relative_speed), 
+                TextStyle::default()
+            ))
+                    .with_width(Val::Percent(100.0))
+                    .with_height(Val::Px(30.0))
+                    .with_top(Val::Px(0.0))
+                    .with_left(Val::Percent(45.0))
+                    .with_position_type(PositionType::Absolute)
+                    .with_align_self(AlignSelf::Center);
+
+
+            }
+        },
         TimeSpeed::Fast => time.context_mut().set_relative_speed(2.0),
         TimeSpeed::Fast2 => time.context_mut().set_relative_speed(3.0),
         TimeSpeed::Fast3 => time.context_mut().set_relative_speed(4.0),
+    }
+
+
+    if let Ok(entity) = q_show.get_single() {
+        commands.add(InsertNodumEntity {
+            entity,
+            nodum: tree,
+        });
     }
 }
 
