@@ -195,6 +195,7 @@ pub enum SceneKey {
     Toilet,
     WaterDispenser,
     WaterCleaner,
+    Ship
 }
 
 impl AssetKey for SceneKey {
@@ -205,6 +206,7 @@ impl FromWorld for HandleMap<SceneKey> {
     fn from_world(world: &mut World) -> Self {
         let asset_server = world.resource::<AssetServer>();
         [
+            (SceneKey::Ship, asset_server.load("models/my_ship.glb#Scene0")),
             (SceneKey::Pc, asset_server.load("models/pc.glb#Scene0")),
             (
                 SceneKey::Kitchen,

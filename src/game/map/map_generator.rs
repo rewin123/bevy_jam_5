@@ -1,4 +1,4 @@
-use crate::game::spawn::level::SpawnLevel;
+use crate::game::{assets::{HandleMap, SceneKey}, spawn::level::SpawnLevel};
 use bevy::prelude::*;
 
 use super::*;
@@ -9,12 +9,13 @@ pub(crate) fn plugin(app: &mut App) {
 
 fn spawn_map(_: Trigger<SpawnLevel>,
      mut commands: Commands,
-     asset_server: Res<AssetServer>
+     asset_server: Res<AssetServer>,
+     scene_map: Res<HandleMap<SceneKey>>,
 ) {
     let ship_scene = "models/my_ship.glb#Scene0";
 
     commands.spawn(SceneBundle {
-        scene: asset_server.load(ship_scene),
+        scene: scene_map.get(&SceneKey::Ship).unwrap().clone_weak(),
         transform: Transform::from_translation(Vec3::new(3.5, -0.2, 3.5)),
         ..default()
     });
