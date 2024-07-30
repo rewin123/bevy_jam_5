@@ -91,7 +91,7 @@ fn manage_billboard(
                 let target = commands.spawn(BillboardTextBundle {
                     text: data.clone(),
                     transform: Transform::from_scale(
-                        Vec3::new(billboard.size.x, billboard.size.y, 1.0) / 48.0,
+                        Vec3::new(billboard.size.x, billboard.size.y, 1.0) / 48.0 * 0.7,
                     ),
 
                     ..default()

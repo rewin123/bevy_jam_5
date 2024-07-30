@@ -12,10 +12,10 @@ use super::daycycle::GameTime;
 pub(super) fn plugin(app: &mut App) {
     // Record directional input as movement controls.
     app.register_type::<MovementController>();
-    app.add_systems(
-        Update,
-        record_movement_controller.in_set(AppSet::RecordInput),
-    );
+    // app.add_systems(
+    //     Update,
+    //     record_movement_controller.in_set(AppSet::RecordInput),
+    // );
 
     // Apply movement based on controls.
     app.register_type::<(Movement, WrapWithinWindow)>();
